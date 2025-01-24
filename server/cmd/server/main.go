@@ -1,10 +1,12 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 
 	"github.com/aedifex/FortiFi/config"
+	"github.com/aedifex/FortiFi/internal/database"
 	"github.com/aedifex/FortiFi/internal/handler"
 )
 
@@ -12,20 +14,33 @@ func main() {
 
 	config := config.SetConfig()
 
-	server := newServer(config)
+	server := NewServer(config)
 
-	err := server.ListenAndServe()
+	err := server.HttpServer.ListenAndServe()
 	if err != nil {
-		log.Fatalf("Failed to start server on %s\n", config.Port)
+		log.Fatalf("Failed to start server on port: %s\n", config.Port)
 	}
 
 }
 
-func newServer(config *config.Config) *http.Server{
+// ------------- Server Struct Logic ------------
+
+type FortifiServer struct {
+	HttpServer *http.Server
+	DBConn *sql.DB
+}
+
+func NewServer(config *config.Config) *FortifiServer {
 
 	http.HandleFunc("/NotifyIntrusion", handler.NotifyIntrusionHandler)
 
-	return &http.Server{
+	httpServer := &http.Server{
 		Addr: config.Port,
 	}
+
+	return &FortifiServer{
+		HttpServer: httpServer,
+		DBConn: database.ConnectDatabase(config),
+	}
+  
 }
