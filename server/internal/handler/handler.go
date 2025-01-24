@@ -1,14 +1,14 @@
 package handler
 
 import (
-	"log"
+	"log/slog"
 	"net/http"
 )
 
 func NotifyIntrusionHandler(writer http.ResponseWriter, request *http.Request){
-	log.Printf("Request from %s", request.RemoteAddr)
+	slog.Info("Incoming Request", "Host IP", request.RemoteAddr)
 	if request.Method != "POST" {
-		log.Printf("Invalid Method from %s", request.RemoteAddr)
+		slog.Info("Invalid Method Request", "Host IP", request.RemoteAddr)
 		writer.WriteHeader(405)
 		response := "Method Not Allowed"
 		writer.Write([]byte(response))

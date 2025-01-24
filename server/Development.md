@@ -31,5 +31,3 @@
 ├── go.mod
 ├── go.sum
 ├── README.md
-├── Dockerfile                 # <-- Dockerfile here
-└── .dockerignore              # <-- Optional: Ignore files for Docker build

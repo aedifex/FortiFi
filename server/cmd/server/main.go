@@ -13,7 +13,7 @@ func main() {
 	config := config.SetConfig()
 
 	server := newServer(config)
-	
+
 	err := server.ListenAndServe()
 	if err != nil {
 		log.Fatalf("Failed to start server on %s\n", config.Port)
