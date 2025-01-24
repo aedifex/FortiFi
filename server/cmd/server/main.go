@@ -42,4 +42,5 @@ func NewServer(config *config.Config) *FortifiServer {
 		HttpServer: httpServer,
 		DBConn: database.ConnectDatabase(config),
 	}
+  
 }
