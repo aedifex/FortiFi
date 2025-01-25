@@ -15,7 +15,7 @@ func main() {
 	config := config.SetConfig()
 
 	server := NewServer(config)
-	
+  
 	err := server.HttpServer.ListenAndServe()
 	if err != nil {
 		log.Fatalf("Failed to start server on port: %s\n", config.Port)
@@ -42,4 +42,5 @@ func NewServer(config *config.Config) *FortifiServer {
 		HttpServer: httpServer,
 		DBConn: database.ConnectDatabase(config),
 	}
+  
 }
