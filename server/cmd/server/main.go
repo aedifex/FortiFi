@@ -65,6 +65,7 @@ func NewServer(config *config.Config) *FortifiServer {
 	// All routes should be passed through middleware.Logging
 	http.Handle("/NotifyIntrusion", middleware.Logging(zapLogger, routeHandler.NotifyIntrusionHandler))
 	http.Handle("/CreateUser", middleware.Logging(zapLogger, routeHandler.CreateUser))
+	http.Handle("/Login", middleware.Logging(zapLogger, routeHandler.Login))
 	
 	return &FortifiServer{
 		HttpServer: httpServer,
