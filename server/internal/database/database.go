@@ -3,13 +3,17 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"log"
 
 	"github.com/aedifex/FortiFi/config"
 	"github.com/go-sql-driver/mysql"
+	"go.uber.org/zap"
 )
 
-func ConnectDatabase(config *config.Config) *sql.DB {
+type DatabaseConn struct {
+    conn *sql.DB
+}
+
+func ConnectDatabase(log *zap.SugaredLogger, config *config.Config) *DatabaseConn {
 	sqlConfig := mysql.Config{
         User:   config.DB_USER,
         Passwd: config.DB_PASS,
@@ -21,15 +25,30 @@ func ConnectDatabase(config *config.Config) *sql.DB {
     // Get a database handle.
     db, err := sql.Open("mysql", sqlConfig.FormatDSN())
     if err != nil {
-        log.Fatal(err)
+        log.Errorf("Error opening the database: %s", err.Error())
     }
 
-    pingErr := db.Ping()
-    if pingErr != nil {
-        log.Fatal(pingErr)
+    err = db.Ping()
+    if err != nil {
+        log.Errorf("Could not connect to DB: %s", err.Error())
     }
-    fmt.Println("Connected!")
+    log.Info("Database connection successful")
 
-	return db
+	return &DatabaseConn{
+        conn: db,
+    }
+
 }
 
+func (db *DatabaseConn) InsertUser(user *User) error {
+
+    query := "INSERT into USERS VALUES (?,?,?,?,?)"
+
+    preparedStatement, err := db.conn.Prepare(query)
+    if err != nil {
+        return fmt.Errorf("failed to create prepared statement: %s", err)
+    }
+    defer preparedStatement.Close()
+    preparedStatement.Exec(user.Id, user.FirstName, user.LastName, user.Email, user.Password)
+    return nil
+}
