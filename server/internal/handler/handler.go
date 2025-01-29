@@ -106,6 +106,11 @@ func (h *RouteHandler) Login(writer http.ResponseWriter, request *http.Request) 
 }
 
 func (h *RouteHandler) Refresh(writer http.ResponseWriter, request *http.Request) {
+
+	if request.Method != "GET" {
+		http.Error(writer, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
 	token := request.Header.Get("Refresh")
 	jwt, refresh, err := h.Db.ValidateRefresh(h.Config.SIGNING_KEY,token)
 	if err != nil {
