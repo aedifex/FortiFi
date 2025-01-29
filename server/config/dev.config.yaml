@@ -1,17 +1,2 @@
 port: 
   ":3000"
-
-db_user:
-  "root"
-
-db_pass:
-  "ADCM@in2003"
-
-db_url:
-  "127.0.0.1:3306"
-
-db_name:
-  "Fortifi"
-
-signing_key:
-  "b2e138d8553ea7d7ff8731e87e41406277bd4c98"
