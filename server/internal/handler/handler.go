@@ -2,9 +2,13 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
+	"github.com/aedifex/FortiFi/config"
 	"github.com/aedifex/FortiFi/internal/database"
+	"github.com/aedifex/FortiFi/internal/middleware"
+	"github.com/aedifex/FortiFi/pkg/utils"
 	"go.uber.org/zap"
 )
 
@@ -12,6 +16,7 @@ import (
 type RouteHandler struct {
 	Log *zap.SugaredLogger
 	Db 	*database.DatabaseConn
+	Config *config.Config
 }
 
 func (h *RouteHandler) NotifyIntrusionHandler(writer http.ResponseWriter, request *http.Request){
@@ -49,8 +54,9 @@ func (h *RouteHandler) CreateUser(writer http.ResponseWriter, request *http.Requ
 	}
 
 	res := "Account Created"
+	h.Log.Infof("New account created: %s", user.Email)
 	writer.WriteHeader(status)
-	writer.Write([]byte(res))
+	h.writeResponse(writer, res)
 }
 
 func (h *RouteHandler) Login(writer http.ResponseWriter, request *http.Request) {
@@ -67,14 +73,56 @@ func (h *RouteHandler) Login(writer http.ResponseWriter, request *http.Request) 
 		return
 	}
 
-	status, err := h.Db.Login(user) // fix logic so handlers belong to server object
+	foundUser, status, err := h.Db.ValidateLogin(user)
 	if err != nil {
 		h.Log.Warnf("login error: %s", err.Error())
 		http.Error(writer, "Login failed", status)
 		return
 	}
-	h.Log.Infof("Successful login for user %s", user.Email)
-	res := "Login Succcess" // should send some form of auth token eventually
+	h.Log.Infof("Successful login for user %s", foundUser.Email)
+	res := "Login Succcess"
+
+	// generate auth tokens
+	auth, refresh, refreshExp, err := utils.GenJwt(h.Config.SIGNING_KEY, foundUser.Id)
+	if err != nil {
+		h.Log.Warnf("GenJwt Error: %s", err.Error())
+		http.Error(writer, "Login Error", http.StatusInternalServerError)
+		return
+	}
+
+	// store the token
+	storeErr := h.Db.StoreRefresh(refresh, foundUser.Id, refreshExp)
+	if storeErr != nil {
+		h.Log.Errorf("error storing refresh token: %s", storeErr.Error())
+		http.Error(writer, "login error", http.StatusInternalServerError)
+		return
+	}
+
+	// set tokens in headers
+	writer.Header().Add("jwt", auth)
+	writer.Header().Add("refresh", refresh)
 	writer.WriteHeader(status)
-	writer.Write([]byte(res))
+	h.writeResponse(writer,res)
+}
+
+func (h *RouteHandler) Refresh(writer http.ResponseWriter, request *http.Request) {
+	token := request.Header.Get("Refresh")
+	jwt, refresh, err := h.Db.ValidateRefresh(h.Config.SIGNING_KEY,token)
+	if err != nil {
+		h.Log.Warnf("Refresh Token Err: %s", err.Error())
+		writer.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	writer.Header().Add("jwt", jwt)
+	writer.Header().Add("refresh", refresh)
+	writer.WriteHeader(http.StatusOK)
+	res := "Valid Refresh Token"
+	h.writeResponse(writer, res)
+}
+
+func (h *RouteHandler) Protected(writer http.ResponseWriter, request *http.Request) {
+	userId := request.Context().Value(middleware.UserIdContextKey)
+	res := fmt.Sprintf("You have reached this endpoint as user: %s", userId)
+	writer.WriteHeader(http.StatusOK)
+	h.writeResponse(writer,res)
 }

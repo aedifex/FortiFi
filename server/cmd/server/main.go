@@ -59,14 +59,20 @@ func NewServer(config *config.Config) *FortifiServer {
 	routeHandler := &handler.RouteHandler{
 		Log: zapLogger,
 		Db: db,
+		Config: config,
 	}
 	
 	// Register the Routes
-	// All routes should be passed through middleware.Logging
-	http.Handle("/NotifyIntrusion", middleware.Logging(zapLogger, routeHandler.NotifyIntrusionHandler))
-	http.Handle("/CreateUser", middleware.Logging(zapLogger, routeHandler.CreateUser))
-	http.Handle("/Login", middleware.Logging(zapLogger, routeHandler.Login))
-	
+	// All routes should be wrapped by middleware.Logging
+	mux := http.NewServeMux()
+	mux.HandleFunc("/NotifyIntrusion", routeHandler.NotifyIntrusionHandler)
+	mux.HandleFunc("/CreateUser", routeHandler.CreateUser)
+	mux.HandleFunc("/Login", routeHandler.Login)
+	mux.HandleFunc("/Refresh", routeHandler.Refresh)
+	mux.HandleFunc("/Protected", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.Protected))
+	loggingMiddleware := middleware.Logging(zapLogger)
+	httpServer.Handler = loggingMiddleware(mux)
+
 	return &FortifiServer{
 		HttpServer: httpServer,
 		DBConn: db,

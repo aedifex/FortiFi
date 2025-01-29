@@ -9,11 +9,12 @@ import (
 )
 
 type Config struct {
-	Port string
-	DB_USER string
-	DB_PASS string
-	DB_URL string
-	DB_NAME string
+	Port 		string
+	DB_USER 	string
+	DB_PASS 	string
+	DB_URL 		string
+	DB_NAME 	string
+	SIGNING_KEY string
 }
 
 
@@ -36,5 +37,6 @@ func SetConfig() *Config{
 		DB_PASS: viper.GetString("db_pass"),
 		DB_URL: viper.GetString("db_url"),
 		DB_NAME: viper.GetString("db_name"),
+		SIGNING_KEY: viper.GetString("signing_key"),
 	}
 }
