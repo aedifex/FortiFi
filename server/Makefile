@@ -15,9 +15,9 @@ clean-database:
 clean-logs:
 	@echo "Deleting log files"
 	rm server.log* errors.log*
-	
+
 # Run development server config
-local-dev: clean-logs
+local-dev:
 	go mod tidy
 	go run ./cmd/server config=dev
 
