@@ -24,7 +24,7 @@ func (h *RouteHandler) NotifyIntrusionHandler(writer http.ResponseWriter, reques
 		http.Error(writer, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	
+	// TODO Implement this as protected route
 	// Correct flow:
 	// Request body should include information about the intrusion and device uid as it is entered in database 
 	// Server should update database with event info

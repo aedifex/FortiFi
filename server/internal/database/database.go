@@ -14,7 +14,7 @@ import (
 )
 
 type DatabaseConn struct {
-    conn *sql.DB
+    Conn *sql.DB
 }
 
 func ConnectDatabase(log *zap.SugaredLogger, config *config.Config) *DatabaseConn {
@@ -39,7 +39,7 @@ func ConnectDatabase(log *zap.SugaredLogger, config *config.Config) *DatabaseCon
     log.Info("Database connection successful")
 
 	return &DatabaseConn{
-        conn: db,
+        Conn: db,
     }
 
 }
@@ -60,7 +60,7 @@ func (db *DatabaseConn) InsertUser(user *User) (int,error) {
     }
 
     // prepare statement
-    preparedStatement, err := db.conn.Prepare(query)
+    preparedStatement, err := db.Conn.Prepare(query)
     if err != nil {
         return http.StatusInternalServerError, fmt.Errorf("failed to create prepared statement: %s", err)
     }
@@ -81,7 +81,7 @@ func (db *DatabaseConn) ValidateLogin(user *User) (*User, int, error) {
     query := "SELECT * FROM  USERS WHERE email = ?;"
 
     // create prepared statment
-    preparedStatement, err := db.conn.Prepare(query)
+    preparedStatement, err := db.Conn.Prepare(query)
     if err != nil {
         return nil, http.StatusInternalServerError, fmt.Errorf("failed to create prepared statement for login: %s", err)
     }
@@ -120,14 +120,14 @@ func (db *DatabaseConn) ValidateLogin(user *User) (*User, int, error) {
 func (db *DatabaseConn) ValidateRefresh(key string, signedToken string) (string, string, error) {
     // drop expired tokens
     query := "DELETE FROM RefreshTokens WHERE expires < Now();"
-    _, err := db.conn.Exec(query)
+    _, err := db.Conn.Exec(query)
     if err != nil {
         return "","",fmt.Errorf("error deleting expired tokens: %s", err.Error())
     }
 
     // check if signed token is in the database
     signedTokenQuery := "SELECT token,FK_UserId FROM RefreshTokens WHERE token = ?;"
-    preparedStatement, err := db.conn.Prepare(signedTokenQuery)
+    preparedStatement, err := db.Conn.Prepare(signedTokenQuery)
     if err != nil {
         return "","",fmt.Errorf("error preparing refreshtoken query: %s", err)
     }
@@ -164,7 +164,7 @@ func (db *DatabaseConn) StoreRefresh(token string, userId string, exp time.Time)
 
     // Delete existing keys for this user
     dropDup := "DELETE FROM RefreshTokens WHERE FK_UserId = ? LIMIT 1;"
-    dropDupPrep, dropDupPrepErr := db.conn.Prepare(dropDup)
+    dropDupPrep, dropDupPrepErr := db.Conn.Prepare(dropDup)
     if dropDupPrepErr != nil {
         return fmt.Errorf("failed to prepare drop duplicates statement: %s", dropDupPrepErr.Error())
     }
@@ -176,7 +176,7 @@ func (db *DatabaseConn) StoreRefresh(token string, userId string, exp time.Time)
     
     // Insert new token into database
     query := "INSERT INTO RefreshTokens VALUES (?, ?, ?)" // token, id, expires
-    preparedStatement, _ := db.conn.Prepare(query)
+    preparedStatement, _ := db.Conn.Prepare(query)
     defer preparedStatement.Close()
     formattedTime := exp.Format("2006-01-02 15:04:05")
     _, err := preparedStatement.Exec(token, userId, formattedTime)
@@ -189,7 +189,7 @@ func (db *DatabaseConn) StoreRefresh(token string, userId string, exp time.Time)
 func (db *DatabaseConn) userExists(user *User) error {
     // check email
     queryEmail := "SELECT * FROM USERS WHERE email = ?;"
-    preparedStatementEmail, _ := db.conn.Prepare(queryEmail)
+    preparedStatementEmail, _ := db.Conn.Prepare(queryEmail)
     defer preparedStatementEmail.Close()
     res, err := preparedStatementEmail.Query(user.Email)
     if err != nil { return fmt.Errorf("error executing query: %s", err.Error()) }
@@ -198,7 +198,7 @@ func (db *DatabaseConn) userExists(user *User) error {
     
     // check id
     queryId := "SELECT * FROM USERS WHERE id = ?;"
-    preparedStatementId, _ := db.conn.Prepare(queryId)
+    preparedStatementId, _ := db.Conn.Prepare(queryId)
     defer preparedStatementId.Close()
     res, err = preparedStatementId.Query(user.Id)
     if err != nil { return fmt.Errorf("error executing query: %s", err.Error()) }
