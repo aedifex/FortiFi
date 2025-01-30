@@ -12,6 +12,8 @@ Create Table Users (
     PRIMARY KEY (id)
 );
 
+CREATE INDEX Users_Email_Index ON Users(email ASC);
+
 CREATE TABLE RefreshTokens (
     token varchar(255) NOT NULL,
     FK_UserId varchar(255) NOT NULL,
@@ -19,6 +21,8 @@ CREATE TABLE RefreshTokens (
     PRIMARY KEY (token),
     FOREIGN KEY (FK_UserId) REFERENCES Users(id) ON DELETE CASCADE
 );
+
+CREATE INDEX Expires_Index ON RefreshTokens(expires ASC);
 
 CREATE TABLE NetworkEvents (
     id varchar(255) NOT NULL,

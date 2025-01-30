@@ -163,7 +163,7 @@ func (db *DatabaseConn) ValidateRefresh(key string, signedToken string) (string,
 func (db *DatabaseConn) StoreRefresh(token string, userId string, exp time.Time) error {
 
     // Delete existing keys for this user
-    dropDup := "DELETE FROM RefreshTokens WHERE FK_UserId = ?;"
+    dropDup := "DELETE FROM RefreshTokens WHERE FK_UserId = ? LIMIT 1;"
     dropDupPrep, dropDupPrepErr := db.conn.Prepare(dropDup)
     if dropDupPrepErr != nil {
         return fmt.Errorf("failed to prepare drop duplicates statement: %s", dropDupPrepErr.Error())
