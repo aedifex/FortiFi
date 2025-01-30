@@ -1,7 +1,5 @@
 package database
 
-import "time"
-
 type User struct {
 	Id 			string	`json:"id" sql:"id"`
  	FirstName 	string	`json:"first_name" sql:"first_name"`
@@ -13,5 +11,4 @@ type User struct {
 type Token struct {
 	Token		string
 	FK_UserId 	string
-    expires		time.Time
 }
