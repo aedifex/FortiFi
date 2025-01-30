@@ -19,7 +19,7 @@ clean-logs:
 # Run development server config
 local-dev:
 	go mod tidy
-	go run ./cmd/server config=dev
+	config=dev go run ./cmd/server
 
 # Setup database for development testing
 database-dev:

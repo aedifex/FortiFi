@@ -12,6 +12,7 @@ import (
 	"github.com/aedifex/FortiFi/internal/handler"
 	"github.com/aedifex/FortiFi/internal/middleware"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 // ------------- Server Struct Logic ------------
@@ -31,7 +32,8 @@ func newServer(config *config.Config) *fortifiServer {
 		zapConfig = zap.NewDevelopmentConfig()
 	}
 	zapConfig.OutputPaths = []string{"server.log.json", os.Stdout.Name()}
-	
+	zapConfig.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+
 	zapLogger := zap.Must(zapConfig.Build()).Sugar()
 	// connect to mysql database
 	db := database.ConnectDatabase(zapLogger, config)

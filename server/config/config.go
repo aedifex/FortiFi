@@ -21,11 +21,10 @@ type Config struct {
 func SetConfig() *Config{
 
 	if os.Getenv("config") != "" {
-		viper.SetConfigFile(fmt.Sprintf("./config/%s",os.Getenv("config")))
+		viper.SetConfigFile(fmt.Sprintf("./config/%s.config.yaml",os.Getenv("config")))
 	} else {
 		viper.SetConfigFile("./config/dev.config.yaml")
 	}
-
 	viper.SetDefault("port", ":3000")
 	err := viper.ReadInConfig()
 	if err != nil {
