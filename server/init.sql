@@ -19,3 +19,12 @@ CREATE TABLE RefreshTokens (
     PRIMARY KEY (token),
     FOREIGN KEY (FK_UserId) REFERENCES Users(id) ON DELETE CASCADE
 );
+
+CREATE TABLE NetworkEvents (
+    id varchar(255) NOT NULL,
+    details varchar(255) NOT NULL,
+    ts DATETIME NOT NULL,
+    expires DATETIME NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (id) REFERENCES Users(id)
+)
