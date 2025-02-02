@@ -14,39 +14,44 @@ import (
 
 // Handler Wrapper
 type RouteHandler struct {
-	Log *zap.SugaredLogger
-	Db 	*database.DatabaseConn
+	Log    *zap.SugaredLogger
+	Db     *database.DatabaseConn
 	Config *config.Config
 }
 
-func (h *RouteHandler) NotifyIntrusionHandler(writer http.ResponseWriter, request *http.Request){
+func (h *RouteHandler) NotifyIntrusionHandler(writer http.ResponseWriter, request *http.Request) {
 	if request.Method != "POST" {
 		http.Error(writer, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
 	// TODO Implement this as protected route
 	// Correct flow:
-	// Request body should include information about the intrusion and device uid as it is entered in database 
+	// Request body should include information about the intrusion and device uid as it is entered in database
 	// Server should update database with event info
 	// Server should send notification to user accordingly
 	//    Need to get user associated with specific pi from database
 }
 
 func (h *RouteHandler) CreateUser(writer http.ResponseWriter, request *http.Request) {
-	if request.Method != "POST" {
+	if request.Method != http.MethodPost {
 		http.Error(writer, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
 	user := &database.User{}
-	err := json.NewDecoder(request.Body).Decode(&user)
-
+	err := json.NewDecoder(request.Body).Decode(user)
 	if err != nil {
 		http.Error(writer, "Failed to parse request body", http.StatusBadRequest)
 		return
 	}
 
-	status, err := h.Db.InsertUser(user) // fix logic so handlers belong to server object
+	// Validate all required fields
+	if user.FirstName == "" || user.LastName == "" || user.Email == "" || user.Password == "" {
+		http.Error(writer, "Missing required fields: first name, last name, email, and password", http.StatusBadRequest)
+		return
+	}
+
+	status, err := h.Db.InsertUser(user)
 	if err != nil {
 		h.Log.Warnf("Error creating a new user: %s", err.Error())
 		http.Error(writer, "Failed to Create User", status)
@@ -102,7 +107,7 @@ func (h *RouteHandler) Login(writer http.ResponseWriter, request *http.Request) 
 	writer.Header().Add("jwt", auth)
 	writer.Header().Add("refresh", refresh)
 	writer.WriteHeader(status)
-	h.writeResponse(writer,res)
+	h.writeResponse(writer, res)
 }
 
 func (h *RouteHandler) Refresh(writer http.ResponseWriter, request *http.Request) {
@@ -112,7 +117,7 @@ func (h *RouteHandler) Refresh(writer http.ResponseWriter, request *http.Request
 		return
 	}
 	token := request.Header.Get("Refresh")
-	jwt, refresh, err := h.Db.ValidateRefresh(h.Config.SIGNING_KEY,token)
+	jwt, refresh, err := h.Db.ValidateRefresh(h.Config.SIGNING_KEY, token)
 	if err != nil {
 		h.Log.Warnf("Refresh Token Err: %s", err.Error())
 		writer.WriteHeader(http.StatusUnauthorized)
@@ -129,5 +134,5 @@ func (h *RouteHandler) Protected(writer http.ResponseWriter, request *http.Reque
 	userId := request.Context().Value(middleware.UserIdContextKey)
 	res := fmt.Sprintf("You have reached this endpoint as user: %s", userId)
 	writer.WriteHeader(http.StatusOK)
-	h.writeResponse(writer,res)
+	h.writeResponse(writer, res)
 }
