@@ -8,7 +8,6 @@ type User struct {
  	Password 	string	`json:"password" sql:"password"`
 }
 
-type Token struct {
-	Token		string
-	FK_UserId 	string
+type Pi struct {
+	Id			string	`json:"id" sql:"id"`
 }

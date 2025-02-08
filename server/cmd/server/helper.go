@@ -51,7 +51,9 @@ func newServer(config *config.Config) *fortifiServer {
 	mux.HandleFunc("/NotifyIntrusion", routeHandler.NotifyIntrusionHandler)
 	mux.HandleFunc("/CreateUser", routeHandler.CreateUser)
 	mux.HandleFunc("/Login", routeHandler.Login)
-	mux.HandleFunc("/Refresh", routeHandler.Refresh)
+	mux.HandleFunc("/RefreshUser", routeHandler.RefreshUser)
+	mux.HandleFunc("/RefreshPi", routeHandler.RefreshPi)
+	mux.HandleFunc("/PiInit", routeHandler.PiInit)
 	mux.HandleFunc("/Protected", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.Protected))
 	loggingMiddleware := middleware.Logging(zapLogger)
 

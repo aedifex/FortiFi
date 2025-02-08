@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/aedifex/FortiFi/config"
-	"github.com/aedifex/FortiFi/pkg/utils"
 	"github.com/go-sql-driver/mysql"
 	"go.uber.org/zap"
 )
@@ -16,6 +15,11 @@ import (
 type DatabaseConn struct {
     Conn *sql.DB
 }
+
+const (
+    UserRefreshTable =  "UserRefreshTokens"
+    PiRefreshTable   =  "PiRefreshTokens"
+)
 
 func ConnectDatabase(log *zap.SugaredLogger, config *config.Config) *DatabaseConn {
 	sqlConfig := mysql.Config{
@@ -54,7 +58,7 @@ func (db *DatabaseConn) InsertUser(user *User) (int,error) {
     query := "INSERT into USERS VALUES (?,?,?,?,?);"
 
     // Hash the password
-    hashedPassword, err := HashPassword(user.Password)
+    hashedPassword, err := HashString(user.Password)
     if err != nil {
         return http.StatusInternalServerError, fmt.Errorf("failed to hash password: %s", err.Error())
     }
@@ -75,7 +79,10 @@ func (db *DatabaseConn) InsertUser(user *User) (int,error) {
     return http.StatusCreated, nil
 }
 
-
+// Takes in a user object and compares the passwords to the matching user in the database.
+//
+// Returns a found user, http status code, and nil if the user is validated.
+// Otherwise returns nil, error code, and a corresponding error.
 func (db *DatabaseConn) ValidateLogin(user *User) (*User, int, error) {
 
     query := "SELECT * FROM  USERS WHERE email = ?;"
@@ -102,7 +109,7 @@ func (db *DatabaseConn) ValidateLogin(user *User) (*User, int, error) {
     }
 
     // check if user exists
-    if !res.Next() { return nil, http.StatusNotFound, errors.New("email does not exist")}
+    if !res.Next() { return nil, http.StatusUnauthorized, errors.New("email does not exist")}
 
     // store the user the query returned
     foundUser := &User{}
@@ -111,81 +118,96 @@ func (db *DatabaseConn) ValidateLogin(user *User) (*User, int, error) {
     }
 
     // validate the user
-    if !ValidatePassword(foundUser.Password, user.Password) {
+    if !HashMatch(foundUser.Password, user.Password) {
         return nil, http.StatusUnauthorized, errors.New("passwords do not match")
     }
     return foundUser, http.StatusOK, nil
 }
 
-func (db *DatabaseConn) ValidateRefresh(key string, signedToken string) (string, string, error) {
-    // drop expired tokens
-    query := "DELETE FROM RefreshTokens WHERE expires < Now();"
+// Validates a refresh token by finding a match in the database.
+// Returns error if token is invalid, otherwise nil.
+func (db *DatabaseConn) ValidateRefresh(token string, tablename string, subjectId string) error {
+    
+    // drop expired tokens from respective table
+    query := fmt.Sprintf("DELETE FROM %s WHERE expires < Now();", tablename)
     _, err := db.Conn.Exec(query)
     if err != nil {
-        return "","",fmt.Errorf("error deleting expired tokens: %s", err.Error())
+        return fmt.Errorf("error deleting expired tokens: %s", err.Error())
+    }
+    
+    // check if matching refresh token is in the database
+    query = fmt.Sprintf("SELECT token_hash FROM %s WHERE id = ? LIMIT 1;",tablename)
+
+    preparedStatement, err := db.Conn.Prepare(query)
+    if err != nil {
+        return fmt.Errorf("error preparing refreshtoken query: %s", err)
     }
 
-    // check if signed token is in the database
-    signedTokenQuery := "SELECT token,FK_UserId FROM RefreshTokens WHERE token = ?;"
-    preparedStatement, err := db.Conn.Prepare(signedTokenQuery)
+    rows, err := preparedStatement.Query(subjectId)
     if err != nil {
-        return "","",fmt.Errorf("error preparing refreshtoken query: %s", err)
+        return fmt.Errorf("error executing query: %s",err.Error())
     }
-    rows, err := preparedStatement.Query(signedToken)
-    if err != nil {
-        return "","", fmt.Errorf("error executing query: %s",err.Error())
-    }
+
     if !rows.Next() {
-        return "","", errors.New("invalid token")
+        return errors.New("token for user does not exist")
     }
 
     // Get token info
-    token := &Token{}
-    scanErr := rows.Scan(&token.Token,&token.FK_UserId)
-    if scanErr != nil {
-        return "","",fmt.Errorf("error scanning results from refreshtokens: %s", scanErr)
+    storedHashedToken := ""
+    err = rows.Scan(&storedHashedToken)
+    if err != nil {
+        return err
+    }
+    
+    if !HashMatch(storedHashedToken, token) {
+        return errors.New("invalid token")
     }
 
-    // userId <- Get FK_UserId from refreshtokens table where token == signedToken
-    userId := token.FK_UserId
-    auth, refresh, expAt, err := utils.GenJwt(key, userId)
-    if err != nil {
-        return "","",err
-    }
-    // Store token
-    storeTokenErr := db.StoreRefresh(refresh, userId, expAt)
-    if storeTokenErr != nil {
-        return "","",storeTokenErr
-    }
-    return auth, refresh, nil
+    return nil
 }
 
-func (db *DatabaseConn) StoreRefresh(token string, userId string, exp time.Time) error {
+// Stores a given token hash and subject id with exp time 7 days from current time the given tablename.
+// Returns nil on success or non-nil error on failure.
+func (db *DatabaseConn) StoreRefresh(token string, subject string, tablename string) error {
+
+    expTime := time.Now().Add(time.Hour*24*7)
 
     // Delete existing keys for this user
-    dropDup := "DELETE FROM RefreshTokens WHERE FK_UserId = ? LIMIT 1;"
-    dropDupPrep, dropDupPrepErr := db.Conn.Prepare(dropDup)
-    if dropDupPrepErr != nil {
-        return fmt.Errorf("failed to prepare drop duplicates statement: %s", dropDupPrepErr.Error())
+    query := fmt.Sprintf("DELETE FROM %s WHERE id = ? LIMIT 1;", tablename)
+    preparedStatement, err := db.Conn.Prepare(query)
+    if err != nil {
+        return fmt.Errorf("failed to prepare drop duplicates statement: %s", err.Error())
     }
-    defer dropDupPrep.Close()
-    _, dropDupErr := dropDupPrep.Exec(userId)
-    if dropDupErr != nil {
-        return fmt.Errorf("error executing drop dup query: %s", dropDupErr.Error())
+    defer preparedStatement.Close()
+
+    _, err = preparedStatement.Exec(subject)
+    if err != nil {
+        return fmt.Errorf("error executing drop dup query: %s", err.Error())
     }
     
     // Insert new token into database
-    query := "INSERT INTO RefreshTokens VALUES (?, ?, ?)" // token, id, expires
-    preparedStatement, _ := db.Conn.Prepare(query)
+    query = fmt.Sprintf("INSERT INTO %s VALUES (?, ?, ?);", tablename) // token, id, expires
+    preparedStatement, err = db.Conn.Prepare(query)
+    if err != nil {
+        return fmt.Errorf("failed to prepare INSERT token statement: %s", err.Error())
+    }
     defer preparedStatement.Close()
-    formattedTime := exp.Format("2006-01-02 15:04:05")
-    _, err := preparedStatement.Exec(token, userId, formattedTime)
+
+    formattedTime := expTime.Format("2006-01-02 15:04:05")
+    tokenHash, err := HashString(token)
+    if err != nil {
+        return err
+    }
+    _, err = preparedStatement.Exec(tokenHash, subject, formattedTime)
     if err != nil {
         return fmt.Errorf("failed to store refresh token: %s", err.Error())
     }
     return nil
 }
 
+
+// Checks if a given user exists in the database.
+// Returns error if the user email or id exists, nil otherwise.
 func (db *DatabaseConn) userExists(user *User) error {
     // check email
     queryEmail := "SELECT * FROM USERS WHERE email = ?;"

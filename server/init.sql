@@ -11,18 +11,25 @@ Create Table Users (
     password varchar(255) NOT NULL,
     PRIMARY KEY (id)
 );
-
 CREATE INDEX Users_Email_Index ON Users(email ASC);
 
-CREATE TABLE RefreshTokens (
-    token varchar(255) NOT NULL,
-    FK_UserId varchar(255) NOT NULL,
-    expires DATETIME NOT NULL,
-    PRIMARY KEY (token),
-    FOREIGN KEY (FK_UserId) REFERENCES Users(id) ON DELETE CASCADE
-);
 
-CREATE INDEX Expires_Index ON RefreshTokens(expires ASC);
+CREATE TABLE PiRefreshTokens (
+    token_hash varchar(255) NOT NULL,
+    id varchar(255) NOT NULL,
+    expires DATETIME NOT NULL,
+    PRIMARY KEY (id)
+);
+CREATE INDEX Pi_Expires_Index ON PiRefreshTokens(expires ASC);
+
+CREATE TABLE UserRefreshTokens (
+    token_hash varchar(255) NOT NULL,
+    id varchar(255) NOT NULL,
+    expires DATETIME NOT NULL,
+    PRIMARY KEY (token_hash),
+    FOREIGN KEY (id) REFERENCES PiRefreshTokens(id) ON DELETE CASCADE
+);
+CREATE INDEX Users_Expires_Index ON UserRefreshTokens(expires ASC);
 
 CREATE TABLE NetworkEvents (
     id varchar(255) NOT NULL,

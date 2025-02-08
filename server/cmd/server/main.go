@@ -33,7 +33,6 @@ func main() {
 
 	// block until ctrl+c
 	// * Program exits with code 0 when programatically interrupted but not via ctrl+c
-	// TODO Discuss graceful exits
 	// go func () {shutdownChan <- os.Interrupt}()
 	<-shutdownChan
 	server.shutdown()

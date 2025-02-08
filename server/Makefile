@@ -4,6 +4,9 @@ SQL_FILE=init.sql
 
 .PHONY: clean local-dev database-dev clean-logs
 
+# clean all
+clean: clean-logs clean-database
+
 # Reset Database
 clean-database:
 	@echo "Dropping database $(DB_NAME)..."
@@ -14,7 +17,7 @@ clean-database:
 # Reset logs
 clean-logs:
 	@echo "Deleting log files"
-	rm server.log* errors.log*
+	rm server.log*
 
 # Run development server config
 local-dev:

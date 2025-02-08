@@ -14,9 +14,16 @@ const UserIdContextKey contextKey = "userId"
 // Middleware to check jwt for protected endpoints
 func Auth(key string, logger *zap.SugaredLogger, next http.HandlerFunc) http.HandlerFunc {
 	fn := func(writer http.ResponseWriter, request *http.Request) {
-		id, err := utils.GetJwtId(key, request.Header.Get("Authorization"))
+		tokenHeader := request.Header.Get("Authorization")
+		signedToken, err := utils.ExtractBearer(tokenHeader)
 		if err != nil {
-			logger.Infof("failed to get jwt id: %s", err)
+			logger.Infof("failed to extract jwt id: %s", err)
+			writer.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		id, err := utils.GetJwtSubject(key, signedToken)
+		if err != nil {
+			logger.Infof("failed to get id from jwt: %s", err)
 			writer.WriteHeader(http.StatusUnauthorized)
 			return
 		}
