@@ -19,7 +19,7 @@ func (h *RouteHandler) PiInit(writer http.ResponseWriter, request *http.Request)
 	pi := &db.Pi{}
 	err := json.NewDecoder(request.Body).Decode(pi)
 	if err != nil {
-		h.Log.Warnf("Decoding error in pi init: %s", err)
+		h.Log.Errorf("Decoding error in pi init: %s", err)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -27,7 +27,7 @@ func (h *RouteHandler) PiInit(writer http.ResponseWriter, request *http.Request)
 	// Gen new tokens
 	jwt, refresh, err := utils.GenTokenPair(h.Config.SIGNING_KEY, pi.Id)
 	if err != nil {
-		h.Log.Warnf("GenJwt Error: %s", err.Error())
+		h.Log.Errorf("GenJwt Error: %s", err.Error())
 		http.Error(writer, "pi init Error", http.StatusInternalServerError)
 		return
 	}
@@ -57,7 +57,7 @@ func (h *RouteHandler) RefreshPi(writer http.ResponseWriter, request *http.Reque
 	token := request.Header.Get("Refresh")
 	err := h.Db.ValidateRefresh(token, db.PiRefreshTable, suppliedId)
 	if err != nil {
-		h.Log.Warnf("Refresh Token Err: %s", err.Error())
+		h.Log.Errorf("Refresh Token Err: %s", err.Error())
 		writer.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -65,7 +65,7 @@ func (h *RouteHandler) RefreshPi(writer http.ResponseWriter, request *http.Reque
 	// Gen new tokens
 	jwt, refresh, err := utils.GenTokenPair(h.Config.SIGNING_KEY, suppliedId)
 	if err != nil {
-		h.Log.Warnf("GenJwt Error: %s", err.Error())
+		h.Log.Errorf("GenJwt Error: %s", err.Error())
 		http.Error(writer, "pi init Error", http.StatusInternalServerError)
 		return
 	}

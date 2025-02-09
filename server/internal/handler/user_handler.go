@@ -30,7 +30,7 @@ func (h *RouteHandler) CreateUser(writer http.ResponseWriter, request *http.Requ
 
 	status, err := h.Db.InsertUser(user)
 	if err != nil {
-		h.Log.Warnf("Error creating a new user: %s", err.Error())
+		h.Log.Errorf("Error creating a new user: %s", err.Error())
 		http.Error(writer, "Failed to Create User", status)
 		return
 	}
@@ -57,7 +57,7 @@ func (h *RouteHandler) Login(writer http.ResponseWriter, request *http.Request) 
 
 	foundUser, status, err := h.Db.ValidateLogin(user)
 	if err != nil {
-		h.Log.Warnf("login error: %s", err.Error())
+		h.Log.Errorf("login error: %s", err.Error())
 		http.Error(writer, "Login failed", status)
 		return
 	}
@@ -67,7 +67,7 @@ func (h *RouteHandler) Login(writer http.ResponseWriter, request *http.Request) 
 	// generate auth tokens
 	auth, refresh, err := utils.GenTokenPair(h.Config.SIGNING_KEY, foundUser.Id)
 	if err != nil {
-		h.Log.Warnf("GenJwt Error: %s", err.Error())
+		h.Log.Errorf("GenJwt Error: %s", err.Error())
 		http.Error(writer, "Login Error", http.StatusInternalServerError)
 		return
 	}
@@ -97,7 +97,7 @@ func (h *RouteHandler) RefreshUser(writer http.ResponseWriter, request *http.Req
 	token := request.Header.Get("Refresh")
 	err := h.Db.ValidateRefresh(token, db.UserRefreshTable, suppliedId)
 	if err != nil {
-		h.Log.Warnf("Refresh Token Err: %s", err.Error())
+		h.Log.Errorf("Refresh Token Err: %s", err.Error())
 		writer.WriteHeader(http.StatusUnauthorized)
 		return
 	}
@@ -105,7 +105,7 @@ func (h *RouteHandler) RefreshUser(writer http.ResponseWriter, request *http.Req
 	// generate auth tokens
 	jwt, refresh, err := utils.GenTokenPair(h.Config.SIGNING_KEY, suppliedId)
 	if err != nil {
-		h.Log.Warnf("Token Gen Error: %s", err.Error())
+		h.Log.Errorf("Token Gen Error: %s", err.Error())
 		http.Error(writer, "Refresh Error", http.StatusInternalServerError)
 		return
 	}

@@ -20,21 +20,12 @@ This file contains information regarding contributing to the server code
 │   └── middleware/
 │       └── auth.go -- auth middleware
 │
-├── pkg/ -- reusable structs (loggers etc)
+├── pkg/ -- reusable structs
 │   └── utils/
-│       └── logger.go
-│
-├── api/
-│   └── user_api.proto
+│       └── jwt.go
 │
 ├── configs/
 │   └── config.yaml
-│
-├── web/
-│   └── index.html
-│
-├── scripts/
-│   └── setup.sh
 │
 ├── go.mod
 ├── go.sum
