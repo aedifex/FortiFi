@@ -42,6 +42,11 @@ func (h *RouteHandler) NotifyIntrusion(writer http.ResponseWriter, request *http
 	// Store event in database
 	event := body.Event
 	event.Id = subjectId
+	if event.Id == "" || event.Details == "" || event.Expires == "" || event.TS == "" {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	
 	storeErr := h.Db.StoreEvent(event)
 	if storeErr != nil {
 		h.Log.Errorf("error storing event: %s", storeErr.Err)

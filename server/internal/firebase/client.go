@@ -16,7 +16,6 @@ type FcmClient struct {
 }
 
 func NewFirebaseMessagingClient(config *config.Config) (*FcmClient, error) {
-	// TODO implement credential file path in config and fix opt
 	opt := option.WithCredentialsFile(config.FcmKeyPath)
 	app, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {

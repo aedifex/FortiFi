@@ -82,38 +82,20 @@ signing_key:
   "b2e138d8553ea7d7ff8731e87e41406277bd4c98"
 ```
 
+Connecting to Firebase allows for notifications to be sent to registered devices. There are a few steps to setting this firebase connection up in a development environment. 
+
+Prerequisites:
+- Firebase account [here](https://firebase.google.com/)
+- XCode
+- Ios Device
+- *The notifications might not be able to run without an Apple Developer Account*
+
+Create a new Firebase IOS project and navigate to the project console. Click the gear icon, then project settings. Under the cloud messaging tab, we can add the Apple Push Notifications Key to interact with the push notifications service. In APNs authentication key under iOS app configuration, click the Upload button. 
+
+If you are following this setup and wish to test notifications locally, contact [@Jonathan](jonathan.nguyen@berkeley.edu) for APN keys. Browse to the location where you saved your key, select it, and click Open. Add the key ID for the key and click Upload. 
+
+Start the Xcode project with a <b>physical</b> IOS device plugged in and selected as the target build machine. After this, follow the API guidelines on creating a user, initializing the PI, and sending notifications.
+
 ### Running the server
 
-To run the server, use `make local-dev`. The server can be queried via http using curl, postman, or other methods. To reset the database, run `make clean`. Enter your `mysql` password when prompted.
-
-## Endpoints
-
-*[POST] /NotifyIntrusion*
-
-```json
-to be implemented
-```
-*[POST] /CreateUser*
-
-```json
-{
-    "Id": string, // This should be a unique id from the raspberry pi
-    "first_name": string,
-    "last_name": string,
-    "email": string,
-    "password": string
-}
-```
-
-returns `201 CREATED` on success. 
-
-*/Login*
-
-```json
-{
-    "email": string,
-    "password": string
-}
-```
-
-returns `200 OK` on with valid JWT and refresh token in the header on success.
+To run the server, use `make local-dev`. The server can be queried via http using curl, postman, or other methods. To reset the database, run `make clean-database`. To empty the logs, run `make clean-logs`. To clean both, run `make clean` (this will only work if both the database and the logs exist). To recreate the database after wiping, run `make database-dev`. Enter your `mysql` password when prompted.

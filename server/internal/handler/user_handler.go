@@ -31,7 +31,7 @@ func (h *RouteHandler) CreateUser(writer http.ResponseWriter, request *http.Requ
 	user := body.User
 
 	// Validate all required fields
-	if user.FirstName == "" || user.LastName == "" || user.Email == "" || user.Password == "" {
+	if user.Id == "" || user.FirstName == "" || user.LastName == "" || user.Email == "" || user.Password == "" {
 		http.Error(writer, "missing fields", http.StatusBadRequest)
 		return
 	}
@@ -150,6 +150,11 @@ func (h *RouteHandler) RefreshUser(writer http.ResponseWriter, request *http.Req
 
 func (h *RouteHandler) UpdateFcmToken(writer http.ResponseWriter, request *http.Request){
 
+	if request.Method != http.MethodPost {
+		writer.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	
 	subjectId := request.Context().Value(middleware.UserIdContextKey).(string)
 
 	// parse body

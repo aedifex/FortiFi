@@ -70,7 +70,7 @@ var (
 	HASH_ERROR = func(err error) *DatabaseError {
 		return &DatabaseError{
 			Err:        err,
-			HttpStatus: http.StatusUnauthorized,
+			HttpStatus: http.StatusInternalServerError,
 		}
 	}
 )

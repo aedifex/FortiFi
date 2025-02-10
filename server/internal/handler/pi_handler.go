@@ -24,7 +24,10 @@ func (h *RouteHandler) PiInit(writer http.ResponseWriter, request *http.Request)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
+	if pi.Id == "" {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	// Gen new tokens
 	jwt, refresh, err := utils.GenTokenPair(h.Config.SIGNING_KEY, pi.Id)
 	if err != nil {
@@ -66,7 +69,7 @@ func (h *RouteHandler) RefreshPi(writer http.ResponseWriter, request *http.Reque
 	err := h.Db.ValidateRefresh(token, db.PiRefreshTable)
 	if err != nil {
 		h.Log.Errorf("Refresh Token Err: %s", err.Err)
-		writer.WriteHeader(http.StatusUnauthorized)
+		writer.WriteHeader(err.HttpStatus)
 		return
 	}
 
