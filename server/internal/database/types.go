@@ -6,8 +6,18 @@ type User struct {
  	LastName 	string 	`json:"last_name" sql:"last_name"`
  	Email 		string	`json:"email" sql:"email"`
  	Password 	string	`json:"password" sql:"password"`
+	FcmToken 	string 	`json:"fcm_token" sql:"fcm_token"`
 }
 
-type Pi struct {
-	Id			string	`json:"id" sql:"id"`
+type RefreshToken struct {
+	Token	 	string	`sql:"token"`
+    Id 			string	`sql:"id"`
+    Expires 	string	`sql:"id"`
+}
+
+type Event struct {
+	Id 			string	`json:"id" sql:"id"`
+    Details 	string	`json:"details" sql:"details"`
+    TS 			string	`json:"ts" sql:"ts"`
+    Expires 	string	`json:"expires" sql:"expires"`
 }

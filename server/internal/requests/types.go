@@ -1,0 +1,24 @@
+package requests
+
+import (
+	db "github.com/aedifex/FortiFi/internal/database"
+)
+type UpdateFcmRequest struct {
+	FcmToken	string	`json:"fcm_token"`
+}
+
+type CreateUserRequest struct {
+	User	*db.User	`json:"user"`
+}
+
+type LoginUserRequest struct {
+	User 	*db.User	`json:"user"`		
+}
+
+type NotifyIntrusionRequest struct {
+	Event	*db.Event	`json:"event"`
+}
+
+type PiInitRequest struct {
+	Id	string	`json:"id"`
+}

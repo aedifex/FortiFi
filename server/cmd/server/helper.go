@@ -9,6 +9,7 @@ import (
 
 	"github.com/aedifex/FortiFi/config"
 	"github.com/aedifex/FortiFi/internal/database"
+	"github.com/aedifex/FortiFi/internal/firebase"
 	"github.com/aedifex/FortiFi/internal/handler"
 	"github.com/aedifex/FortiFi/internal/middleware"
 	"go.uber.org/zap"
@@ -18,10 +19,11 @@ import (
 // ------------- Server Struct Logic ------------
 
 type fortifiServer struct {
-	httpServer *http.Server
-	dbconn *database.DatabaseConn // Database wrapper
-	config *config.Config
-	logger *zap.SugaredLogger
+	httpServer 	*http.Server
+	dbconn 		*database.DatabaseConn // Database wrapper
+	config 		*config.Config
+	logger 		*zap.SugaredLogger
+	fcmClient 	*firebase.FcmClient
 }
 
 func newServer(config *config.Config) *fortifiServer {
@@ -36,25 +38,36 @@ func newServer(config *config.Config) *fortifiServer {
 
 	zapLogger := zap.Must(zapConfig.Build()).Sugar()
 	// connect to mysql database
-	db := database.ConnectDatabase(zapLogger, config)
-	
+	db, err := database.ConnectDatabase(config)
+	if err != nil {
+		zapLogger.Panicf("database connection error: %s", err)
+	}
+	zapLogger.Info("database connection successful")
+
+	fcmClient,err := firebase.NewFirebaseMessagingClient(config)
+	if err != nil {
+		zapLogger.Panicf("error connecting to firebase: %s", err)
+	}
+	zapLogger.Info("connected to firebase client")
+
 	// Route handling wrapper
 	routeHandler := &handler.RouteHandler{
 		Log: zapLogger,
 		Db: db,
 		Config: config,
+		FcmClient: fcmClient,
 	}
 	
 	// Register the Routes
 	// All routes should be wrapped by middleware.Logging
 	mux := http.NewServeMux()
-	mux.HandleFunc("/NotifyIntrusion", routeHandler.NotifyIntrusionHandler)
+	mux.HandleFunc("/NotifyIntrusion", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.NotifyIntrusion))
 	mux.HandleFunc("/CreateUser", routeHandler.CreateUser)
 	mux.HandleFunc("/Login", routeHandler.Login)
 	mux.HandleFunc("/RefreshUser", routeHandler.RefreshUser)
 	mux.HandleFunc("/RefreshPi", routeHandler.RefreshPi)
 	mux.HandleFunc("/PiInit", routeHandler.PiInit)
-	mux.HandleFunc("/Protected", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.Protected))
+	mux.HandleFunc("/UpdateFcm",  middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.UpdateFcmToken))
 	loggingMiddleware := middleware.Logging(zapLogger)
 
 	httpServer := &http.Server{
@@ -67,6 +80,7 @@ func newServer(config *config.Config) *fortifiServer {
 		dbconn: db,
 		config: config,
 		logger: zapLogger,
+		fcmClient: fcmClient,
 	}
 
 }
@@ -84,7 +98,7 @@ func (s *fortifiServer) shutdown() {
 	s.logger.Info("Http server shutdown complete")
 	if s.dbconn != nil {
 		s.logger.Info("closing database connection")
-		if err := s.dbconn.Conn.Close(); err != nil {
+		if err := s.dbconn.Close(); err != nil {
 			s.logger.Error("Error during HTTP server shutdown:", err)
 		} else {
 			s.logger.Info("Database connection closed")

@@ -8,13 +8,14 @@ import (
 	"strings"
 	"time"
 
+	db "github.com/aedifex/FortiFi/internal/database"
 	"github.com/golang-jwt/jwt/v5"
 )
 
 // Returns a JWT/Refresh Token pair.
 
 // Returns non-nil error if unsuccessful.
-func GenTokenPair(key string, id string) (string, string, error) {
+func GenTokenPair(key string, id string) (string, *db.RefreshToken, error) {
 	claims := jwt.RegisteredClaims{
 		Issuer: "FortiFi",
 		Subject: id,
@@ -24,14 +25,20 @@ func GenTokenPair(key string, id string) (string, string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signedToken, err := token.SignedString([]byte(key))
 	if err != nil {
-		return "", "", err
+		return "", nil, err
 	}
 
-	refresh, err := genRefresh()
+	refreshString, err := genRefreshString()
 	if err != nil {
-		return "", "", err
+		return "", nil, err
 	}
 
+	// Create refresh token with expiration date a week from now
+	refresh := &db.RefreshToken{
+		Id: id,
+		Token: refreshString,
+		Expires: SerializeTime(time.Now().Add(time.Hour*24*7)),
+	}
 	return signedToken, refresh, nil
 }
 
@@ -66,7 +73,7 @@ func GetJwtSubject(key string, signedToken string) (string, error) {
 	return sub, nil
 }
 
-func genRefresh() (string, error) {
+func genRefreshString() (string, error) {
 	// Generate random 20 byte string
 	bytes := make([]byte, 20)
 	_, err := rand.Read(bytes)
