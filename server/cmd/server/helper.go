@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -33,7 +34,13 @@ func newServer(config *config.Config) *fortifiServer {
 	if os.Getenv("config") == "dev" {
 		zapConfig = zap.NewDevelopmentConfig()
 	}
-	zapConfig.OutputPaths = []string{"server.log.json", os.Stdout.Name()}
+	verbose := flag.Bool("verbose", false, "Enable logging output")
+	flag.Parse()
+	if *verbose {
+		zapConfig.OutputPaths = []string{"server.log.json", os.Stdout.Name()}
+	} else {
+		zapConfig.OutputPaths = []string{"/dev/null"}
+	}
 	zapConfig.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 
 	zapLogger := zap.Must(zapConfig.Build()).Sugar()

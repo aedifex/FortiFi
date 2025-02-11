@@ -22,7 +22,7 @@ request_body: json
     - id: string (should be a uuid associated with the pi)
     - example:
         {
-            "id": "userId123"
+            "id": id
         }
 
 responses:
@@ -70,7 +70,9 @@ responses:
     - 200: OK
 
 response_body: []
-response_headers: []
+response_headers:
+    - Jwt: short-lived token
+    - Refresh: long-lived token
 ```
 
 <!-- User Create Path -->
@@ -97,7 +99,7 @@ request_body: json
     - example:
         {
             "user": {
-                "id": "userId123",
+                "id": id,
                 "first_name":"oski",
                 "last_name":"bear",
                 "email":"oski@berkeley.edu",
@@ -150,10 +152,13 @@ responses:
         fix: check http method
     - 400: bad request
         fix: check request body follows format above and all fields are present
-    - 409: the user already exists
+    - 404: the user is not found
+        fix: check the provided email belongs to an account
+    - 401: unauthorized
+        fix: check the password is correct
     - 500: internal server error
         fix: check server logs
-    - 201: CREATED
+    - 201: OK
 
 response_body: []
 response_headers:
@@ -273,10 +278,8 @@ responses:
         fix: check the user entry in database
     - 500: internal server error
         fix: check server logs
-    - 202: Accepted
+    - 200: OK
 
 response_body: []
-response_headers:
-    - Jwt: short-lived jwt token
-    - Refresh: long-lived refresh token
+response_headers: []
 ```

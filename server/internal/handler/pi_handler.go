@@ -18,6 +18,10 @@ func (h *RouteHandler) PiInit(writer http.ResponseWriter, request *http.Request)
 
 	// Get pi id
 	pi := &requests.PiInitRequest{}
+	if request.Body == nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	err := json.NewDecoder(request.Body).Decode(pi)
 	if err != nil {
 		h.Log.Errorf("Decoding error in pi init: %s", err)
