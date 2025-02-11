@@ -18,6 +18,10 @@ func (h *RouteHandler) CreateUser(writer http.ResponseWriter, request *http.Requ
 	
 	// parse body
 	body := &requests.CreateUserRequest{}
+	if request.Body == nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	err := json.NewDecoder(request.Body).Decode(body)
 	if err != nil {
 		http.Error(writer, "Failed to parse request body", http.StatusBadRequest)
@@ -58,6 +62,10 @@ func (h *RouteHandler) Login(writer http.ResponseWriter, request *http.Request) 
 
 	// Parse body
 	body := &requests.LoginUserRequest{}
+	if request.Body == nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	decodeErr := json.NewDecoder(request.Body).Decode(body)
 	if decodeErr != nil {
 		http.Error(writer, "Failed to parse request body", http.StatusBadRequest)
@@ -155,10 +163,19 @@ func (h *RouteHandler) UpdateFcmToken(writer http.ResponseWriter, request *http.
 		return
 	}
 	
-	subjectId := request.Context().Value(middleware.UserIdContextKey).(string)
+	subjectId, ok := request.Context().Value(middleware.UserIdContextKey).(string)
+	if !ok {
+		h.Log.Errorf("could not assert subjectId from context as string: %v", subjectId)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	// parse body
 	body := &requests.UpdateFcmRequest{}
+	if request.Body == nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	err := json.NewDecoder(request.Body).Decode(body)
 	if err != nil {
 		h.Log.Errorf("json decode error: %s", err.Error())
@@ -177,12 +194,15 @@ func (h *RouteHandler) UpdateFcmToken(writer http.ResponseWriter, request *http.
 		http.Error(writer, "unable to update fcm token", fcmErr.HttpStatus)
 		return
 	}
-
+	h.Log.Infof("updated fcm for user: %s", subjectId)
 	writer.WriteHeader(http.StatusAccepted)
 	h.writeResponse(writer, "notifications token updated")
 }
 
-//TODO implement this -- Should revoke refresh tokens
+// TODO implement events route to return users a list of events
+// TODO should be protected
+
+// TODO implement this -- Should revoke refresh tokens
 // func (h *RouteHandler) Logout(writer http.ResponseWriter, request *http.Request){
 // 	return
 // }

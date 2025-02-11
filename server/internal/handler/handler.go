@@ -25,10 +25,18 @@ func (h *RouteHandler) NotifyIntrusion(writer http.ResponseWriter, request *http
 		http.Error(writer, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	subjectId := request.Context().Value(middleware.UserIdContextKey).(string)
-
+	subjectId, ok := request.Context().Value(middleware.UserIdContextKey).(string)
+	if !ok  {
+		writer.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	
 	// Decode body
 	body := &requests.NotifyIntrusionRequest{}
+	if request.Body == nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	err := json.NewDecoder(request.Body).Decode(body)
 	if err != nil {
 		http.Error(writer, "failed to parse body", http.StatusBadRequest)
