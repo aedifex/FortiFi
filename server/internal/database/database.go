@@ -2,22 +2,24 @@ package database
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
-	"net/http"
-	"time"
 
 	"github.com/aedifex/FortiFi/config"
-	"github.com/aedifex/FortiFi/pkg/utils"
 	"github.com/go-sql-driver/mysql"
-	"go.uber.org/zap"
 )
 
 type DatabaseConn struct {
-    Conn *sql.DB
+    conn *sql.DB
 }
 
-func ConnectDatabase(log *zap.SugaredLogger, config *config.Config) *DatabaseConn {
+const (
+    UsersTable       = "Users"
+    EventsTable      = "NetworkEvents"
+    UserRefreshTable =  "UserRefreshTokens"
+    PiRefreshTable   =  "PiRefreshTokens"
+)
+
+func ConnectDatabase(config *config.Config) (*DatabaseConn, error) {
 	sqlConfig := mysql.Config{
         User:   config.DB_USER,
         Passwd: config.DB_PASS,
@@ -29,181 +31,281 @@ func ConnectDatabase(log *zap.SugaredLogger, config *config.Config) *DatabaseCon
     // Get a database handle.
     db, err := sql.Open("mysql", sqlConfig.FormatDSN())
     if err != nil {
-        log.Errorf("Error opening the database: %s", err.Error())
+        return nil, fmt.Errorf("error opening the database: %s", err.Error())
     }
 
     err = db.Ping()
     if err != nil {
-        log.Errorf("Could not connect to DB: %s", err.Error())
+        return nil, fmt.Errorf("could not connect to DB: %s", err.Error())
     }
-    log.Info("Database connection successful")
-
+    
 	return &DatabaseConn{
-        Conn: db,
-    }
+        conn: db,
+    }, nil
 
 }
 
-func (db *DatabaseConn) InsertUser(user *User) (int,error) {
+func (db *DatabaseConn) InsertUser(user *User) (*DatabaseError) {
     //Check if user exists
     userExists := db.userExists(user)
     if userExists != nil {
-        return http.StatusConflict, userExists
+        return USER_EXISTS_ERROR
     }
     
-    query := "INSERT into USERS VALUES (?,?,?,?,?);"
+    query := fmt.Sprintf("INSERT into %s (id,first_name,last_name,email,password) VALUES (?,?,?,?,?);", UsersTable)
 
     // Hash the password
-    hashedPassword, err := HashPassword(user.Password)
+    hashedPassword, err := HashString(user.Password)
     if err != nil {
-        return http.StatusInternalServerError, fmt.Errorf("failed to hash password: %s", err.Error())
+        return HASH_ERROR(err)
     }
 
     // prepare statement
-    preparedStatement, err := db.Conn.Prepare(query)
+    preparedStatement, err := db.conn.Prepare(query)
     if err != nil {
-        return http.StatusInternalServerError, fmt.Errorf("failed to create prepared statement: %s", err)
+        return PREPARE_ERROR(err)
     }
     defer preparedStatement.Close()
 
     // execute statement
     _, err = preparedStatement.Exec(user.Id, user.FirstName, user.LastName, user.Email, hashedPassword)
     if err != nil {
-        return http.StatusInternalServerError, fmt.Errorf("failed to insert user: %s", err.Error())
+        return EXEC_ERROR(err)
     }
 
-    return http.StatusCreated, nil
+    return nil
 }
 
+func (db *DatabaseConn) UpdateFcmToken(subjectId string, fcmToken string) *DatabaseError {
+    
+    // insert new fcm token
+    query := fmt.Sprintf("UPDATE %s SET fcm_token = ? WHERE id = ?;", UsersTable)
 
-func (db *DatabaseConn) ValidateLogin(user *User) (*User, int, error) {
+    preparedStatement, err := db.conn.Prepare(query)
+    if err != nil {
+        return PREPARE_ERROR(err)
+    }
 
-    query := "SELECT * FROM  USERS WHERE email = ?;"
+    // execute statement
+    res, err := preparedStatement.Exec(fcmToken, subjectId)
+    if err != nil {
+        return QUERY_ERROR(err)
+    }
+    
+   // validate the user was updated
+    numChanged, err := res.RowsAffected()
+    if err != nil {
+        return ROWS_AFFECTED_ERROR(err)
+    }
+    if numChanged == 0 {
+        return DNE_ERROR
+    }
+
+    return nil
+}
+
+// Takes in a user object and compares the passwords to the matching user in the database.
+//
+// Returns a found user, http status code, and nil if the user is validated.
+// Otherwise returns nil, error code, and a corresponding error.
+func (db *DatabaseConn) ValidateLogin(user *User) (*User, *DatabaseError) {
+
+    query := fmt.Sprintf("SELECT id, first_name, last_name, email, password FROM %s WHERE email = ?;", UsersTable)
 
     // create prepared statment
-    preparedStatement, err := db.Conn.Prepare(query)
+    preparedStatement, err := db.conn.Prepare(query)
     if err != nil {
-        return nil, http.StatusInternalServerError, fmt.Errorf("failed to create prepared statement for login: %s", err)
+        return nil, PREPARE_ERROR(err)
     }
     defer preparedStatement.Close()
 
     // input validation
-    if user.Email == "" {
-        return nil, http.StatusBadRequest, errors.New("email not provided")
-    }
-    if user.Password == "" {
-        return nil, http.StatusBadRequest, errors.New("password not provided")
+    if user.Email == "" || user.Password == "" {
+        return nil, INVALID_INPUT_ERROR
     }
 
     // Query database
     res, err := preparedStatement.Query(user.Email)
     if err != nil {
-        return nil, http.StatusInternalServerError, err
+        return nil, QUERY_ERROR(err)
     }
 
     // check if user exists
-    if !res.Next() { return nil, http.StatusNotFound, errors.New("email does not exist")}
+    if !res.Next() { return nil, DNE_ERROR }
 
     // store the user the query returned
     foundUser := &User{}
     if err := res.Scan(&foundUser.Id, &foundUser.FirstName, &foundUser.LastName, &foundUser.Email, &foundUser.Password); err != nil {
-        return nil, http.StatusInternalServerError, err
+        return nil, SCAN_ERROR(err)
     }
 
     // validate the user
-    if !ValidatePassword(foundUser.Password, user.Password) {
-        return nil, http.StatusUnauthorized, errors.New("passwords do not match")
+    if !HashMatch(foundUser.Password, user.Password) {
+        return nil, UNAUTHORIZED_ERROR
     }
-    return foundUser, http.StatusOK, nil
+    return foundUser, nil
 }
 
-func (db *DatabaseConn) ValidateRefresh(key string, signedToken string) (string, string, error) {
-    // drop expired tokens
-    query := "DELETE FROM RefreshTokens WHERE expires < Now();"
-    _, err := db.Conn.Exec(query)
+// Validates a refresh token by finding a match in the database.
+// Returns error if token is invalid, otherwise nil.
+func (db *DatabaseConn) ValidateRefresh(refresh *RefreshToken, tablename string) *DatabaseError {
+    
+    // drop expired tokens from respective table
+    query := fmt.Sprintf("DELETE FROM %s WHERE expires < Now();", tablename)
+    _, err := db.conn.Exec(query)
     if err != nil {
-        return "","",fmt.Errorf("error deleting expired tokens: %s", err.Error())
+        return EXEC_ERROR(err)
+    }
+    
+    // check if matching refresh token is in the database
+    query = fmt.Sprintf("SELECT token_hash FROM %s WHERE id = ?;",tablename)
+
+    preparedStatement, err := db.conn.Prepare(query)
+    if err != nil {
+        return PREPARE_ERROR(err)
     }
 
-    // check if signed token is in the database
-    signedTokenQuery := "SELECT token,FK_UserId FROM RefreshTokens WHERE token = ?;"
-    preparedStatement, err := db.Conn.Prepare(signedTokenQuery)
+    rows, err := preparedStatement.Query(refresh.Id)
     if err != nil {
-        return "","",fmt.Errorf("error preparing refreshtoken query: %s", err)
+        return QUERY_ERROR(err)
     }
-    rows, err := preparedStatement.Query(signedToken)
-    if err != nil {
-        return "","", fmt.Errorf("error executing query: %s",err.Error())
-    }
+
     if !rows.Next() {
-        return "","", errors.New("invalid token")
+        return DNE_ERROR
     }
 
     // Get token info
-    token := &Token{}
-    scanErr := rows.Scan(&token.Token,&token.FK_UserId)
-    if scanErr != nil {
-        return "","",fmt.Errorf("error scanning results from refreshtokens: %s", scanErr)
+    storedHashedToken := ""
+    err = rows.Scan(&storedHashedToken)
+    if err != nil {
+        return SCAN_ERROR(err)
+    }
+    
+    if !HashMatch(storedHashedToken, refresh.Token) {
+        return UNAUTHORIZED_ERROR
     }
 
-    // userId <- Get FK_UserId from refreshtokens table where token == signedToken
-    userId := token.FK_UserId
-    auth, refresh, expAt, err := utils.GenJwt(key, userId)
-    if err != nil {
-        return "","",err
-    }
-    // Store token
-    storeTokenErr := db.StoreRefresh(refresh, userId, expAt)
-    if storeTokenErr != nil {
-        return "","",storeTokenErr
-    }
-    return auth, refresh, nil
+    return nil
 }
 
-func (db *DatabaseConn) StoreRefresh(token string, userId string, exp time.Time) error {
+// Stores the hash of a given token and subject id with exp time 7 days from current time the given tablename.
+// Returns nil on success or non-nil error on failure.
+func (db *DatabaseConn) StoreRefresh(refresh *RefreshToken, tablename string) *DatabaseError {
 
     // Delete existing keys for this user
-    dropDup := "DELETE FROM RefreshTokens WHERE FK_UserId = ? LIMIT 1;"
-    dropDupPrep, dropDupPrepErr := db.Conn.Prepare(dropDup)
-    if dropDupPrepErr != nil {
-        return fmt.Errorf("failed to prepare drop duplicates statement: %s", dropDupPrepErr.Error())
+    query := fmt.Sprintf("DELETE FROM %s WHERE id = ?;", tablename)
+    preparedStatement, err := db.conn.Prepare(query)
+    if err != nil {
+        return PREPARE_ERROR(err)
     }
-    defer dropDupPrep.Close()
-    _, dropDupErr := dropDupPrep.Exec(userId)
-    if dropDupErr != nil {
-        return fmt.Errorf("error executing drop dup query: %s", dropDupErr.Error())
+    defer preparedStatement.Close()
+
+    _, err = preparedStatement.Exec(refresh.Id)
+    if err != nil {
+        return EXEC_ERROR(err)
     }
     
     // Insert new token into database
-    query := "INSERT INTO RefreshTokens VALUES (?, ?, ?)" // token, id, expires
-    preparedStatement, _ := db.Conn.Prepare(query)
-    defer preparedStatement.Close()
-    formattedTime := exp.Format("2006-01-02 15:04:05")
-    _, err := preparedStatement.Exec(token, userId, formattedTime)
+    query = fmt.Sprintf("INSERT INTO %s VALUES (?, ?, ?);", tablename) // token, id, expires
+    preparedStatement, err = db.conn.Prepare(query)
     if err != nil {
-        return fmt.Errorf("failed to store refresh token: %s", err.Error())
+        return PREPARE_ERROR(err)
+    }
+    defer preparedStatement.Close()
+
+    tokenHash, err := HashString(refresh.Token)
+    if err != nil {
+        return HASH_ERROR(err)
+    }
+    _, err = preparedStatement.Exec(tokenHash, refresh.Id, refresh.Expires)
+    if err != nil {
+        return EXEC_ERROR(err)
     }
     return nil
 }
 
-func (db *DatabaseConn) userExists(user *User) error {
+
+// Checks if a given user exists in the database.
+// Returns non-nil if the user email or id exists, otherwise.
+func (db *DatabaseConn) userExists(user *User) *DatabaseError {
     // check email
-    queryEmail := "SELECT * FROM USERS WHERE email = ?;"
-    preparedStatementEmail, _ := db.Conn.Prepare(queryEmail)
+    queryEmail := fmt.Sprintf("SELECT * FROM %s WHERE email = ?;", UsersTable)
+    preparedStatementEmail, _ := db.conn.Prepare(queryEmail)
     defer preparedStatementEmail.Close()
     res, err := preparedStatementEmail.Query(user.Email)
-    if err != nil { return fmt.Errorf("error executing query: %s", err.Error()) }
+    if err != nil { return EXEC_ERROR(err) }
     defer res.Close()
-    if res.Next() { return errors.New("user already exists")}
+    if res.Next() { return USER_EXISTS_ERROR}
     
     // check id
     queryId := "SELECT * FROM USERS WHERE id = ?;"
-    preparedStatementId, _ := db.Conn.Prepare(queryId)
+    preparedStatementId, _ := db.conn.Prepare(queryId)
     defer preparedStatementId.Close()
     res, err = preparedStatementId.Query(user.Id)
-    if err != nil { return fmt.Errorf("error executing query: %s", err.Error()) }
+    if err != nil { return QUERY_ERROR(err) }
     defer res.Close()
-    if res.Next() { return errors.New("user already exists")}
+    if res.Next() { return USER_EXISTS_ERROR }
 
     return nil
+}
+
+func (db *DatabaseConn) StoreEvent(e *Event) *DatabaseError {
+
+    // Insert id, details, ts, expires
+    query := fmt.Sprintf("INSERT INTO %s VALUES (?, ?, ?, ?)", EventsTable)
+
+    // prepare statement
+    preparedStatement, err := db.conn.Prepare(query)
+    if err != nil {
+        return PREPARE_ERROR(err)
+    }
+
+    // execute statement
+    res, err := preparedStatement.Exec(e.Id, e.Details, e.TS, e.Expires)
+    if err != nil {
+        return EXEC_ERROR(err)
+    }
+
+    // check rows affected
+    rowsAffected, err := res.RowsAffected()
+    if err != nil {
+        return ROWS_AFFECTED_ERROR(err)
+    }
+    if rowsAffected == 0 {
+        return DNE_ERROR
+    }
+    
+    return nil
+}
+
+func (db *DatabaseConn) GetFcmToken(subjectId string) (string, *DatabaseError) {
+    
+    // prepare query
+    query := fmt.Sprintf("SELECT fcm_token from %s where id = ?;", UsersTable)
+    preparedStatement, err := db.conn.Prepare(query)
+    if err != nil {
+        return "", PREPARE_ERROR(err)
+    }
+
+    // execute query
+    rows, err := preparedStatement.Query(subjectId)
+    if err != nil {
+        return "", QUERY_ERROR(err)
+    }
+
+    if !rows.Next() {
+        return "", DNE_ERROR
+    }
+
+    fcmToken := ""
+    err = rows.Scan(&fcmToken)
+    if err != nil {
+        return "", SCAN_ERROR(err)
+    }
+
+    return fcmToken,nil
+}
+
+func (db *DatabaseConn) Close() error {
+    return db.conn.Close()
 }

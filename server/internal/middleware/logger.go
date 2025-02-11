@@ -10,7 +10,7 @@ import (
 func Logging(logger *zap.SugaredLogger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-			logger.Infof("Incoming request from: %s", request.RemoteAddr)
+			logger.Infof("Incoming request from: %s to %s", request.RemoteAddr, request.URL.Path)
 			next.ServeHTTP(writer, request) // Call the next handler
 		})
 	}

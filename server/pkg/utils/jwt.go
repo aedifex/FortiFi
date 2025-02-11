@@ -8,40 +8,43 @@ import (
 	"strings"
 	"time"
 
+	db "github.com/aedifex/FortiFi/internal/database"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func GenJwt(key string, userId string) (string, string, time.Time, error) {
+// Returns a JWT/Refresh Token pair.
+
+// Returns non-nil error if unsuccessful.
+func GenTokenPair(key string, id string) (string, *db.RefreshToken, error) {
 	claims := jwt.RegisteredClaims{
 		Issuer: "FortiFi",
-		Subject: userId,
+		Subject: id,
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour*24)),
 		IssuedAt: jwt.NewNumericDate(time.Now()),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signedToken, err := token.SignedString([]byte(key))
 	if err != nil {
-		return "", "", time.Time{}, err
+		return "", nil, err
 	}
 
-	refresh, expTime, err := genRefresh(userId)
+	refreshString, err := genRefreshString()
 	if err != nil {
-		return "", "", time.Time{}, err
+		return "", nil, err
 	}
 
-	return signedToken, refresh, expTime, nil
+	// Create refresh token with expiration date a week from now
+	refresh := &db.RefreshToken{
+		Id: id,
+		Token: refreshString,
+		Expires: SerializeTime(time.Now().Add(time.Hour*24*7)),
+	}
+	return signedToken, refresh, nil
 }
 
-// Validates the Jwt Signing algorithm and exp time then returns the associated user id 
-func GetJwtId(key string, tokenHeader string) (string,error) {
-
-	signedToken := ""
-	if strings.HasPrefix(tokenHeader, "Bearer ") {
-		signedToken = strings.TrimPrefix(tokenHeader, "Bearer ")
-	} else {
-		return "", errors.New("invalid Authorization header")
-	}
-
+// Validates the Jwt Signing algorithm and exp time then returns the associated subject id 
+func GetJwtSubject(key string, signedToken string) (string, error) {
+	
 	// parse token and check signing method
 	parsedToken, err := jwt.Parse(signedToken, func(token *jwt.Token) (interface{}, error) {
         if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -60,7 +63,7 @@ func GetJwtId(key string, tokenHeader string) (string,error) {
 
 	// Check signature
 	if !parsedToken.Valid {
-		return "", fmt.Errorf("invalid signature")
+		return "", errors.New("invalid signature")
 	}
 
 	sub, err := parsedToken.Claims.GetSubject()
@@ -70,28 +73,24 @@ func GetJwtId(key string, tokenHeader string) (string,error) {
 	return sub, nil
 }
 
-func genRefresh(userId string) (string, time.Time, error) {
+func genRefreshString() (string, error) {
 	// Generate random 20 byte string
 	bytes := make([]byte, 20)
 	_, err := rand.Read(bytes)
 	if err != nil {
-		return "", time.Time{}, err
+		return "", err
 	}
-	key := hex.EncodeToString(bytes)
+	tokenString := hex.EncodeToString(bytes)
 
-	// Generate the refresh token
-	expAt := time.Now().Add(time.Hour*24*7)
-	claims := jwt.RegisteredClaims{
-		Issuer: "FortiFi",
-		Subject: userId,
-		ExpiresAt: jwt.NewNumericDate(expAt),
-		IssuedAt: jwt.NewNumericDate(time.Now()),
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	signedToken, err := token.SignedString([]byte(key))
-	if err != nil {
-		return "", time.Time{}, fmt.Errorf("failed to sign refresh token: %s", err.Error())
-	}
+	return tokenString, nil
+}
 
-	return signedToken, expAt, nil
+func ExtractBearer(tokenHeader string) (string, error) {
+	signedToken := ""
+	if strings.HasPrefix(tokenHeader, "Bearer ") {
+		signedToken = strings.TrimPrefix(tokenHeader, "Bearer ")
+	} else {
+		return "", errors.New("invalid Authorization header")
+	}
+	return signedToken, nil
 }
