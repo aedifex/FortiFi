@@ -82,6 +82,8 @@ signing_key:
   "b2e138d8553ea7d7ff8731e87e41406277bd4c98"
 ```
 
+Also, your database password should be set in the Makefile as the password you used to setup `mysql`.
+
 Connecting to Firebase allows for notifications to be sent to registered devices. There are a few steps to setting this firebase connection up in a development environment. 
 
 Prerequisites:
@@ -99,3 +101,7 @@ Start the Xcode project with a <b>physical</b> IOS device plugged in and selecte
 ### Running the server
 
 To run the server, use `make local-dev`. The server can be queried via http using curl, postman, or other methods. To reset the database, run `make clean-database`. To empty the logs, run `make clean-logs`. To clean both, run `make clean` (this will only work if both the database and the logs exist). To recreate the database after wiping, run `make database-dev`. Enter your `mysql` password when prompted.
+
+### Running the tests
+
+To run the tests, use `make test`. This will reset the database and run the tests. Make sure to fill in the correct values in the `server_test.go` file. for the config values. The `fcmToken` should be a valid FCM token for an iOS device and should be set in the `server_test.go` file.
