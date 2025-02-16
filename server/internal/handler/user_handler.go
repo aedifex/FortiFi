@@ -235,9 +235,6 @@ func (h *RouteHandler) GetUserEvents(writer http.ResponseWriter, request *http.R
 
 }
 
-// TODO implement events route to return users a list of events
-// TODO should be protected
-
 // TODO implement this -- Should revoke refresh tokens
 // func (h *RouteHandler) Logout(writer http.ResponseWriter, request *http.Request){
 // 	return
