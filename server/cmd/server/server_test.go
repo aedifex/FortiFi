@@ -8,8 +8,6 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 
@@ -76,16 +74,16 @@ func formatError(s string) func(err error) string {
 
 func setupTestServer() *fortifiServer {
 	testing.Init()
-	// Change working directory
-	err := os.Chdir(filepath.Dir("/Users/jonathannguyen/Documents/Cyber 295 (Capstone)/FortiFi/server/config"))
-	if err != nil {
-		log.Fatalf("Failed to change working directory: %v", err)
-	}
 
 	// Setup environment
-	config := config.SetConfig()
-	if config == nil {
-		log.Fatalf("Config not set")
+	config := &config.Config{
+		Port: "<fill in port>",
+		DB_USER: "<fill in user>",
+		DB_PASS: "<fill in password>",
+		DB_URL: "<fill in url>",
+		DB_NAME: "<fill in name>",
+		SIGNING_KEY: "<fill in key>",
+		FcmKeyPath: "<fill in path>",
 	}
 
 	// Create new FortifiServer
