@@ -57,11 +57,12 @@
             responseElement.className = '';
             responseElement.textContent = '';
 
+            // TODO this should be the server url once deployed
             const url = 'http://localhost:3000';
 
             const userData = {
                 user: {
-                    id: crypto.randomUUID(),
+                    id: crypto.randomUUID(), // TODO this should come from the pi device
                     first_name: document.getElementById('firstName').value,
                     last_name: document.getElementById('lastName').value,
                     email: document.getElementById('email').value,
