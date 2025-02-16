@@ -51,4 +51,6 @@ pipeline:
                   identifier: Configure_database
                   spec:
                     shell: Sh
-                    command: make database-dev
+                    command: |-
+                      cd server
+                      make database-dev
