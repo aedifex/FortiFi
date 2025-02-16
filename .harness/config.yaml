@@ -26,13 +26,29 @@ pipeline:
             spec: {}
           execution:
             steps:
+              - parallel:
+                  - step:
+                      type: Run
+                      name: Say Hi
+                      identifier: Say_Hi
+                      spec:
+                        shell: Sh
+                        command: |-
+                          echo "Hello, FortiFi!"
+
+                          ls -alt
+                  - step:
+                      type: Background
+                      name: Run MYSQL
+                      identifier: Run_MYSQL
+                      spec:
+                        connectorRef: chriscircleci
+                        image: mysql:latest
+                        shell: Sh
               - step:
                   type: Run
-                  name: Say Hi
-                  identifier: Say_Hi
+                  name: Configure database
+                  identifier: Configure_database
                   spec:
                     shell: Sh
-                    command: |-
-                      echo "Hello, FortiFi!"
-
-                      ls -alt
+                    command: make database-dev
