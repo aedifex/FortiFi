@@ -36,5 +36,7 @@ local-dev:
 
 # run tests locally -- this will reset the database
 test: reset
+	@echo "erasing cached tests"
+	go clean -testcache
 	@echo "running unit tests"
 	config=dev go test ./cmd/server -v
