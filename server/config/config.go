@@ -16,6 +16,7 @@ type Config struct {
 	DB_NAME 		string
 	SIGNING_KEY 	string
 	FcmKeyPath		string
+	CORS_ORIGIN 	string
 }
 
 
@@ -39,5 +40,6 @@ func SetConfig() *Config{
 		DB_NAME: viper.GetString("db_name"),
 		SIGNING_KEY: viper.GetString("signing_key"),
 		FcmKeyPath: viper.GetString("fcm_key_path"),
+		CORS_ORIGIN: viper.GetString("cors_origin"),
 	}
 }
