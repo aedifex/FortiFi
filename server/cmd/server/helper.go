@@ -77,10 +77,11 @@ func newServer(config *config.Config) *fortifiServer {
 	mux.HandleFunc("/UpdateFcm",  middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.UpdateFcmToken))
 	mux.HandleFunc("/GetUserEvents", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.GetUserEvents))
 	loggingMiddleware := middleware.Logging(zapLogger)
-
+	corsMiddleware := middleware.CORSMiddleware(config.CORS_ORIGIN)
+	serverHandler := corsMiddleware(loggingMiddleware(mux))
 	httpServer := &http.Server{
 		Addr: config.Port,
-		Handler: loggingMiddleware(mux),
+		Handler: serverHandler,
 	}
 
 	return &fortifiServer{
