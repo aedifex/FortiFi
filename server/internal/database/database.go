@@ -309,3 +309,44 @@ func (db *DatabaseConn) GetFcmToken(subjectId string) (string, *DatabaseError) {
 func (db *DatabaseConn) Close() error {
     return db.conn.Close()
 }
+
+func (db *DatabaseConn) GetUserEvents(userId string) ([]*Event, *DatabaseError) {
+
+    // delete expired events
+    deleteQuery := fmt.Sprintf("DELETE FROM %s WHERE expires < NOW();", EventsTable)
+    _, err := db.conn.Exec(deleteQuery)
+    if err != nil {
+        return nil, EXEC_ERROR(err)
+    }
+
+    // prepare query
+    query := fmt.Sprintf("SELECT id, details, ts, expires FROM %s WHERE id = ? ORDER BY ts DESC;", EventsTable)
+    preparedStatement, err := db.conn.Prepare(query)
+    if err != nil {
+        return nil, PREPARE_ERROR(err)
+    }
+    defer preparedStatement.Close()
+
+    // execute query
+    rows, err := preparedStatement.Query(userId)
+    if err != nil {
+        return nil, QUERY_ERROR(err)
+    }
+    defer rows.Close()
+
+    var events []*Event
+    for rows.Next() {
+        event := &Event{}
+        err := rows.Scan(&event.Id, &event.Details, &event.TS, &event.Expires)
+        if err != nil {
+            return nil, SCAN_ERROR(err)
+        }
+        events = append(events, event)
+    }
+
+    if err = rows.Err(); err != nil {
+        return nil, QUERY_ERROR(err)
+    }
+
+    return events, nil
+}

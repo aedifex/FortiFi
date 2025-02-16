@@ -199,6 +199,42 @@ func (h *RouteHandler) UpdateFcmToken(writer http.ResponseWriter, request *http.
 	h.writeResponse(writer, "notifications token updated")
 }
 
+func (h *RouteHandler) GetUserEvents(writer http.ResponseWriter, request *http.Request) {
+	if request.Method != http.MethodGet {
+		http.Error(writer, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Get user ID from context (set by Auth middleware)
+	userId, ok := request.Context().Value(middleware.UserIdContextKey).(string)
+	if !ok {
+		h.Log.Error("could not assert userId from context")
+		http.Error(writer, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Get events from database
+	events, err := h.Db.GetUserEvents(userId)
+	if err != nil {
+		h.Log.Errorf("Error fetching user events: %s", err.Err)
+		http.Error(writer, "Failed to fetch events", err.HttpStatus)
+		return
+	}
+
+	// Write response
+	writer.Header().Set("Content-Type", "application/json")
+	encodeErr := json.NewEncoder(writer).Encode(map[string][]*db.Event{
+		"events": events,
+	})
+	if encodeErr != nil {
+		h.Log.Errorf("error encoding events: %s", encodeErr.Error())
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	writer.WriteHeader(http.StatusOK)
+
+}
+
 // TODO implement events route to return users a list of events
 // TODO should be protected
 
