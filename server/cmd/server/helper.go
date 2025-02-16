@@ -75,6 +75,7 @@ func newServer(config *config.Config) *fortifiServer {
 	mux.HandleFunc("/RefreshPi", routeHandler.RefreshPi)
 	mux.HandleFunc("/PiInit", routeHandler.PiInit)
 	mux.HandleFunc("/UpdateFcm",  middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.UpdateFcmToken))
+	mux.HandleFunc("/GetUserEvents", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.GetUserEvents))
 	loggingMiddleware := middleware.Logging(zapLogger)
 
 	httpServer := &http.Server{
