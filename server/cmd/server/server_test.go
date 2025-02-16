@@ -10,6 +10,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/aedifex/FortiFi/config"
@@ -25,6 +26,11 @@ var (
 	}
 
 	BadResponseHeader = "invalid response: expected headers"
+
+	InvalidBody = func(exp interface{}, got interface{}) string {
+		return formatError("invalid body")(fmt.Errorf("\nexpected: %v\ngot %v", exp, got))
+	}
+
 )
 
 var (
@@ -43,7 +49,7 @@ var (
 	lastName = "Bear"
 	email = "oskibear@berkeley.edu"
 	password = "Go Bears!"
-	fcmToken = "<fill in fcm token from device"
+	fcmToken = "<fill in token>"
 )
 
 var server = setupTestServer()
@@ -59,6 +65,7 @@ type testCase struct {
 	setup 			func (req *http.Request)
 	jwtTarget		*string
 	refreshTarget	*string
+	expectedBody	interface{}
 }
 
 func formatError(s string) func(err error) string {
@@ -164,6 +171,24 @@ func buildTest(tc testCase, method string, path string) func (t *testing.T) {
 			refreshTemp = *tc.refreshTarget
 			*tc.jwtTarget = resp.Header().Get("jwt")
 			*tc.refreshTarget = resp.Header().Get("refresh")
+		}
+		if tc.expectedBody != nil {			
+			// Convert both expected and got to JSON strings for comparison
+			expectedJSON := Marshal(tc.expectedBody, t)
+			expectedBytes, err := io.ReadAll(expectedJSON)
+			if err != nil {
+				t.Fatalf("failed to read expected body: %s", err)
+			}
+			expectedString := strings.TrimSpace(string(expectedBytes))
+
+			got := strings.TrimSpace(resp.Body.String())
+			
+			if expectedString != got {
+				t.Fatalf("Strings differ:\nexpected (len=%d): %q\ngot (len=%d): %q", 
+					len(expectedString), expectedString, 
+					len(got), got)
+				t.Fatalf(InvalidBody(expectedString, got))
+			}
 		}
 	}
 }
@@ -622,7 +647,7 @@ func TestNotifyIntrusion(t *testing.T) {
 				Event: &database.Event{
 					Details: "Instrusion event details here",
 					TS: "2006-01-02 15:04:05",
-					Expires: "2006-01-02 15:04:05",
+					Expires: "2026-01-02 15:04:05",
 				},
 			},
 			jwt: piJwt,
@@ -640,7 +665,7 @@ func TestNotifyIntrusion(t *testing.T) {
 				Event: &database.Event{
 					Details: "Instrusion event details here",
 					TS: "2006-01-02 15:04:05",
-					Expires: "2006-01-02 15:04:05",
+					Expires: "2026-01-02 15:04:05",
 				},
 			},
 		},
@@ -650,7 +675,7 @@ func TestNotifyIntrusion(t *testing.T) {
 			requestBody: &requests.NotifyIntrusionRequest{
 				Event: &database.Event{
 					TS: "2006-01-02 15:04:05",
-					Expires: "2006-01-02 15:04:05",
+					Expires: "2026-01-02 15:04:05",
 				},
 			},
 			jwt: piJwt,
@@ -661,7 +686,7 @@ func TestNotifyIntrusion(t *testing.T) {
 			requestBody: &requests.NotifyIntrusionRequest{
 				Event: &database.Event{
 					Details: "Instrusion event details here",
-					Expires: "2006-01-02 15:04:05",
+					Expires: "2026-01-02 15:04:05",
 				},
 			},
 			jwt: piJwt,
@@ -681,6 +706,44 @@ func TestNotifyIntrusion(t *testing.T) {
 
 	missingBodyTest(t, method, path)
 	for _,tc := range testCases {
+		t.Run(tc.name, buildTest(tc, method, path))
+	}
+}
+
+func TestGetUserEvents(t *testing.T) {
+	path := "/GetUserEvents"
+	method := http.MethodGet
+
+	event := map[string][]database.Event{
+		"events": {
+			{
+				Id: id,
+				Details: "Instrusion event details here",
+				TS: "2006-01-02 15:04:05",
+				Expires: "2026-01-02 15:04:05",
+			},
+		},
+	}
+
+	testCases := []testCase{
+		{
+			name: "valid request",
+			correctStatus: http.StatusOK,
+			jwt: userJwt,
+			expectedBody: event,
+		},
+		{
+			name: "missing jwt",
+			correctStatus: http.StatusUnauthorized,
+		},
+		{
+			name: "invalid jwt",
+			correctStatus: http.StatusUnauthorized,
+			jwt: "invalid.jwt.token",
+		},
+	}
+
+	for _, tc := range testCases {
 		t.Run(tc.name, buildTest(tc, method, path))
 	}
 }
