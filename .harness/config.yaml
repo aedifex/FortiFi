@@ -1,0 +1,38 @@
+pipeline:
+  name: FortiFi
+  identifier: FortiFi
+  projectIdentifier: default_project
+  orgIdentifier: default
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: account.Github_OAuth_1720712504098
+        repoName: aedifex/FortiFi
+        build: <+input>
+  stages:
+    - stage:
+        name: Build Server Component
+        identifier: Build_Server_Component
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          platform:
+            os: Linux
+            arch: Arm64
+          runtime:
+            type: Cloud
+            spec: {}
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: Say Hi
+                  identifier: Say_Hi
+                  spec:
+                    shell: Sh
+                    command: |-
+                      echo "Hello, FortiFi!"
+
+                      ls -alt
