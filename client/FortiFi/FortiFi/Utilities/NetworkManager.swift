@@ -13,7 +13,7 @@ final class NetworkManager {
     static let shared = NetworkManager()
     static var fcm = ""
 
-    static private let baseUrl = "http://10.0.0.141:3000"
+    static private let baseUrl = "<fill in with ip address:port of device the server is running on"
     private let loginUrl = baseUrl + "/Login"
     private let eventsUrl = baseUrl + "/GetUserEvents"
     private let refreshUrl = baseUrl + "/RefreshUser"
