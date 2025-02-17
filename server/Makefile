@@ -1,7 +1,7 @@
 DB_NAME=FortiFi
 DB_USER=root
 SQL_FILE=init.sql
-DB_PASSWORD=${DB_PASSWORD}
+# DB_PASSWORD=${DB_PASSWORD}
 .PHONY: clean local-dev database-dev clean-logs
 
 # clean all
