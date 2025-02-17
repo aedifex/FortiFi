@@ -11,7 +11,8 @@ clean: clean-logs clean-database
 clean-database:
 	@echo "Dropping database $(DB_NAME)..."
 	@echo "Requires mysql password"
-	mysql -u$(DB_USER) -p$(DB_PASSWORD) -e "DROP DATABASE IF EXISTS $(DB_NAME);"
+	# mysql -u$(DB_USER) -p$(DB_PASSWORD) -e "DROP DATABASE IF EXISTS $(DB_NAME);"
+        mysql -h 127.0.0.1 -P 3306 -uroot -p"$MYSQL_ROOT_PASSWORD" -e "SOURCE init.sql;"
 	@echo "Database $(DB_NAME) dropped."
 
 # delete logs
