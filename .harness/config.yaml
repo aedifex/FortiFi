@@ -54,3 +54,9 @@ pipeline:
                     command: |-
                       cd server
                       make database-dev
+  variables:
+    - name: DB_PASSWORD
+      type: String
+      description: ""
+      required: false
+      value: ""
