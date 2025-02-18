@@ -53,7 +53,8 @@ pipeline:
                     shell: Sh
                     command: |-
                       cd server
-                      make cicd-database-dev
+                      # make cicd-database-dev
+                      docker ps | grep mysql
   variables:
     - name: DB_PASSWORD
       type: String
