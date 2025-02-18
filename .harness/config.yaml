@@ -60,3 +60,8 @@ pipeline:
       description: ""
       required: false
       value: ""
+    - name: MYSQL_ALLOW_EMPTY_PASSWORD
+      type: String
+      description: ""
+      required: false
+      value: "yes"
