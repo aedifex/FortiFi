@@ -27,7 +27,8 @@ reset: clean-database database-dev
 database-dev:
 	@echo "Creating database and tables..."
 	@echo "Requires mysql password"
-	mysql -u$(DB_USER) -p$(DB_PASSWORD) -e "SOURCE $(SQL_FILE);"
+	# mysql -u$(DB_USER) -p$(DB_PASSWORD) -e "SOURCE $(SQL_FILE);"
+	mysql -h 127.0.0.1 -P 3306 -uroot -p"$MYSQL_ROOT_PASSWORD" -e "SOURCE init.sql;"
 	@echo "Database and tables created successfully."
 
 # Run development server config
