@@ -11,8 +11,7 @@ clean: clean-logs clean-database
 clean-database:
 	@echo "Dropping database $(DB_NAME)..."
 	@echo "Requires mysql password"
-	# mysql -u$(DB_USER) -p$(DB_PASSWORD) -e "DROP DATABASE IF EXISTS $(DB_NAME);"
-	mysql -h 127.0.0.1 -P 3306 -uroot -p"$MYSQL_ROOT_PASSWORD" -e "SOURCE init.sql;"
+	mysql -u$(DB_USER) -p$(DB_PASSWORD) -e "DROP DATABASE IF EXISTS $(DB_NAME);"
 	@echo "Database $(DB_NAME) dropped."
 
 # delete logs
@@ -27,8 +26,7 @@ reset: clean-database database-dev
 database-dev:
 	@echo "Creating database and tables..."
 	@echo "Requires mysql password"
-	# mysql -u$(DB_USER) -p$(DB_PASSWORD) -e "SOURCE $(SQL_FILE);"
-	mysql -h 127.0.0.1 -P 3306 -uroot -p"$MYSQL_ROOT_PASSWORD" -e "SOURCE init.sql;"
+	mysql -u$(DB_USER) -p$(DB_PASSWORD) -e "SOURCE $(SQL_FILE);"
 	@echo "Database and tables created successfully."
 
 # Run development server config
@@ -42,3 +40,6 @@ test: reset
 	go clean -testcache
 	@echo "running unit tests"
 	config=dev go test ./cmd/server -v
+
+cicd-database-dev:
+	mysql -h 127.0.0.1 -P 3306 -u$(DB_USER) --password="" -e "SOURCE $(SQL_FILE);"

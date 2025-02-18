@@ -53,7 +53,7 @@ pipeline:
                     shell: Sh
                     command: |-
                       cd server
-                      make database-dev
+                      make cicd-database-dev
   variables:
     - name: DB_PASSWORD
       type: String
