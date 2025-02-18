@@ -55,6 +55,8 @@ pipeline:
                       cd server
                       # make cicd-database-dev
                       docker ps | grep mysql
+
+                      mysql -h mysql -P 3306 -uroot --password="" -e "SOURCE init.sql;"
   variables:
     - name: DB_PASSWORD
       type: String
