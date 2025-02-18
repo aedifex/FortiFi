@@ -78,6 +78,14 @@ func (db *DatabaseConn) InsertUser(user *User) (*DatabaseError) {
 
 func (db *DatabaseConn) UpdateFcmToken(subjectId string, fcmToken string) *DatabaseError {
     
+    userIdExists, existsErr := db.userIdExists(subjectId)
+    if existsErr != nil {
+        return existsErr
+    }
+    if !userIdExists {
+        return DNE_ERROR
+    }
+
     // insert new fcm token
     query := fmt.Sprintf("UPDATE %s SET fcm_token = ? WHERE id = ?;", UsersTable)
 
@@ -87,18 +95,9 @@ func (db *DatabaseConn) UpdateFcmToken(subjectId string, fcmToken string) *Datab
     }
 
     // execute statement
-    res, err := preparedStatement.Exec(fcmToken, subjectId)
+    _, err = preparedStatement.Exec(fcmToken, subjectId)
     if err != nil {
         return QUERY_ERROR(err)
-    }
-    
-   // validate the user was updated
-    numChanged, err := res.RowsAffected()
-    if err != nil {
-        return ROWS_AFFECTED_ERROR(err)
-    }
-    if numChanged == 0 {
-        return DNE_ERROR
     }
 
     return nil
@@ -247,6 +246,26 @@ func (db *DatabaseConn) userExists(user *User) *DatabaseError {
     if res.Next() { return USER_EXISTS_ERROR }
 
     return nil
+}
+
+// Checks if a given user id exists in the database.
+// Returns true if the user id exists, otherwise false.
+func (db *DatabaseConn) userIdExists(id string) (bool, *DatabaseError) {
+
+    query := fmt.Sprintf("SELECT * FROM %s WHERE id = ?;", UsersTable)
+    preparedStatement, err := db.conn.Prepare(query)
+    if err != nil {
+        return false, PREPARE_ERROR(err)
+    }
+    defer preparedStatement.Close()
+
+    res, err := preparedStatement.Query(id)
+    if err != nil { return false, QUERY_ERROR(err) }
+    defer res.Close()
+    if res.Next() { return true, nil }
+
+    return false, nil
+
 }
 
 func (db *DatabaseConn) StoreEvent(e *Event) *DatabaseError {
