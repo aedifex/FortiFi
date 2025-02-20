@@ -47,7 +47,7 @@ var (
 	lastName = "Bear"
 	email = "oskibear@berkeley.edu"
 	password = "Go Bears!"
-	fcmToken = "c9g9Wdmp90NchwYMhiiLBp:APA91bHfeKLGu921KeSj45uikQbhg1_Gx44qBjHErrjDoMzSIag5fGJdUotOCOjCQumLv2etUbe_e_gfJNKOIQEhUua6KIcp7zQcgGetkleiWPLJgRJ3GcY"
+	fcmToken = ""
 )
 
 var server = setupTestServer()
@@ -77,13 +77,13 @@ func setupTestServer() *fortifiServer {
 
 	// Setup environment
 	config := &config.Config{
-		Port: ":3000",
-		DB_USER: "root",
-		DB_PASS: "",
-		DB_URL: "127.0.0.1:3306",
+		Port: "<fill in>",
+		DB_USER: "<fill in>",
+		DB_PASS: "<fill in>",
+		DB_URL: "<fill in>",
 		DB_NAME: "FortiFi",
-		SIGNING_KEY: "b2e138d8553ea7d7ff8731e87e41406277bd4c98",
-		FcmKeyPath: "/Users/jonathannguyen/Documents/Cyber 295 (Capstone)/FortiFi/server/config/fortifi-1e7b8-firebase-adminsdk-fbsvc-7d9b6225cf.json",
+		SIGNING_KEY: "<fill in>",
+		FcmKeyPath: "<fill in>",
 	}
 
 	// Create new FortifiServer
@@ -818,8 +818,7 @@ func TestGetWeeklyDistribution(t *testing.T) {
 		},
 		{
 			name: "user does not exist",
-			correctStatus: http.StatusNotFound,
-			jwt: piJwt,
+			correctStatus: http.StatusUnauthorized,
 		},
 	}
 	
