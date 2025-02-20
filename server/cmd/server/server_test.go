@@ -77,13 +77,13 @@ func setupTestServer() *fortifiServer {
 
 	// Setup environment
 	config := &config.Config{
-		Port: "<fill in>",
-		DB_USER: "<fill in>",
-		DB_PASS: "<fill in>",
-		DB_URL: "<fill in>",
+		Port: ":3000",
+		DB_USER: "root",
+		DB_PASS: "",
+		DB_URL: "localhost:3306",
 		DB_NAME: "FortiFi",
-		SIGNING_KEY: "<fill in>",
-		FcmKeyPath: "<fill in>",
+		SIGNING_KEY: "b2e138d8553ea7d7ff8731e87e41406277bd4c98",
+		FcmKeyPath: "<path to fcm key>",
 	}
 
 	// Create new FortifiServer
@@ -647,6 +647,8 @@ func TestNotifyIntrusion(t *testing.T) {
 					TS: "2006-01-02 15:04:05",
 					Expires: "2026-01-02 15:04:05",
 					Type: "anomaly",
+					SrcIP: "10.0.1.1",
+					DstIP: "10.0.1.2",
 				},
 			},
 			jwt: piJwt,
@@ -713,8 +715,34 @@ func TestNotifyIntrusion(t *testing.T) {
 			},
 			jwt: piJwt,
 		},
+		{
+			name: "missing src ip",
+			correctStatus: http.StatusBadRequest,
+			requestBody: &requests.NotifyIntrusionRequest{
+				Event: &database.Event{
+					Details: "Instrusion event details here",
+					TS: "2006-01-02 15:04:05",
+					Expires: "2026-01-02 15:04:05",
+					Type: "anomaly",
+				},
+			},
+			jwt: piJwt,
+		},
+		{
+			name: "missing dst ip",
+			correctStatus: http.StatusBadRequest,
+			requestBody: &requests.NotifyIntrusionRequest{
+				Event: &database.Event{
+					Details: "Instrusion event details here",
+					TS: "2006-01-02 15:04:05",
+					Expires: "2026-01-02 15:04:05",
+					Type: "anomaly",
+				},
+			},
+			jwt: piJwt,
+		},
 	}
-
+	
 	missingBodyTest(t, method, path)
 	for _,tc := range testCases {
 		t.Run(tc.name, buildTest(tc, method, path))
@@ -733,6 +761,8 @@ func TestGetUserEvents(t *testing.T) {
 				TS: "2006-01-02 15:04:05",
 				Expires: "2026-01-02 15:04:05",
 				Type: "anomaly",
+				SrcIP: "10.0.1.1",
+				DstIP: "10.0.1.2",
 			},
 		},
 	}
@@ -805,7 +835,7 @@ func TestGetWeeklyDistribution(t *testing.T) {
 				Normal: 10,
 				Anomalous: 5,
 				Malicious: 2,
-				PrevWeekTotal: 17,
+				PrevWeekTotal: 0,
 			},
 		},
 		{

@@ -21,6 +21,8 @@ type Event struct {
     TS 			string	`json:"ts" sql:"ts"`
     Expires 	string	`json:"expires" sql:"expires"`
 	Type 		string	`json:"type" sql:"event_type"`
+	SrcIP 		string	`json:"src" sql:"src_ip"`
+	DstIP 		string	`json:"dst" sql:"dst_ip"`
 }
 
 type WeeklyDistribution struct {

@@ -271,7 +271,7 @@ func (db *DatabaseConn) userIdExists(id string) (bool, *DatabaseError) {
 func (db *DatabaseConn) StoreEvent(e *Event) *DatabaseError {
 
     // Insert id, details, ts, expires
-    query := fmt.Sprintf("INSERT INTO %s VALUES (?, ?, ?, ?, ?)", EventsTable)
+    query := fmt.Sprintf("INSERT INTO %s VALUES (?, ?, ?, ?, ?, ?, ?)", EventsTable)
 
     // prepare statement
     preparedStatement, err := db.conn.Prepare(query)
@@ -280,7 +280,7 @@ func (db *DatabaseConn) StoreEvent(e *Event) *DatabaseError {
     }
 
     // execute statement
-    res, err := preparedStatement.Exec(e.Id, e.Details, e.TS, e.Expires, e.Type)
+    res, err := preparedStatement.Exec(e.Id, e.Details, e.TS, e.Expires, e.Type, e.SrcIP, e.DstIP)
     if err != nil {
         return EXEC_ERROR(err)
     }
@@ -339,7 +339,7 @@ func (db *DatabaseConn) GetUserEvents(userId string) ([]*Event, *DatabaseError) 
     }
 
     // prepare query
-    query := fmt.Sprintf("SELECT id, details, ts, expires, event_type FROM %s WHERE id = ? ORDER BY ts DESC;", EventsTable)
+    query := fmt.Sprintf("SELECT id, details, ts, expires, event_type, src_ip, dst_ip FROM %s WHERE id = ? ORDER BY ts DESC;", EventsTable)
     preparedStatement, err := db.conn.Prepare(query)
     if err != nil {
         return nil, PREPARE_ERROR(err)
@@ -356,7 +356,7 @@ func (db *DatabaseConn) GetUserEvents(userId string) ([]*Event, *DatabaseError) 
     var events []*Event
     for rows.Next() {
         event := &Event{}
-        err := rows.Scan(&event.Id, &event.Details, &event.TS, &event.Expires, &event.Type)
+        err := rows.Scan(&event.Id, &event.Details, &event.TS, &event.Expires, &event.Type, &event.SrcIP, &event.DstIP)
         if err != nil {
             return nil, SCAN_ERROR(err)
         }
