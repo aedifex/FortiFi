@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct Home: View {
+    
+    @ObservedObject var homeViewModel = HomeViewModel.shared
+    
     var body: some View {
         NavigationStack{
             ScrollView{
@@ -27,11 +30,7 @@ struct Home: View {
                                 .fontWeight(.regular)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        NavigationLink {
-                            Text("Hello events")
-                        } label: {
-                            Label("Needs Attention", image: "warn")
-                        }
+                        NetworkStatusNavigation()
                     }
                     
                     VStack (spacing: 16){
@@ -45,8 +44,13 @@ struct Home: View {
                     
                 }
                 .padding()
-                .background(Color("background"))
+                .background(Color("Background"))
                 
+            }
+        }
+        .refreshable {
+            Task {
+                await homeViewModel.refresh()
             }
         }
     }

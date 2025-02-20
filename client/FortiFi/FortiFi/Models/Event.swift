@@ -6,3 +6,10 @@
 //
 
 import Foundation
+
+struct Event: Codable {
+    var id: String
+    var details: String
+    var ts: String
+    var expires: String
+}

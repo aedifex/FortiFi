@@ -8,8 +8,65 @@
 import SwiftUI
 
 struct NetworkStatusNavigation: View {
+    
+    @ObservedObject var homeViewModel = HomeViewModel.shared
+
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        
+        if homeViewModel.events.count == 0 {
+            
+            HStack {
+                
+                Image("OK")
+                
+                VStack (alignment: .leading){
+                    Text("Good")
+                        .font(.body)
+                        .foregroundColor(Color("Foreground"))
+                    Text("^[\(homeViewModel.events.count) Threat](inflect: true) found")
+                        .font(.subheadline)
+                        .foregroundColor(Color("Foreground-Muted"))
+                }
+                
+                Spacer()
+                
+            }
+            .padding()
+            .background(Color(.white))
+            .cornerRadius(12)
+            .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+            
+        } else {
+            
+            NavigationLink(destination: Events()) {
+                
+                HStack {
+                    
+                    Image("Error")
+                    
+                    VStack (alignment: .leading){
+                        Text("Needs Attention")
+                            .font(.body)
+                            .foregroundColor(Color("Foreground"))
+                        Text("^[\(homeViewModel.events.count) Threat](inflect: true) found")
+                            .font(.subheadline)
+                            .foregroundColor(Color("Foreground-Muted"))
+                    }
+                    
+                    Spacer()
+                    
+                    Image(systemName: "chevron.right")
+                        .foregroundColor(Color("Foreground-Muted"))
+                }
+                .padding()
+                .background(Color(.white))
+                .cornerRadius(12)
+                .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+                
+            }
+            .buttonStyle(PlainButtonStyle())
+            
+        }
     }
 }
 

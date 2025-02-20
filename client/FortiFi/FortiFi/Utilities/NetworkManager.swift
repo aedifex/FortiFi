@@ -11,17 +11,17 @@ import SwiftUI
 final class NetworkManager {
     
     static let shared = NetworkManager()
-    static var fcm = ""
+    var fcm = ""
 
-    static private let baseUrl = "<fill in with ip address:port of device the server is running on"
+    static private let baseUrl = "http://10.0.0.141:3000"
     private let loginUrl = baseUrl + "/Login"
     private let eventsUrl = baseUrl + "/GetUserEvents"
     private let refreshUrl = baseUrl + "/RefreshUser"
     private let setFcmUrl = baseUrl + "/UpdateFcm"
-    private var jwt = ""
         
     @AppStorage("refreshToken") private var refreshToken: String = ""
-    
+    @AppStorage("jwt") var jwt: String = ""
+        
     func login(_ user: User) async throws {
 
         guard let url = URL(string: loginUrl) else {
@@ -45,16 +45,17 @@ final class NetworkManager {
 
         switch response.statusCode {
         case 200:
-            let headers = response.allHeaderFields
-            guard let refreshHeader = headers["Refresh"] as? String else {
+            
+            if response.value(forHTTPHeaderField: "Refresh") == nil {
                 throw Errors.networkError("could not get auth tokens")
             }
-            guard let jwtHeader = headers["Jwt"] as? String else {
+            if response.value(forHTTPHeaderField: "Jwt") == nil {
                 throw Errors.networkError("could not get auth tokens")
             }
             
-            refreshToken = refreshHeader
-            jwt = jwtHeader
+            refreshToken = response.value(forHTTPHeaderField: "Refresh")!
+            jwt = response.value(forHTTPHeaderField: "Jwt")!
+            
             try await setNotificationsToken()
         case 404:
             throw Errors.notFound("user does not exist")
@@ -79,7 +80,7 @@ final class NetworkManager {
             throw Errors.invalidUrl("url could not be constructed")
         }
         
-        let requestBody = SetFcmRequest(fcm_token: NetworkManager.fcm)
+        let requestBody = SetFcmRequest(fcm_token: fcm)
         guard let encodedData = try? JSONEncoder().encode(requestBody) else {
             throw Errors.internalError("failed to encode request body")
         }
@@ -110,6 +111,13 @@ final class NetworkManager {
     
     private func refreshAuthTokens() async throws {
         
+        defer {
+            if jwt == "" || refreshToken == "" {
+                jwt = ""
+                refreshToken = ""
+            }
+        }
+        
         guard let url = URL(string: refreshUrl) else {
             throw Errors.invalidUrl("url could not be constructed")
         }
@@ -118,23 +126,25 @@ final class NetworkManager {
         request.setValue("\(refreshToken)", forHTTPHeaderField: "Refresh")
         request.httpMethod = "GET"
         
-        let (_, response) = try await URLSession.shared.upload(for: request, from: Data())
+        let (_, response) = try await URLSession.shared.data(for: request)
         
         guard let response = response as? HTTPURLResponse else {
             throw Errors.internalError("failed to parse response")
         }
         
+        jwt = ""
+        refreshToken = ""
         switch response.statusCode {
         case 200:
-            let headers = response.allHeaderFields
-            guard let refreshHeader = headers["Refresh"] as? String else {
+            if response.value(forHTTPHeaderField: "Refresh") == nil {
                 throw Errors.networkError("could not get auth tokens")
             }
-            guard let jwtHeader = headers["Jwt"] as? String else {
+            if response.value(forHTTPHeaderField: "Jwt") == nil {
                 throw Errors.networkError("could not get auth tokens")
             }
-            refreshToken = refreshHeader
-            jwt = jwtHeader
+            
+            refreshToken = response.value(forHTTPHeaderField: "Refresh")!
+            jwt = response.value(forHTTPHeaderField: "Jwt")!
         case 404:
             throw Errors.notFound("user does not exist")
         case 401:
@@ -145,6 +155,35 @@ final class NetworkManager {
         
     }
     
+    func getEvents() async throws -> [Event] {
+        
+        if try JWT.isExpired(jwt) {
+            try await refreshAuthTokens()
+        }
+        
+        guard let url = URL(string: eventsUrl) else {
+            throw Errors.invalidUrl("url could not be constructed")
+        }
+        
+        var request = URLRequest(url:url)
+        request.setValue("Bearer \(jwt)", forHTTPHeaderField: "Authorization")
+        request.httpMethod = "GET"
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let response = response as? HTTPURLResponse else {
+            throw Errors.internalError("failed to parse response")
+        }
+        
+        switch response.statusCode {
+        case 200:
+            let events = try JSONDecoder().decode(EventsResponse.self, from: data)
+            return events.events
+        default:
+            throw Errors.networkError("network error")
+        }
+        
+    }
     
 }
 

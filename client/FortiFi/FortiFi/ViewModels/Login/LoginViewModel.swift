@@ -9,6 +9,8 @@ import Foundation
 
 @MainActor final class LoginViewModel: ObservableObject {
     
+    static var shared = LoginViewModel()
+    
     @Published var user = User()
     @Published var isLoading = false
     @Published var alert: AlertItem?
@@ -19,7 +21,6 @@ import Foundation
 
         do {
             try await NetworkManager.shared.login(user)
-            BaseViewModel.shared.loginSuccess = true
         } catch {
             switch error {
             case Errors.inputError:

@@ -37,5 +37,6 @@ CREATE TABLE NetworkEvents (
     details varchar(255) NOT NULL,
     ts DATETIME NOT NULL,
     expires DATETIME NOT NULL,
+    type varchar(255) NOT NULL,
     FOREIGN KEY (id) REFERENCES Users(id)
 )
