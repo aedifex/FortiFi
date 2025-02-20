@@ -231,7 +231,6 @@ func (h *RouteHandler) GetUserEvents(writer http.ResponseWriter, request *http.R
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	writer.WriteHeader(http.StatusOK)
 
 }
 

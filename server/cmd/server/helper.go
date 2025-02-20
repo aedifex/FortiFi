@@ -69,6 +69,7 @@ func newServer(config *config.Config) *fortifiServer {
 	// All routes should be wrapped by middleware.Logging
 	mux := http.NewServeMux()
 	mux.HandleFunc("/NotifyIntrusion", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.NotifyIntrusion))
+	// ? Should CreateUser be wrapped by Auth? Use the Pi init token to create a user
 	mux.HandleFunc("/CreateUser", routeHandler.CreateUser)
 	mux.HandleFunc("/Login", routeHandler.Login)
 	mux.HandleFunc("/RefreshUser", routeHandler.RefreshUser)
