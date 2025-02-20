@@ -16,7 +16,7 @@ final class JWT {
             throw Errors.inputError("failed to parse jwt exp time")
         }
            
-        let expirationDate = Date(timeIntervalSince1970: expiration)
+        let expirationDate = Date(timeIntervalSince1970: expiration).addingTimeInterval(TimeInterval(-60))
         return Date() >= expirationDate
     }
     

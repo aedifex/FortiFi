@@ -11,9 +11,10 @@ import Foundation
     static let shared = HomeViewModel()
     
     @Published var events: [Event] = []
-    @Published var distribution: DistributionResponse = DistributionResponse(Normal: 0, Anomalous: 0, Malicious: 0, PrevWeekTotal: 0)
+    @Published var eventCounts: DistributionResponse = DistributionResponse(Normal: 0, Anomalous: 0, Malicious: 0, PrevWeekTotal: 0)
     @Published var totalEvents: Int = 0
     @Published var difference = 0
+    @Published var distributions = [0.0, 0.0, 0.0]
     
     func updateEvents() async {
         do {
@@ -26,9 +27,12 @@ import Foundation
     
     func getEventsDistribution() async {
         do {
-            distribution = try await NetworkManager.shared.getEventsDistribution()
-            totalEvents = distribution.Anomalous + distribution.Normal + distribution.Malicious
-            difference = totalEvents - distribution.PrevWeekTotal
+            eventCounts = try await NetworkManager.shared.getEventsDistribution()
+            totalEvents = eventCounts.Anomalous + eventCounts.Normal + eventCounts.Malicious
+            difference = totalEvents - eventCounts.PrevWeekTotal
+            distributions[0] = (Double(eventCounts.Normal) / Double(totalEvents)) * 100
+            distributions[1] = (Double(eventCounts.Anomalous) / Double(totalEvents)) * 100
+            distributions[2] = (Double(eventCounts.Malicious) / Double(totalEvents)) * 100
         }
         catch {
             print("error getting distribution info: \(error)")

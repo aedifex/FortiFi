@@ -13,7 +13,7 @@ import SwiftUI
     static let shared = NetworkManager()
     var fcm = ""
 
-    static private let baseUrl = "http://192.168.4.106:3000"
+    static private let baseUrl = "http://192.168.4.136:3000"
     private let loginUrl = baseUrl + "/Login"
     private let eventsUrl = baseUrl + "/GetUserEvents"
     private let refreshUrl = baseUrl + "/RefreshUser"
@@ -56,7 +56,7 @@ import SwiftUI
             
             refreshToken = response.value(forHTTPHeaderField: "Refresh")!
             jwt = response.value(forHTTPHeaderField: "Jwt")!
-            try await setNotificationsToken()
+//            try await setNotificationsToken()
             return try JWT.getSubject(for: jwt)
             
         case 404:
@@ -118,7 +118,8 @@ import SwiftUI
             throw Errors.invalidUrl("url could not be constructed")
         }
         
-        url.append(queryItems: [URLQueryItem(name: "id", value: LoginViewModel.shared.user.id)])
+        print("setting query param id: \(LoginViewModel.shared.userId)")
+        url.append(queryItems: [URLQueryItem(name: "id", value: LoginViewModel.shared.userId)])
         var request = URLRequest(url:url)
         request.setValue("\(refreshToken)", forHTTPHeaderField: "Refresh")
         request.httpMethod = "GET"

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 @MainActor final class LoginViewModel: ObservableObject {
     
@@ -14,13 +15,14 @@ import Foundation
     @Published var user = User()
     @Published var isLoading = false
     @Published var alert: AlertItem?
+    @AppStorage("userId") var userId: String = ""
     
     func loginUser() async{
         
         isLoading = true
 
         do {
-            user.id = try await NetworkManager.shared.login(user)
+            userId = try await NetworkManager.shared.login(user)
             BaseViewModel.shared.authenticated = true
         } catch {
             print("error: \(error)")

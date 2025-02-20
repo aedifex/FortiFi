@@ -12,4 +12,5 @@ struct Event: Codable {
     var details: String
     var ts: String
     var expires: String
+    var type: String
 }

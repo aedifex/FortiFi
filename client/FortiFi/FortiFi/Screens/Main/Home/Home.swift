@@ -35,18 +35,18 @@ struct Home: View {
                     
                     VStack (spacing: 16){
                         HStack {
-                            Text("Events Insights")
+                            Text("Event Insights")
                                 .font(.title3)
                                 .fontWeight(.regular)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                         TotalEventsTab()
+                        EventsDistribution()
                     }
                     
                 }
-                .padding()
             }
-            .padding()
+            .contentMargins(16)
             .frame(maxHeight: .infinity)
             .background(Color("Background"))
             .foregroundStyle(Color("Foreground"))

@@ -13,7 +13,7 @@ struct TotalEventsTab: View {
         VStack {
             HStack {
                 VStack (alignment: .leading, spacing: 8) {
-                    Text("**\(viewModel.totalEvents)** total events this week")
+                    Text("^[**\(viewModel.totalEvents)** total event](inflect: true) this week")
                             .font(.body)
                     if viewModel.difference == 0 {
                         Text("Same as previous week")
@@ -35,7 +35,7 @@ struct TotalEventsTab: View {
         }
         .background(Color(.white))
         .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 2, y: 2)
     }
 }
 

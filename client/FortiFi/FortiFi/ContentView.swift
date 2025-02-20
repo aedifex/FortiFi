@@ -16,7 +16,6 @@ struct ContentView: View {
         switch manager.authenticated {
         case true:
             TabView(selection: $selection){
-                
                 Home()
                     .tabItem {
                         if selection == "home" {
@@ -27,7 +26,9 @@ struct ContentView: View {
         
                     }
                     .tag("home")
-                
+                    .toolbarBackground(.white, for: .tabBar)
+                    
+
                 Devices()
                     .tabItem {
                         if selection == "devices" {
@@ -38,7 +39,7 @@ struct ContentView: View {
         
                     }
                     .tag("devices")
-                
+
                 Chat()
                     .tabItem {
                         if selection == "chat" {
@@ -49,7 +50,7 @@ struct ContentView: View {
         
                     }
                     .tag("chat")
-                
+
             }
             .onAppear{
                 Task {
