@@ -360,3 +360,45 @@ responses:
 response_body: []
 response_headers: []
 ```
+
+<!-- Get Weekly Distribution -->
+<b>Get Weekly Distribution</b>
+
+```yaml
+path: /GetWeeklyDistribution
+description: Get the weekly distribution of events for a user
+
+methods:
+    - GET
+
+query_params: []
+
+headers:
+    - Authorization: Bearer <jwt token>
+
+request_body: []
+
+responses:
+    - 405: method not allowed
+        fix: check http method
+    - 401: unauthorized
+        fix: check the jwt header and ensure valid
+    - 404: not found
+        fix: check the user entry in database
+    - 500: internal server error
+        fix: check server logs
+    - 200: OK
+
+response_body: json
+    - normal: int
+    - anomalous: int
+    - malicious: int
+    - example:
+        {
+            "normal": 124,
+            "anomalous": 13,
+            "malicious": 2
+        }
+
+response_headers: []
+```

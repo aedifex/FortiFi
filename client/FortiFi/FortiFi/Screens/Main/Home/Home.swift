@@ -26,7 +26,7 @@ struct Home: View {
                     VStack (spacing: 16){
                         HStack {
                             Text("Network Status")
-                                .font(.headline)
+                                .font(.title3)
                                 .fontWeight(.regular)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
@@ -35,11 +35,12 @@ struct Home: View {
                     
                     VStack (spacing: 16){
                         HStack {
-                            Text("Insights")
-                                .font(.headline)
+                            Text("Events Insights")
+                                .font(.title3)
                                 .fontWeight(.regular)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
+                        TotalEventsTab()
                     }
                     
                 }

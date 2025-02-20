@@ -53,7 +53,7 @@ struct ContentView: View {
             }
             .onAppear{
                 Task {
-                    await HomeViewModel.shared.updateEvents()
+                    await HomeViewModel.shared.refresh()
                 }
             }
         case false:

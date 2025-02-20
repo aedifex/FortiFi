@@ -8,5 +8,5 @@
 import Foundation
 
 struct EventsResponse: Codable {
-    var events: [Event]
+    var events: [Event]?
 }

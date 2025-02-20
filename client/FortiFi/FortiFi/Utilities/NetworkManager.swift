@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-final class NetworkManager {
+@MainActor final class NetworkManager: Observable {
     
     static let shared = NetworkManager()
     var fcm = ""
@@ -18,9 +18,14 @@ final class NetworkManager {
     private let eventsUrl = baseUrl + "/GetUserEvents"
     private let refreshUrl = baseUrl + "/RefreshUser"
     private let setFcmUrl = baseUrl + "/UpdateFcm"
-        
+    private let distributionUrl = baseUrl + "/GetWeeklyDistribution"
+    
     @AppStorage("refreshToken") private var refreshToken: String = ""
-    @AppStorage("jwt") var jwt: String = ""
+    @AppStorage("jwt") var jwt: String = "" {
+        didSet {
+            BaseViewModel.shared.authenticated = true
+        }
+    }
         
     func login(_ user: User) async throws {
 
@@ -94,6 +99,8 @@ final class NetworkManager {
         guard let response = response as? HTTPURLResponse else {
             throw Errors.internalError("failed to parse response")
         }
+        
+        print("fcm token req: \(response)")
         switch response.statusCode {
         case 202:
             break
@@ -110,13 +117,6 @@ final class NetworkManager {
     }
     
     private func refreshAuthTokens() async throws {
-        
-        defer {
-            if jwt == "" || refreshToken == "" {
-                jwt = ""
-                refreshToken = ""
-            }
-        }
         
         guard let url = URL(string: refreshUrl) else {
             throw Errors.invalidUrl("url could not be constructed")
@@ -178,7 +178,45 @@ final class NetworkManager {
         switch response.statusCode {
         case 200:
             let events = try JSONDecoder().decode(EventsResponse.self, from: data)
-            return events.events
+            return events.events!
+        case 404:
+            throw Errors.notFound("user does not exist")
+        case 401:
+            throw Errors.expiredToken("tokens have expired")
+        default:
+            throw Errors.networkError("network error")
+        }
+        
+    }
+    
+    func getEventsDistribution() async throws -> DistributionResponse{
+        
+        if try JWT.isExpired(jwt) {
+            try await refreshAuthTokens()
+        }
+        
+        guard let url = URL(string: distributionUrl) else {
+            throw Errors.invalidUrl("url could not be constructed")
+        }
+        
+        var request = URLRequest(url:url)
+        request.setValue("Bearer \(jwt)", forHTTPHeaderField: "Authorization")
+        request.httpMethod = "GET"
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let response = response as? HTTPURLResponse else {
+            throw Errors.internalError("failed to parse response")
+        }
+        
+        switch response.statusCode {
+        case 200:
+            let distribution = try JSONDecoder().decode(DistributionResponse.self, from: data)
+            return distribution
+        case 404:
+            throw Errors.notFound("user does not exist")
+        case 401:
+            throw Errors.expiredToken("tokens have expired")
         default:
             throw Errors.networkError("network error")
         }
