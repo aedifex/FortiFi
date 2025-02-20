@@ -20,8 +20,10 @@ import Foundation
         isLoading = true
 
         do {
-            try await NetworkManager.shared.login(user)
+            user.id = try await NetworkManager.shared.login(user)
+            BaseViewModel.shared.authenticated = true
         } catch {
+            print("error: \(error)")
             switch error {
             case Errors.inputError:
                 alert = AlertContext.inputError

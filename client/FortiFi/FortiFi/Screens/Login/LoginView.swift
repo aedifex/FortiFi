@@ -8,15 +8,16 @@
 import SwiftUI
 
 struct LoginView: View {
-    @ObservedObject var viewModel = LoginViewModel()
+    @ObservedObject var viewModel = LoginViewModel.shared
+    
     var body: some View {
-        VStack(spacing: 32) {
+        VStack(spacing: 28) {
             // Header
-            VStack(spacing: 15) {
+            VStack(spacing: 18) {
                 Image("FortiFi-Logo")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 150)
+                    .frame(width: 120)
                 Text("Welcome back to FortiFi. If you have not yet registered an account, login via the QR code on your FortiFi device.")
                     .font(.system(size: 14))
                     .foregroundColor(.gray)
@@ -58,6 +59,8 @@ struct LoginView: View {
             
         }
         .padding(40)
+        .frame(maxHeight: .infinity)
+        .background(Color("Background"))
         .alert(item: $viewModel.alert) {alert in
             Alert(title: alert.title, message: alert.message, dismissButton: alert.dismissButton)
         }

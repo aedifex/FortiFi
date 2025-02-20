@@ -45,9 +45,11 @@ struct Home: View {
                     
                 }
                 .padding()
-                .background(Color("Background"))
-                
             }
+            .padding()
+            .frame(maxHeight: .infinity)
+            .background(Color("Background"))
+            .foregroundStyle(Color("Foreground"))
         }
         .refreshable {
             Task {

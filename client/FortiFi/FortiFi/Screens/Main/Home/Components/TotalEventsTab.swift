@@ -16,7 +16,7 @@ struct TotalEventsTab: View {
                     Text("**\(viewModel.totalEvents)** total events this week")
                             .font(.body)
                     if viewModel.difference == 0 {
-                        Text("Same previous week")
+                        Text("Same as previous week")
                                 .font(.subheadline)
                                 .foregroundStyle(Color("Foreground-Muted"))
                     } else if viewModel.difference < 0 {

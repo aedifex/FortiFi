@@ -13,7 +13,7 @@ import SwiftUI
     static let shared = NetworkManager()
     var fcm = ""
 
-    static private let baseUrl = "http://10.0.0.141:3000"
+    static private let baseUrl = "http://192.168.4.106:3000"
     private let loginUrl = baseUrl + "/Login"
     private let eventsUrl = baseUrl + "/GetUserEvents"
     private let refreshUrl = baseUrl + "/RefreshUser"
@@ -21,13 +21,9 @@ import SwiftUI
     private let distributionUrl = baseUrl + "/GetWeeklyDistribution"
     
     @AppStorage("refreshToken") private var refreshToken: String = ""
-    @AppStorage("jwt") var jwt: String = "" {
-        didSet {
-            BaseViewModel.shared.authenticated = true
-        }
-    }
+    @AppStorage("jwt") var jwt: String = ""
         
-    func login(_ user: User) async throws {
+    func login(_ user: User) async throws -> String {
 
         guard let url = URL(string: loginUrl) else {
             throw Errors.invalidUrl("url could not be constructed")
@@ -60,8 +56,9 @@ import SwiftUI
             
             refreshToken = response.value(forHTTPHeaderField: "Refresh")!
             jwt = response.value(forHTTPHeaderField: "Jwt")!
-            
             try await setNotificationsToken()
+            return try JWT.getSubject(for: jwt)
+            
         case 404:
             throw Errors.notFound("user does not exist")
         case 401:
@@ -106,7 +103,7 @@ import SwiftUI
         case 401:
             throw Errors.unauthorized("invalid auth token")
         case 400:
-            throw Errors.inputError("invalid fcm token")
+            throw Errors.networkError("failed to register notifications")
         case 404:
             throw Errors.notFound("no use associated with token")
         default:
@@ -117,14 +114,14 @@ import SwiftUI
     
     private func refreshAuthTokens() async throws {
         
-        guard let url = URL(string: refreshUrl) else {
+        guard var url = URL(string: refreshUrl) else {
             throw Errors.invalidUrl("url could not be constructed")
         }
         
+        url.append(queryItems: [URLQueryItem(name: "id", value: LoginViewModel.shared.user.id)])
         var request = URLRequest(url:url)
         request.setValue("\(refreshToken)", forHTTPHeaderField: "Refresh")
         request.httpMethod = "GET"
-        
         let (_, response) = try await URLSession.shared.data(for: request)
         
         guard let response = response as? HTTPURLResponse else {

@@ -20,6 +20,16 @@ final class JWT {
         return Date() >= expirationDate
     }
     
+    static func getSubject(for jwt: String) throws -> String {
+        let parsed = try parseJwt(jwt)
+        
+        guard let subject = parsed["sub"] as? String else {
+            throw Errors.inputError("failed to parse jwt subject")
+        }
+           
+        return subject
+    }
+    
     static private func parseJwt(_ jwt: String) throws -> [String: Any] {
         let segments = jwt.components(separatedBy: ".")
         if segments.count < 3 {
