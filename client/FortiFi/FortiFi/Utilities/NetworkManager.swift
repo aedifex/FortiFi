@@ -100,7 +100,6 @@ import SwiftUI
             throw Errors.internalError("failed to parse response")
         }
         
-        print("fcm token req: \(response)")
         switch response.statusCode {
         case 202:
             break
@@ -178,6 +177,7 @@ import SwiftUI
         switch response.statusCode {
         case 200:
             let events = try JSONDecoder().decode(EventsResponse.self, from: data)
+            if events.events == nil { return [] }
             return events.events!
         case 404:
             throw Errors.notFound("user does not exist")

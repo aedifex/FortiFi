@@ -11,7 +11,7 @@ import Foundation
     static let shared = HomeViewModel()
     
     @Published var events: [Event] = []
-    @Published var distribution: DistributionResponse = DistributionResponse(Normal: 0, Anomalous: 0, Malicious: 0, PrevCount: 0)
+    @Published var distribution: DistributionResponse = DistributionResponse(Normal: 0, Anomalous: 0, Malicious: 0, PrevWeekTotal: 0)
     @Published var totalEvents: Int = 0
     @Published var difference = 0
     
@@ -28,7 +28,7 @@ import Foundation
         do {
             distribution = try await NetworkManager.shared.getEventsDistribution()
             totalEvents = distribution.Anomalous + distribution.Normal + distribution.Malicious
-            difference = totalEvents - distribution.PrevCount
+            difference = totalEvents - distribution.PrevWeekTotal
         }
         catch {
             print("error getting distribution info: \(error)")

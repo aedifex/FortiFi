@@ -805,6 +805,7 @@ func TestGetWeeklyDistribution(t *testing.T) {
 				Normal: 10,
 				Anomalous: 5,
 				Malicious: 2,
+				PrevWeekTotal: 17,
 			},
 		},
 		{

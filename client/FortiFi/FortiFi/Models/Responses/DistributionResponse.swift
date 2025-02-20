@@ -11,5 +11,5 @@ struct DistributionResponse: Codable {
     var Normal: Int
     var Anomalous: Int
     var Malicious: Int
-    var PrevCount: Int
+    var PrevWeekTotal: Int
 }

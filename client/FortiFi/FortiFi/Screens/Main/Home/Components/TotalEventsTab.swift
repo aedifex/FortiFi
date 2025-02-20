@@ -15,9 +15,19 @@ struct TotalEventsTab: View {
                 VStack (alignment: .leading, spacing: 8) {
                     Text("**\(viewModel.totalEvents)** total events this week")
                             .font(.body)
-                    Text("+\(viewModel.difference) from previous week")
-                            .font(.subheadline)
-                            .foregroundStyle(Color("Foreground-Positive"))
+                    if viewModel.difference == 0 {
+                        Text("Same previous week")
+                                .font(.subheadline)
+                                .foregroundStyle(Color("Foreground-Muted"))
+                    } else if viewModel.difference < 0 {
+                        Text("\(viewModel.difference) from previous week")
+                                .font(.subheadline)
+                                .foregroundStyle(Color("Foreground-Negative"))
+                    } else {
+                        Text("+\(viewModel.difference) from previous week")
+                                .font(.subheadline)
+                                .foregroundStyle(Color("Foreground-Positive"))
+                    }
                 }
                 .padding()
                 Spacer()
