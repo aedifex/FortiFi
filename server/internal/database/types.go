@@ -24,7 +24,8 @@ type Event struct {
 }
 
 type WeeklyDistribution struct {
-	Normal		int	`sql:"normal_count"`
-	Anomalous	int	`sql:"anomalous_count"`
-	Malicious	int	`sql:"malicious_count"`
+	Normal			int	`sql:"normal_count"`
+	Anomalous		int	`sql:"anomalous_count"`
+	Malicious		int	`sql:"malicious_count"`
+	PrevWeekTotal	int	`sql:"prev_week_total"`
 }
