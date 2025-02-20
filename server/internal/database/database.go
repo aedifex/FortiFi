@@ -369,3 +369,24 @@ func (db *DatabaseConn) GetUserEvents(userId string) ([]*Event, *DatabaseError) 
 
     return events, nil
 }
+
+func (db *DatabaseConn) UpdateWeeklyDistribution(userId string, normal int, anomalous int, malicious int) *DatabaseError {
+
+    if _,userExistsErr := db.userIdExists(userId); userExistsErr != nil {
+        return userExistsErr
+    }
+
+    query := fmt.Sprintf("UPDATE %s SET normal_count = ?, anomalous_count = ?, malicious_count = ? WHERE id = ?;", UsersTable)
+    preparedStatement, err := db.conn.Prepare(query)
+    if err != nil {
+        return PREPARE_ERROR(err)
+    }
+    defer preparedStatement.Close()
+
+    _, err = preparedStatement.Exec(normal, anomalous, malicious, userId)
+    if err != nil {
+        return EXEC_ERROR(err)
+    }
+
+    return nil
+}

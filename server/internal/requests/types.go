@@ -22,3 +22,9 @@ type NotifyIntrusionRequest struct {
 type PiInitRequest struct {
 	Id	string	`json:"id"`
 }
+
+type UpdateWeeklyDistributionRequest struct {
+	Normal	int	`json:"normal"`
+	Anomalous	int	`json:"anomalous"`
+	Malicious	int	`json:"malicious"`
+}
