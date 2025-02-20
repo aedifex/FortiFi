@@ -125,8 +125,6 @@ func (h *RouteHandler) RefreshUser(writer http.ResponseWriter, request *http.Req
 	}
 
 	//Validate token
-	h.Log.Debugf("Using refresh token: %s", refresh.Token)
-	h.Log.Debugf("Using refresh id: %s", refresh.Id)
 	err := h.Db.ValidateRefresh(refresh, db.UserRefreshTable)
 	if err != nil {
 		h.Log.Errorf("Refresh Token Err: %s", err.Err)
