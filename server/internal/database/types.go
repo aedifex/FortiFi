@@ -20,4 +20,11 @@ type Event struct {
     Details 	string	`json:"details" sql:"details"`
     TS 			string	`json:"ts" sql:"ts"`
     Expires 	string	`json:"expires" sql:"expires"`
+	Type 		string	`json:"type" sql:"event_type"`
+}
+
+type WeeklyDistribution struct {
+	Normal		int	`sql:"normal_count"`
+	Anomalous	int	`sql:"anomalous_count"`
+	Malicious	int	`sql:"malicious_count"`
 }

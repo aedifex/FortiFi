@@ -50,7 +50,7 @@ func (h *RouteHandler) NotifyIntrusion(writer http.ResponseWriter, request *http
 	// Store event in database
 	event := body.Event
 	event.Id = subjectId
-	if event.Id == "" || event.Details == "" || event.Expires == "" || event.TS == "" {
+	if event.Id == "" || event.Details == "" || event.Expires == "" || event.TS == "" || event.Type == "" {
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}

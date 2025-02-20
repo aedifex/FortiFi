@@ -271,7 +271,7 @@ func (db *DatabaseConn) userIdExists(id string) (bool, *DatabaseError) {
 func (db *DatabaseConn) StoreEvent(e *Event) *DatabaseError {
 
     // Insert id, details, ts, expires
-    query := fmt.Sprintf("INSERT INTO %s VALUES (?, ?, ?, ?)", EventsTable)
+    query := fmt.Sprintf("INSERT INTO %s VALUES (?, ?, ?, ?, ?)", EventsTable)
 
     // prepare statement
     preparedStatement, err := db.conn.Prepare(query)
@@ -280,7 +280,7 @@ func (db *DatabaseConn) StoreEvent(e *Event) *DatabaseError {
     }
 
     // execute statement
-    res, err := preparedStatement.Exec(e.Id, e.Details, e.TS, e.Expires)
+    res, err := preparedStatement.Exec(e.Id, e.Details, e.TS, e.Expires, e.Type)
     if err != nil {
         return EXEC_ERROR(err)
     }
@@ -339,7 +339,7 @@ func (db *DatabaseConn) GetUserEvents(userId string) ([]*Event, *DatabaseError) 
     }
 
     // prepare query
-    query := fmt.Sprintf("SELECT id, details, ts, expires FROM %s WHERE id = ? ORDER BY ts DESC;", EventsTable)
+    query := fmt.Sprintf("SELECT id, details, ts, expires, event_type FROM %s WHERE id = ? ORDER BY ts DESC;", EventsTable)
     preparedStatement, err := db.conn.Prepare(query)
     if err != nil {
         return nil, PREPARE_ERROR(err)
@@ -356,7 +356,7 @@ func (db *DatabaseConn) GetUserEvents(userId string) ([]*Event, *DatabaseError) 
     var events []*Event
     for rows.Next() {
         event := &Event{}
-        err := rows.Scan(&event.Id, &event.Details, &event.TS, &event.Expires)
+        err := rows.Scan(&event.Id, &event.Details, &event.TS, &event.Expires, &event.Type)
         if err != nil {
             return nil, SCAN_ERROR(err)
         }
@@ -372,8 +372,12 @@ func (db *DatabaseConn) GetUserEvents(userId string) ([]*Event, *DatabaseError) 
 
 func (db *DatabaseConn) UpdateWeeklyDistribution(userId string, normal int, anomalous int, malicious int) *DatabaseError {
 
-    if _,userExistsErr := db.userIdExists(userId); userExistsErr != nil {
+    userExists, userExistsErr := db.userIdExists(userId);
+    if userExistsErr != nil {
         return userExistsErr
+    }
+    if !userExists {
+        return DNE_ERROR
     }
 
     query := fmt.Sprintf("UPDATE %s SET normal_count = ?, anomalous_count = ?, malicious_count = ? WHERE id = ?;", UsersTable)
@@ -390,3 +394,38 @@ func (db *DatabaseConn) UpdateWeeklyDistribution(userId string, normal int, anom
 
     return nil
 }
+
+func (db *DatabaseConn) GetWeeklyDistribution(userId string) (*WeeklyDistribution, *DatabaseError) {
+
+    userExists, userExistsErr := db.userIdExists(userId);
+    if userExistsErr != nil {
+        return nil, userExistsErr
+    }
+    if !userExists {
+        return nil, DNE_ERROR
+    }
+
+    query := fmt.Sprintf("SELECT normal_count, anomalous_count, malicious_count FROM %s WHERE id = ?;", UsersTable)
+    preparedStatement, err := db.conn.Prepare(query)
+    if err != nil {
+        return nil, PREPARE_ERROR(err)
+    }
+    defer preparedStatement.Close()
+
+    rows, err := preparedStatement.Query(userId)
+    if err != nil { return nil, QUERY_ERROR(err) }
+    defer rows.Close()
+
+    if !rows.Next() {
+        return nil, DNE_ERROR
+    }   
+
+    weeklyDistribution := &WeeklyDistribution{}
+    err = rows.Scan(&weeklyDistribution.Normal, &weeklyDistribution.Anomalous, &weeklyDistribution.Malicious)
+    if err != nil {
+        return nil, SCAN_ERROR(err)
+    }
+    
+    return weeklyDistribution, nil
+}
+

@@ -258,12 +258,14 @@ request_body: json
         - details: string
         - ts: timestamp string
         - expires: timestamp string
+        - type: string
     - example:
         {
             "event": {
                 "details": "there has been an intrusion on your network",
                 "ts": "2006-01-02 15:04:05",
-                "expires": "2006-01-02 15:04:05"
+                "expires": "2006-01-02 15:04:05",
+                "type": "anomaly"
             }
         }
 
