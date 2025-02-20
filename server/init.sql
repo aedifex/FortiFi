@@ -37,6 +37,7 @@ CREATE TABLE NetworkEvents (
     details varchar(255) NOT NULL,
     ts DATETIME NOT NULL,
     expires DATETIME NOT NULL,
-    event_type varchar(255) NOT NULL,
-    FOREIGN KEY (id) REFERENCES Users(id)
-)
+    event_type varchar(255) NOT NULL, -- normal, anomalous, malicious
+    FOREIGN KEY (id) REFERENCES Users(id) ON DELETE CASCADE
+);
+CREATE INDEX NetworkEvents_Id_Index ON NetworkEvents(id ASC);
