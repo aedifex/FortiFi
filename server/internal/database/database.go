@@ -414,7 +414,7 @@ func (db *DatabaseConn) GetWeeklyDistribution(userId string) (*WeeklyDistributio
         return nil, DNE_ERROR
     }
 
-    query := fmt.Sprintf("SELECT normal_count, anomalous_count, malicious_count FROM %s WHERE id = ?;", UsersTable)
+    query := fmt.Sprintf("SELECT normal_count, anomalous_count, malicious_count, prev_week_total FROM %s WHERE id = ?;", UsersTable)
     preparedStatement, err := db.conn.Prepare(query)
     if err != nil {
         return nil, PREPARE_ERROR(err)
@@ -430,7 +430,7 @@ func (db *DatabaseConn) GetWeeklyDistribution(userId string) (*WeeklyDistributio
     }   
 
     weeklyDistribution := &WeeklyDistribution{}
-    err = rows.Scan(&weeklyDistribution.Normal, &weeklyDistribution.Anomalous, &weeklyDistribution.Malicious)
+    err = rows.Scan(&weeklyDistribution.Normal, &weeklyDistribution.Anomalous, &weeklyDistribution.Malicious, &weeklyDistribution.PrevWeekTotal)
     if err != nil {
         return nil, SCAN_ERROR(err)
     }
