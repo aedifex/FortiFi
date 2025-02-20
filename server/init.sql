@@ -12,6 +12,7 @@ Create Table Users (
     normal_count int NOT NULL DEFAULT 0,
     anomalous_count int NOT NULL DEFAULT 0,
     malicious_count int NOT NULL DEFAULT 0,
+    prev_week_total int NOT NULL DEFAULT 0,
     password varchar(255) NOT NULL,
     PRIMARY KEY (id)
 );

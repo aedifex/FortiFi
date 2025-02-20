@@ -380,14 +380,23 @@ func (db *DatabaseConn) UpdateWeeklyDistribution(userId string, normal int, anom
         return DNE_ERROR
     }
 
-    query := fmt.Sprintf("UPDATE %s SET normal_count = ?, anomalous_count = ?, malicious_count = ? WHERE id = ?;", UsersTable)
+    prevWeekDistribution, getWeeklyDistributionErr := db.GetWeeklyDistribution(userId)
+    if getWeeklyDistributionErr != nil {
+        return getWeeklyDistributionErr
+    }
+
+    prevWeekTotal := prevWeekDistribution.Normal + 
+                        prevWeekDistribution.Anomalous + 
+                            prevWeekDistribution.Malicious
+
+    query := fmt.Sprintf("UPDATE %s SET normal_count = ?, anomalous_count = ?, malicious_count = ?, prev_week_total = ? WHERE id = ?;", UsersTable)
     preparedStatement, err := db.conn.Prepare(query)
     if err != nil {
         return PREPARE_ERROR(err)
     }
     defer preparedStatement.Close()
 
-    _, err = preparedStatement.Exec(normal, anomalous, malicious, userId)
+    _, err = preparedStatement.Exec(normal, anomalous, malicious, prevWeekTotal, userId)
     if err != nil {
         return EXEC_ERROR(err)
     }
