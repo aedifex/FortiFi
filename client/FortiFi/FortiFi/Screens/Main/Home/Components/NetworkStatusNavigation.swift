@@ -18,21 +18,23 @@ struct NetworkStatusNavigation: View {
             HStack {
                 
                 Image("OK")
+                    .resizable()
+                    .frame(width: 50, height: 50)
                 
                 VStack (alignment: .leading){
                     Text("Good")
                         .font(.body)
-                        .foregroundColor(Color("Foreground"))
+                        .foregroundColor(.fortifiForeground)
                     Text("^[\(homeViewModel.threats.count) Threat](inflect: true) found")
-                        .font(.subheadline)
-                        .foregroundColor(Color("Foreground-Muted"))
+                        .Label()
+                        .foregroundColor(.foregroundMuted)
                 }
                 
                 Spacer()
                 
             }
             .padding()
-            .background(Color(.white))
+            .background(.fortifiBackground)
             .cornerRadius(12)
             .shadow(color: Color.black.opacity(0.1), radius: 5, x: 2, y: 2)
             
@@ -43,23 +45,24 @@ struct NetworkStatusNavigation: View {
                 HStack {
                     
                     Image("Error")
-                    
+                        .resizable()
+                        .frame(width: 50, height: 50)
                     VStack (alignment: .leading){
                         Text("Needs Attention")
                             .font(.body)
-                            .foregroundColor(Color("Foreground"))
+                            .foregroundColor(.fortifiForeground)
                         Text("^[\(homeViewModel.threats.count) Threat](inflect: true) found")
-                            .font(.subheadline)
-                            .foregroundColor(Color("Foreground-Muted"))
+                            .Label()
+                            .foregroundColor(.foregroundMuted)
                     }
                     
                     Spacer()
                     
                     Image(systemName: "chevron.right")
-                        .foregroundColor(Color("Foreground-Muted"))
+                        .foregroundColor(.foregroundMuted)
                 }
                 .padding()
-                .background(Color(.white))
+                .background(.fortifiBackground)
                 .cornerRadius(12)
                 .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
                 

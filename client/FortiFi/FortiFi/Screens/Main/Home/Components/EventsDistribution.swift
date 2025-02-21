@@ -10,10 +10,10 @@ import Charts
 
 struct EventsDistribution: View {
     
-    let data = [
-        (name: "normal", count: HomeViewModel.shared.eventCounts.Benign, style: Color("Foreground-Positive")),
-        (name: "anomaly", count: HomeViewModel.shared.eventCounts.PortScan, style: .yellow),
-        (name: "malicious", count: HomeViewModel.shared.eventCounts.DDoS, style: Color("Foreground-Negative")),
+    let data: [(name:String, count: Int, style: Color)] = [
+        (name: "normal", count: HomeViewModel.shared.eventCounts.Benign, style: .fortifiPositive),
+        (name: "anomaly", count: HomeViewModel.shared.eventCounts.PortScan, style: .fortifiWarning),
+        (name: "malicious", count: HomeViewModel.shared.eventCounts.DDoS, style: .fortifiNegative),
     ]
     
     let weekStart = Calendar(identifier: .gregorian).currentWeekBoundary()!.startOfWeek!
@@ -23,12 +23,12 @@ struct EventsDistribution: View {
         VStack (spacing: 24){
             HStack {
                 Text("Traffic Distribution")
-                    .font(.subheadline)
-                    .foregroundStyle(Color("Foreground-Muted"))
+                    .Label()
+                    .foregroundStyle(.foregroundMuted)
                 Spacer()
                 Text("\(weekStart) - Present")
-                    .font(.subheadline)
-                    .foregroundStyle(Color("Foreground-Muted"))
+                    .Label()
+                    .foregroundStyle(.foregroundMuted)
             }
             HStack (spacing: 50){
                 VStack(alignment: .leading, spacing: 15){
@@ -36,30 +36,30 @@ struct EventsDistribution: View {
                         Text("^[**\(HomeViewModel.shared.totalEvents)** total event](inflect: true)")
                             .font(.body)
                         Text("This week")
-                            .font(.subheadline)
-                            .foregroundStyle(Color("Foreground-Muted"))
+                            .Label()
+                            .foregroundStyle(.foregroundMuted)
                     }
                     VStack(alignment: .leading, spacing: 16) {
                         HStack {
                             Text("**\(HomeViewModel.shared.eventCounts.Benign)** Benign")
-                                .font(.subheadline)
+                                .Label()
                             Text("\(HomeViewModel.shared.distributions[.benign] ?? 0, specifier: "%.1f")%")
-                                .font(.subheadline)
-                                .foregroundStyle(Color("Foreground-Muted"))
+                                .Label()
+                                .foregroundStyle(.foregroundMuted)
                         }
                         HStack {
                             Text("**\(HomeViewModel.shared.eventCounts.PortScan)** Port Scan")
-                                .font(.subheadline)
+                                .Label()
                             Text("\(HomeViewModel.shared.distributions[.portScan] ?? 0,specifier: "%.1f")%")
-                                .font(.subheadline)
-                                .foregroundStyle(Color("Foreground-Muted"))
+                                .Label()
+                                .foregroundStyle(.foregroundMuted)
                         }
                         HStack {
                             Text("**\(HomeViewModel.shared.eventCounts.DDoS)** DDoS")
-                                .font(.subheadline)
+                                .Label()
                             Text("\(HomeViewModel.shared.distributions[.ddos] ?? 0,specifier: "%.1f")%")
-                                .font(.subheadline)
-                                .foregroundStyle(Color("Foreground-Muted"))
+                                .Label()
+                                .foregroundStyle(.foregroundMuted)
                         }
                     }
                     .padding(.vertical)
@@ -79,7 +79,7 @@ struct EventsDistribution: View {
                             SectorMark(angle: .value("percent", 1),
                                        innerRadius: .ratio(0.7),
                                        angularInset: 1)
-                            .foregroundStyle(Color("Foreground-Positive"))
+                            .foregroundStyle(.fortifiPositive)
                         }
                         .frame(height: 150)
                         .chartBackground { chartProxy in
@@ -88,8 +88,8 @@ struct EventsDistribution: View {
                               let frame = geometry[anchor]
                               Text("Nothing to\nReport")
                                 .multilineTextAlignment(.center)
-                                .font(.caption)
-                                .foregroundStyle(Color("Foreground-Muted"))
+                                .Tag()
+                                .foregroundStyle(.foregroundMuted)
                                 .position(x: frame.midX, y: frame.midY)
                             }
                           }
@@ -99,7 +99,7 @@ struct EventsDistribution: View {
             }
         }
         .padding()
-        .background(Color(.white))
+        .background(.fortifiBackground)
         .cornerRadius(12)
         .shadow(color: Color.black.opacity(0.1), radius: 5, x: 2, y: 2)
     }

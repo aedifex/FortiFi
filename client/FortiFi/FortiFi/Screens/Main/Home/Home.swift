@@ -18,7 +18,7 @@ struct Home: View {
                     
                     HStack {
                         Text("Summary")
-                            .font(.title)
+                            .Title()
                             .fontWeight(.medium)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
@@ -26,7 +26,7 @@ struct Home: View {
                     VStack (spacing: 16){
                         HStack {
                             Text("Network Status")
-                                .font(.title3)
+                                .Header()
                                 .fontWeight(.regular)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
@@ -36,7 +36,7 @@ struct Home: View {
                     VStack (spacing: 16){
                         HStack {
                             Text("Event Insights")
-                                .font(.title3)
+                                .Header()
                                 .fontWeight(.regular)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
@@ -48,8 +48,8 @@ struct Home: View {
             }
             .contentMargins(16)
             .frame(maxHeight: .infinity)
-            .background(Color("Background"))
-            .foregroundStyle(Color("Foreground"))
+            .background(.backgroundAlt)
+            .foregroundStyle(.fortifiForeground)
         }
         .refreshable {
             Task {
