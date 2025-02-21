@@ -48,3 +48,14 @@ CREATE TABLE NetworkThreats (
 );
 CREATE INDEX NetworkThreats_Id_Index ON NetworkThreats(id ASC);
 CREATE INDEX NetworkThreats_TS_Index ON NetworkThreats(ts ASC);
+
+CREATE TABLE Devices (
+    id INT NOT NULL AUTO_INCREMENT,
+    userId varchar(255) NOT NULL,
+    name varchar(255) NOT NULL,
+    ip_address varchar(255) NOT NULL,
+    mac_address varchar(255) NOT NULL,
+    FOREIGN KEY (userId) REFERENCES Users(id) ON DELETE CASCADE,
+    PRIMARY KEY (id)
+);
+CREATE INDEX Devices_UserId_Index ON Devices(userId ASC);
