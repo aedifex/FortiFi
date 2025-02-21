@@ -270,6 +270,14 @@ func (db *DatabaseConn) userIdExists(id string) (bool, *DatabaseError) {
 
 func (db *DatabaseConn) StoreEvent(e *Event) *DatabaseError {
 
+    userExists, userExistsErr := db.userIdExists(e.Id)
+    if userExistsErr != nil {
+        return userExistsErr
+    }
+    if !userExists {
+        return DNE_ERROR
+    }
+
     // Insert id, details, ts, expires
     query := fmt.Sprintf("INSERT INTO %s VALUES (?, ?, ?, ?, ?, ?, ?)", EventsTable)
 

@@ -39,6 +39,7 @@ func (h *RouteHandler) NotifyIntrusion(writer http.ResponseWriter, request *http
 	}
 	err := json.NewDecoder(request.Body).Decode(body)
 	if err != nil {
+		h.Log.Errorf("error decoding body: %s", err)
 		http.Error(writer, "failed to parse body", http.StatusBadRequest)
 		return
 	}
@@ -61,7 +62,7 @@ func (h *RouteHandler) NotifyIntrusion(writer http.ResponseWriter, request *http
 		http.Error(writer, "failed to store event", storeErr.HttpStatus)
 		return
 	}
-	h.Log.Info("new event stored for user %s", subjectId)
+	h.Log.Infof("new event stored for user %s", subjectId)
 
 	// Get notifications token
 	fcmToken, fcmTokenErr := h.Db.GetFcmToken(subjectId)

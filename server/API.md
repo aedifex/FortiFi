@@ -255,17 +255,23 @@ headers:
 
 request_body: json
     - event:
+        - id: string
         - details: string
         - ts: timestamp string
         - expires: timestamp string
         - type: string (1 for port scan, 2 for ddos)
+        - src: string
+        - dst: string
     - example:
         {
             "event": {
+                "id": "id",
                 "details": "there has been an intrusion on your network",
                 "ts": "2006-01-02 15:04:05",
                 "expires": "2006-01-02 15:04:05",
-                "type": "1"
+                "type": "1",
+                "src": "10.0.1.1",
+                "dst": "10.0.1.2"
             }
         }
 
