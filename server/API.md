@@ -99,7 +99,7 @@ request_body: json
     - example:
         {
             "user": {
-                "id": id,
+                "id": "id",
                 "first_name":"oski",
                 "last_name":"bear",
                 "email":"oski@berkeley.edu",
@@ -258,14 +258,14 @@ request_body: json
         - details: string
         - ts: timestamp string
         - expires: timestamp string
-        - type: string
+        - type: string (1 for port scan, 2 for ddos)
     - example:
         {
             "event": {
                 "details": "there has been an intrusion on your network",
                 "ts": "2006-01-02 15:04:05",
                 "expires": "2006-01-02 15:04:05",
-                "type": "anomaly"
+                "type": "1"
             }
         }
 
@@ -314,7 +314,16 @@ responses:
         fix: check server logs
     - 200: OK
 
-response_body: []
+response_body: json
+    - events: [Events]
+        - id: string
+        - details: string
+        - ts: timestamp string
+        - expires: timestamp string
+        - type: string (1 for port scan, 2 for ddos)
+        - src_ip: string
+        - dst_ip: string
+        
 response_headers: []
 ```
 
@@ -334,14 +343,14 @@ headers:
     - Authorization: Bearer <jwt token>
 
 request_body: json
-    - normal: int
-    - anomaly: int
-    - malicious: int
+    - benign: int
+    - port_scan: int
+    - ddos: int
     - example:
         {
-            "normal": 124,
-            "anomaly": 13,
-            "malicious": 2
+            "benign": 124,
+            "port_scan": 13,
+            "ddos": 2
         }
 
 responses:
