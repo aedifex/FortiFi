@@ -14,7 +14,7 @@ type DatabaseConn struct {
 
 const (
     UsersTable       = "Users"
-    EventsTable      = "NetworkEvents"
+    EventsTable      = "NetworkThreats"
     UserRefreshTable =  "UserRefreshTokens"
     PiRefreshTable   =  "PiRefreshTokens"
 )
