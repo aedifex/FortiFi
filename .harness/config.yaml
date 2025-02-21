@@ -35,7 +35,6 @@ pipeline:
                         shell: Sh
                         command: |-
                           echo "Hello, FortiFi!"
-
                           ls -alt
                   - step:
                       type: Background
@@ -45,6 +44,10 @@ pipeline:
                         connectorRef: chriscircleci
                         image: mysql:latest
                         shell: Sh
+                        envVariables:
+                          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+                        portBindings:
+                          "3306": "3306"
               - step:
                   type: Run
                   name: Configure database
@@ -52,15 +55,19 @@ pipeline:
                   spec:
                     shell: Sh
                     command: |-
-                      cd server
-                      # make cicd-database-dev
-                      docker ps | grep mysql
+                      echo "Waiting for MySQL to start..."
+                      sleep 15  # Allow time for MySQL startup
 
+                      # Verify MySQL is running
+                      if ! nc -z 127.0.0.1 3306; then
+                        echo "MySQL is not running"
+                        exit 1
+                      fi
 
+                      echo "MySQL is running, proceeding with database setup"
 
-                      MYSQL_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -q --filter "ancestor=mysql:latest"))
-
-                      mysql -h $MYSQL_IP -P 3306 -uroot --password="" -e "SOURCE init.sql;"
+                      # Initialize database
+                      mysql -h 127.0.0.1 -P 3306 -uroot --password="" -e "SOURCE server/init.sql;"
   variables:
     - name: DB_PASSWORD
       type: String
