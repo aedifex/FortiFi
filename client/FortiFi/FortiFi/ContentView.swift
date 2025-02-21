@@ -10,50 +10,33 @@ import SwiftUI
 struct ContentView: View {
     
     @ObservedObject var manager = BaseViewModel.shared
-    @State var selection = "home"
     
     var body: some View {
         switch manager.authenticated {
         case true:
-            TabView(selection: $selection){
+            TabView{
                 Home()
-                    .tabItem {
-                        if selection == "home" {
-                            Image("home-active")
-                                .resizable()
-                                .frame(width: 50, height: 50)
-                        } else {
-                            Image("home")
-                        }
-        
+                    .tabItem{
+                        SwiftUI.Label("Summary", systemImage: "house")
                     }
-                    .tag("home")
                     .toolbarBackground(.fortifiBackground, for: .tabBar)
-                    
+                    .toolbarBackgroundVisibility(.visible, for: .tabBar)
 
                 Devices()
                     .tabItem {
-                        if selection == "devices" {
-                            Image("devices-active")
-                        } else {
-                            Image("devices")
-                        }
-        
+                        SwiftUI.Label("Devices", systemImage: "wifi.router")
                     }
-                    .tag("devices")
+                    .toolbarBackground(.fortifiBackground, for: .tabBar)
+                    .toolbarBackgroundVisibility(.visible, for: .tabBar)
 
                 Chat()
                     .tabItem {
-                        if selection == "chat" {
-                            Image("chatbot-active")
-                        } else {
-                            Image("chatbot")
-                        }
-        
+                        SwiftUI.Label("Chat", systemImage: "bubble.left.and.exclamationmark.bubble.right")
                     }
-                    .tag("chat")
-
+                    .toolbarBackground(.fortifiBackground, for: .tabBar)
+                    .toolbarBackgroundVisibility(.visible, for: .tabBar)
             }
+            .tint(.fortifiPrimary)
             .onAppear{
                 Task {
                     await HomeViewModel.shared.refresh()
