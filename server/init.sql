@@ -36,14 +36,15 @@ CREATE TABLE UserRefreshTokens (
 );
 CREATE INDEX Users_Expires_Index ON UserRefreshTokens(expires ASC);
 
-CREATE TABLE NetworkEvents (
+CREATE TABLE NetworkThreats (
     id varchar(255) NOT NULL,
     details varchar(255) NOT NULL,
     ts DATETIME NOT NULL,
     expires DATETIME NOT NULL,
-    event_type varchar(255) NOT NULL, --  anomalous or malicious
+    event_type INT NOT NULL, --  1 = HorizontalPortScan, 2 = DDoS
     src_ip varchar(255) NOT NULL,
     dst_ip varchar(255) NOT NULL,
     FOREIGN KEY (id) REFERENCES Users(id) ON DELETE CASCADE
 );
 CREATE INDEX NetworkEvents_Id_Index ON NetworkEvents(id ASC);
+CREATE INDEX NetworkEvents_TS_Index ON NetworkEvents(ts ASC);
