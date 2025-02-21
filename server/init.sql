@@ -9,9 +9,9 @@ Create Table Users (
     last_name varchar(64) NOT NULL,
     email varchar(64) NOT NULL,
     fcm_token varchar(255),
-    normal_count int NOT NULL DEFAULT 0,
-    anomalous_count int NOT NULL DEFAULT 0,
-    malicious_count int NOT NULL DEFAULT 0,
+    benign_count int NOT NULL DEFAULT 0,
+    port_scan_count int NOT NULL DEFAULT 0,
+    ddos_count int NOT NULL DEFAULT 0,
     prev_week_total int NOT NULL DEFAULT 0,
     password varchar(255) NOT NULL,
     PRIMARY KEY (id)
