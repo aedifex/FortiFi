@@ -47,7 +47,7 @@ var (
 	lastName = "Bear"
 	email = "oskibear@berkeley.edu"
 	password = "Go Bears!"
-	fcmToken = "<fill in token>"
+	fcmToken = "c9g9Wdmp90NchwYMhiiLBp:APA91bHfeKLGu921KeSj45uikQbhg1_Gx44qBjHErrjDoMzSIag5fGJdUotOCOjCQumLv2etUbe_e_gfJNKOIQEhUua6KIcp7zQcgGetkleiWPLJgRJ3GcY"
 )
 
 var server = setupTestServer()
@@ -77,13 +77,13 @@ func setupTestServer() *fortifiServer {
 
 	// Setup environment
 	config := &config.Config{
-		Port: "<fill in port>",
-		DB_USER: "<fill in user>",
-		DB_PASS: "<fill in password>",
-		DB_URL: "<fill in url>",
-		DB_NAME: "<fill in name>",
-		SIGNING_KEY: "<fill in key>",
-		FcmKeyPath: "<fill in path>",
+		Port: ":3000",
+		DB_USER: "root",
+		DB_PASS: "",
+		DB_URL: "localhost:3306",
+		DB_NAME: "FortiFi",
+		SIGNING_KEY: "b2e138d8553ea7d7ff8731e87e41406277bd4c98",
+		FcmKeyPath: "",
 	}
 
 	// Create new FortifiServer
@@ -646,6 +646,9 @@ func TestNotifyIntrusion(t *testing.T) {
 					Details: "Instrusion event details here",
 					TS: "2006-01-02 15:04:05",
 					Expires: "2026-01-02 15:04:05",
+					Type: "1",
+					SrcIP: "10.0.1.1",
+					DstIP: "10.0.1.2",
 				},
 			},
 			jwt: piJwt,
@@ -700,8 +703,46 @@ func TestNotifyIntrusion(t *testing.T) {
 			},
 			jwt: piJwt,
 		},
+		{
+			name: "missing type",
+			correctStatus: http.StatusBadRequest,
+			requestBody: &requests.NotifyIntrusionRequest{
+				Event: &database.Event{
+					Details: "Instrusion event details here",
+					TS: "2006-01-02 15:04:05",
+					Expires: "2026-01-02 15:04:05",
+				},
+			},
+			jwt: piJwt,
+		},
+		{
+			name: "missing src ip",
+			correctStatus: http.StatusBadRequest,
+			requestBody: &requests.NotifyIntrusionRequest{
+				Event: &database.Event{
+					Details: "Instrusion event details here",
+					TS: "2006-01-02 15:04:05",
+					Expires: "2026-01-02 15:04:05",
+					Type: "anomaly",
+				},
+			},
+			jwt: piJwt,
+		},
+		{
+			name: "missing dst ip",
+			correctStatus: http.StatusBadRequest,
+			requestBody: &requests.NotifyIntrusionRequest{
+				Event: &database.Event{
+					Details: "Instrusion event details here",
+					TS: "2006-01-02 15:04:05",
+					Expires: "2026-01-02 15:04:05",
+					Type: "anomaly",
+				},
+			},
+			jwt: piJwt,
+		},
 	}
-
+	
 	missingBodyTest(t, method, path)
 	for _,tc := range testCases {
 		t.Run(tc.name, buildTest(tc, method, path))
@@ -719,6 +760,9 @@ func TestGetUserEvents(t *testing.T) {
 				Details: "Instrusion event details here",
 				TS: "2006-01-02 15:04:05",
 				Expires: "2026-01-02 15:04:05",
+				Type: "1",
+				SrcIP: "10.0.1.1",
+				DstIP: "10.0.1.2",
 			},
 		},
 	}
@@ -741,6 +785,100 @@ func TestGetUserEvents(t *testing.T) {
 		},
 	}
 
+	for _, tc := range testCases {
+		t.Run(tc.name, buildTest(tc, method, path))
+	}
+}
+
+func TestUpdateWeeklyDistribution(t *testing.T) {
+	path := "/UpdateWeeklyDistribution"
+	method := http.MethodPost
+
+	testCases := []testCase{
+		{
+			name: "valid request",
+			correctStatus: http.StatusOK,
+			jwt: piJwt,
+			requestBody: &requests.UpdateWeeklyDistributionRequest{
+				Benign: 10,
+				PortScan: 5,
+				DDoS: 2,
+			},
+		},
+		{
+			name: "missing jwt",
+			correctStatus: http.StatusUnauthorized,
+		},
+		{
+			name: "invalid jwt",
+			correctStatus: http.StatusUnauthorized,
+			jwt: "invalid.jwt.token",
+		},
+	}
+
+	missingBodyTest(t, method, path)
+	for _, tc := range testCases {
+		t.Run(tc.name, buildTest(tc, method, path))
+	}
+}
+
+func TestGetWeeklyDistribution(t *testing.T) {
+	path := "/GetWeeklyDistribution"
+	method := http.MethodGet
+
+	testCases := []testCase{
+		{
+			name: "valid request",
+			correctStatus: http.StatusOK,
+			jwt: piJwt,
+			expectedBody: &database.WeeklyDistribution{
+				Benign: 10,
+				PortScan: 5,
+				DDoS: 2,
+				PrevWeekTotal: 0,
+			},
+		},
+		{
+			name: "missing jwt",
+			correctStatus: http.StatusUnauthorized,
+		},
+		{
+			name: "invalid jwt",
+			correctStatus: http.StatusUnauthorized,
+			jwt: "invalid.jwt.token",
+		},
+		{
+			name: "user does not exist",
+			correctStatus: http.StatusUnauthorized,
+		},
+	}
+	
+	for _, tc := range testCases {
+		t.Run(tc.name, buildTest(tc, method, path))
+	}
+}
+
+func TestResetWeeklyDistribution(t *testing.T) {
+	path := "/ResetWeeklyDistribution"
+	method := http.MethodPost
+
+	testCases := []testCase{
+		{
+			name: "valid request",
+			correctStatus: http.StatusOK,
+			jwt: piJwt,
+		},
+		{
+			name: "missing jwt",
+			correctStatus: http.StatusUnauthorized,
+		},
+		{
+			name: "invalid jwt",
+			correctStatus: http.StatusUnauthorized,
+			jwt: "invalid.jwt.token",
+		},
+	}
+	
 	for _, tc := range testCases {
 		t.Run(tc.name, buildTest(tc, method, path))
 	}

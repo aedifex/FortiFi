@@ -3,13 +3,27 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		602857392D6614A600295739 /* Devices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 602857382D6614A600295739 /* Devices.swift */; };
+		6028573B2D6614B100295739 /* Chat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6028573A2D6614B100295739 /* Chat.swift */; };
+		602857412D66328B00295739 /* NetworkStatusNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 602857402D66328B00295739 /* NetworkStatusNavigation.swift */; };
+		602857432D6662BE00295739 /* Events.swift in Sources */ = {isa = PBXBuildFile; fileRef = 602857422D6662BE00295739 /* Events.swift */; };
+		602857452D66A2BB00295739 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 602857442D66A2BB00295739 /* HomeViewModel.swift */; };
+		602857472D66A33200295739 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 602857462D66A33200295739 /* Event.swift */; };
+		602857492D66A37A00295739 /* EventsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 602857482D66A37A00295739 /* EventsResponse.swift */; };
+		6028574B2D66CB3700295739 /* DistributionResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6028574A2D66CB3700295739 /* DistributionResponse.swift */; };
+		6028574D2D66D99600295739 /* TotalEventsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6028574C2D66D99600295739 /* TotalEventsTab.swift */; };
+		6028574F2D67679D00295739 /* EventsDistribution.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6028574E2D67679D00295739 /* EventsDistribution.swift */; };
 		6052319F2D582B9100882091 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 6052319E2D582B9100882091 /* FirebaseAnalytics */; };
 		605231A32D584BD900882091 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 605231A22D584BD900882091 /* GoogleService-Info.plist */; };
 		605231A52D584C7E00882091 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 605231A42D584C7E00882091 /* FirebaseMessaging */; };
+		606E27F02D679EED00387D67 /* EventTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606E27EF2D679EE600387D67 /* EventTab.swift */; };
+		606E27F22D67A55F00387D67 /* SingleEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606E27F12D67A55F00387D67 /* SingleEvent.swift */; };
+		606E27F52D681C1B00387D67 /* Date+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606E27F42D681C1500387D67 /* Date+.swift */; };
+		606E27F92D68B1E500387D67 /* ThreatTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606E27F82D68B1E500387D67 /* ThreatTypes.swift */; };
 		60C633C32D553A3100CFD81C /* FortiFiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C633C22D553A3100CFD81C /* FortiFiApp.swift */; };
 		60C633C52D553A3100CFD81C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C633C42D553A3100CFD81C /* ContentView.swift */; };
 		60C633C72D553A3200CFD81C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 60C633C62D553A3200CFD81C /* Assets.xcassets */; };
@@ -29,8 +43,22 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		602857382D6614A600295739 /* Devices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Devices.swift; sourceTree = "<group>"; };
+		6028573A2D6614B100295739 /* Chat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chat.swift; sourceTree = "<group>"; };
+		602857402D66328B00295739 /* NetworkStatusNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkStatusNavigation.swift; sourceTree = "<group>"; };
+		602857422D6662BE00295739 /* Events.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Events.swift; sourceTree = "<group>"; };
+		602857442D66A2BB00295739 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
+		602857462D66A33200295739 /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
+		602857482D66A37A00295739 /* EventsResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventsResponse.swift; sourceTree = "<group>"; };
+		6028574A2D66CB3700295739 /* DistributionResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistributionResponse.swift; sourceTree = "<group>"; };
+		6028574C2D66D99600295739 /* TotalEventsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TotalEventsTab.swift; sourceTree = "<group>"; };
+		6028574E2D67679D00295739 /* EventsDistribution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventsDistribution.swift; sourceTree = "<group>"; };
 		6052319A2D5826CF00882091 /* FortiFi.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FortiFi.entitlements; sourceTree = "<group>"; };
 		605231A22D584BD900882091 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		606E27EF2D679EE600387D67 /* EventTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventTab.swift; sourceTree = "<group>"; };
+		606E27F12D67A55F00387D67 /* SingleEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleEvent.swift; sourceTree = "<group>"; };
+		606E27F42D681C1500387D67 /* Date+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+.swift"; sourceTree = "<group>"; };
+		606E27F82D68B1E500387D67 /* ThreatTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ThreatTypes.swift; path = /Users/jonathannguyen/Downloads/ThreatTypes.swift; sourceTree = "<absolute>"; };
 		60C633BF2D553A3100CFD81C /* FortiFi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FortiFi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		60C633C22D553A3100CFD81C /* FortiFiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FortiFiApp.swift; sourceTree = "<group>"; };
 		60C633C42D553A3100CFD81C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -64,6 +92,36 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6028573E2D66326200295739 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				6028573F2D66326E00295739 /* Components */,
+				60DB19822D63CB26009ECBA9 /* Home.swift */,
+				602857422D6662BE00295739 /* Events.swift */,
+				606E27F12D67A55F00387D67 /* SingleEvent.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		6028573F2D66326E00295739 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				606E27EF2D679EE600387D67 /* EventTab.swift */,
+				602857402D66328B00295739 /* NetworkStatusNavigation.swift */,
+				6028574C2D66D99600295739 /* TotalEventsTab.swift */,
+				6028574E2D67679D00295739 /* EventsDistribution.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		606E27F32D681BFF00387D67 /* extensions */ = {
+			isa = PBXGroup;
+			children = (
+				606E27F42D681C1500387D67 /* Date+.swift */,
+			);
+			path = extensions;
+			sourceTree = "<group>";
+		};
 		60C633B62D553A3100CFD81C = {
 			isa = PBXGroup;
 			children = (
@@ -109,7 +167,7 @@
 		60DB195E2D62C110009ECBA9 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
-				60DB19622D62C191009ECBA9 /* Home */,
+				60DB19622D62C191009ECBA9 /* Main */,
 				60DB19612D62C186009ECBA9 /* Login */,
 			);
 			path = Screens;
@@ -118,6 +176,7 @@
 		60DB195F2D62C154009ECBA9 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				606E27F32D681BFF00387D67 /* extensions */,
 				60DB197D2D63AE51009ECBA9 /* Jwt */,
 				60DB19702D62CA03009ECBA9 /* Alerts */,
 				60DB196E2D62C532009ECBA9 /* NetworkManager.swift */,
@@ -131,6 +190,8 @@
 				60DB19762D62D561009ECBA9 /* Responses */,
 				60DB19732D62D419009ECBA9 /* Requests */,
 				60DB196C2D62C3BF009ECBA9 /* User.swift */,
+				602857462D66A33200295739 /* Event.swift */,
+				606E27F82D68B1E500387D67 /* ThreatTypes.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -143,18 +204,20 @@
 			path = Login;
 			sourceTree = "<group>";
 		};
-		60DB19622D62C191009ECBA9 /* Home */ = {
+		60DB19622D62C191009ECBA9 /* Main */ = {
 			isa = PBXGroup;
 			children = (
-				60DB19822D63CB26009ECBA9 /* Home.swift */,
+				6028573E2D66326200295739 /* Home */,
+				602857382D6614A600295739 /* Devices.swift */,
+				6028573A2D6614B100295739 /* Chat.swift */,
 			);
-			path = Home;
+			path = Main;
 			sourceTree = "<group>";
 		};
 		60DB19672D62C2F0009ECBA9 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				60DB19692D62C2FF009ECBA9 /* Home */,
+				60DB19692D62C2FF009ECBA9 /* Main */,
 				60DB19682D62C2FB009ECBA9 /* Login */,
 				60DB19802D63BF73009ECBA9 /* Base.swift */,
 			);
@@ -169,11 +232,12 @@
 			path = Login;
 			sourceTree = "<group>";
 		};
-		60DB19692D62C2FF009ECBA9 /* Home */ = {
+		60DB19692D62C2FF009ECBA9 /* Main */ = {
 			isa = PBXGroup;
 			children = (
+				602857442D66A2BB00295739 /* HomeViewModel.swift */,
 			);
-			path = Home;
+			path = Main;
 			sourceTree = "<group>";
 		};
 		60DB19702D62CA03009ECBA9 /* Alerts */ = {
@@ -198,6 +262,8 @@
 			isa = PBXGroup;
 			children = (
 				60DB19772D62D56F009ECBA9 /* LoginResponse.swift */,
+				602857482D66A37A00295739 /* EventsResponse.swift */,
+				6028574A2D66CB3700295739 /* DistributionResponse.swift */,
 			);
 			path = Responses;
 			sourceTree = "<group>";
@@ -250,7 +316,6 @@
 				};
 			};
 			buildConfigurationList = 60C633BA2D553A3100CFD81C /* Build configuration list for PBXProject "FortiFi" */;
-			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -261,6 +326,7 @@
 			packageReferences = (
 				6052319D2D582B9100882091 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
+			preferredProjectObjectVersion = 77;
 			productRefGroup = 60C633C02D553A3100CFD81C /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -288,16 +354,30 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				602857452D66A2BB00295739 /* HomeViewModel.swift in Sources */,
 				60DB197C2D63AD1D009ECBA9 /* SetFcmRequest.swift in Sources */,
+				606E27F22D67A55F00387D67 /* SingleEvent.swift in Sources */,
+				602857412D66328B00295739 /* NetworkStatusNavigation.swift in Sources */,
 				60DB196F2D62C532009ECBA9 /* NetworkManager.swift in Sources */,
+				6028574B2D66CB3700295739 /* DistributionResponse.swift in Sources */,
+				606E27F92D68B1E500387D67 /* ThreatTypes.swift in Sources */,
+				602857472D66A33200295739 /* Event.swift in Sources */,
+				602857392D6614A600295739 /* Devices.swift in Sources */,
 				60DB196B2D62C374009ECBA9 /* LoginViewModel.swift in Sources */,
+				606E27F52D681C1B00387D67 /* Date+.swift in Sources */,
+				6028574F2D67679D00295739 /* EventsDistribution.swift in Sources */,
 				60DB19782D62D56F009ECBA9 /* LoginResponse.swift in Sources */,
+				602857432D6662BE00295739 /* Events.swift in Sources */,
+				6028573B2D6614B100295739 /* Chat.swift in Sources */,
 				60DB19642D62C24A009ECBA9 /* LoginView.swift in Sources */,
 				60DB19812D63BF73009ECBA9 /* Base.swift in Sources */,
 				60DB19832D63CB26009ECBA9 /* Home.swift in Sources */,
 				60C633C52D553A3100CFD81C /* ContentView.swift in Sources */,
 				60DB196D2D62C3BF009ECBA9 /* User.swift in Sources */,
+				602857492D66A37A00295739 /* EventsResponse.swift in Sources */,
+				606E27F02D679EED00387D67 /* EventTab.swift in Sources */,
 				60DB197A2D62DA76009ECBA9 /* Alerts.swift in Sources */,
+				6028574D2D66D99600295739 /* TotalEventsTab.swift in Sources */,
 				60C633C32D553A3100CFD81C /* FortiFiApp.swift in Sources */,
 				60DB197F2D63AE60009ECBA9 /* jwt.swift in Sources */,
 				60DB19722D62D2A6009ECBA9 /* Errors.swift in Sources */,
@@ -446,6 +526,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -479,6 +560,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

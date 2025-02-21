@@ -33,7 +33,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, MessagingDelegate, UNUserNot
         
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         if let fcm = Messaging.messaging().fcmToken {
-            NetworkManager.fcm = fcm
+            NetworkManager.shared.fcm = fcm
         }
     }
     

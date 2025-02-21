@@ -19,7 +19,7 @@ func GenTokenPair(key string, id string) (string, *db.RefreshToken, error) {
 	claims := jwt.RegisteredClaims{
 		Issuer: "FortiFi",
 		Subject: id,
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour*24)),
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute*5)),
 		IssuedAt: jwt.NewNumericDate(time.Now()),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

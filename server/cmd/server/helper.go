@@ -69,6 +69,7 @@ func newServer(config *config.Config) *fortifiServer {
 	// All routes should be wrapped by middleware.Logging
 	mux := http.NewServeMux()
 	mux.HandleFunc("/NotifyIntrusion", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.NotifyIntrusion))
+	// ? Should CreateUser be wrapped by Auth? Use the Pi init token to create a user
 	mux.HandleFunc("/CreateUser", routeHandler.CreateUser)
 	mux.HandleFunc("/Login", routeHandler.Login)
 	mux.HandleFunc("/RefreshUser", routeHandler.RefreshUser)
@@ -76,6 +77,9 @@ func newServer(config *config.Config) *fortifiServer {
 	mux.HandleFunc("/PiInit", routeHandler.PiInit)
 	mux.HandleFunc("/UpdateFcm",  middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.UpdateFcmToken))
 	mux.HandleFunc("/GetUserEvents", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.GetUserEvents))
+	mux.HandleFunc("/GetWeeklyDistribution", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.GetWeeklyDistribution))
+	mux.HandleFunc("/UpdateWeeklyDistribution", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.UpdateWeeklyDistribution))
+	mux.HandleFunc("/ResetWeeklyDistribution", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.ResetWeeklyDistribution))
 	loggingMiddleware := middleware.Logging(zapLogger)
 	corsMiddleware := middleware.CORSMiddleware(config.CORS_ORIGIN)
 	serverHandler := corsMiddleware(loggingMiddleware(mux))

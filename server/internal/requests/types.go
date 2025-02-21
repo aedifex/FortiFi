@@ -22,3 +22,13 @@ type NotifyIntrusionRequest struct {
 type PiInitRequest struct {
 	Id	string	`json:"id"`
 }
+
+type UpdateWeeklyDistributionRequest struct {
+	Benign		int	`json:"benign"`
+	PortScan	int	`json:"port_scan"`
+	DDoS		int	`json:"ddos"`
+}
+
+type ResetWeeklyDistributionRequest struct {
+	WeekTotal	int	`json:"week_total"`
+}

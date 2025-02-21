@@ -231,10 +231,39 @@ func (h *RouteHandler) GetUserEvents(writer http.ResponseWriter, request *http.R
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	writer.WriteHeader(http.StatusOK)
 
 }
 
+func (h *RouteHandler) GetWeeklyDistribution(writer http.ResponseWriter, request *http.Request) {
+
+	if request.Method != http.MethodGet {
+		http.Error(writer, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	subjectId, ok := request.Context().Value(middleware.UserIdContextKey).(string)
+	if !ok {
+		h.Log.Errorf("could not assert subjectId from context as string: %v", subjectId)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	weeklyDistribution, err := h.Db.GetWeeklyDistribution(subjectId)
+	if err != nil {
+		h.Log.Errorf("error getting weekly distribution: %s", err.Err)
+		http.Error(writer, "failed to get weekly distribution", err.HttpStatus)
+		return
+	}
+	
+	writer.Header().Set("Content-Type", "application/json")
+	encodeErr := json.NewEncoder(writer).Encode(weeklyDistribution)
+	if encodeErr != nil {
+		h.Log.Errorf("error encoding weekly distribution: %s", encodeErr.Error())
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	
+}
 // TODO implement this -- Should revoke refresh tokens
 // func (h *RouteHandler) Logout(writer http.ResponseWriter, request *http.Request){
 // 	return

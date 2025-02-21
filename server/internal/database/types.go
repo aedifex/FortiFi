@@ -20,4 +20,14 @@ type Event struct {
     Details 	string	`json:"details" sql:"details"`
     TS 			string	`json:"ts" sql:"ts"`
     Expires 	string	`json:"expires" sql:"expires"`
+	Type 		string	`json:"type" sql:"event_type"`
+	SrcIP 		string	`json:"src" sql:"src_ip"`
+	DstIP 		string	`json:"dst" sql:"dst_ip"`
+}
+
+type WeeklyDistribution struct {
+	Benign			int	`sql:"benign_count"`
+	PortScan		int	`sql:"port_scan_count"`
+	DDoS			int	`sql:"ddos_count"`
+	PrevWeekTotal	int	`sql:"prev_week_total"`
 }

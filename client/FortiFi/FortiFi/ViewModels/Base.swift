@@ -9,6 +9,5 @@ import Foundation
 
 @MainActor final class BaseViewModel: ObservableObject {
     static var shared = BaseViewModel()
-    @Published var loginSuccess = false
-    
+    @Published var authenticated = NetworkManager.shared.jwt != ""
 }

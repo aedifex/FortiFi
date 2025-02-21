@@ -16,8 +16,18 @@ final class JWT {
             throw Errors.inputError("failed to parse jwt exp time")
         }
            
-        let expirationDate = Date(timeIntervalSince1970: expiration)
+        let expirationDate = Date(timeIntervalSince1970: expiration).addingTimeInterval(TimeInterval(-60))
         return Date() >= expirationDate
+    }
+    
+    static func getSubject(for jwt: String) throws -> String {
+        let parsed = try parseJwt(jwt)
+        
+        guard let subject = parsed["sub"] as? String else {
+            throw Errors.inputError("failed to parse jwt subject")
+        }
+           
+        return subject
     }
     
     static private func parseJwt(_ jwt: String) throws -> [String: Any] {

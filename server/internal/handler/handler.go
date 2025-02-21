@@ -39,6 +39,7 @@ func (h *RouteHandler) NotifyIntrusion(writer http.ResponseWriter, request *http
 	}
 	err := json.NewDecoder(request.Body).Decode(body)
 	if err != nil {
+		h.Log.Errorf("error decoding body: %s", err)
 		http.Error(writer, "failed to parse body", http.StatusBadRequest)
 		return
 	}
@@ -50,7 +51,7 @@ func (h *RouteHandler) NotifyIntrusion(writer http.ResponseWriter, request *http
 	// Store event in database
 	event := body.Event
 	event.Id = subjectId
-	if event.Id == "" || event.Details == "" || event.Expires == "" || event.TS == "" {
+	if event.Id == "" || event.Details == "" || event.Expires == "" || event.TS == "" || event.Type == "" || event.SrcIP == "" || event.DstIP == "" {
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -61,7 +62,7 @@ func (h *RouteHandler) NotifyIntrusion(writer http.ResponseWriter, request *http
 		http.Error(writer, "failed to store event", storeErr.HttpStatus)
 		return
 	}
-	h.Log.Info("new event stored for user %s", subjectId)
+	h.Log.Infof("new event stored for user %s", subjectId)
 
 	// Get notifications token
 	fcmToken, fcmTokenErr := h.Db.GetFcmToken(subjectId)
@@ -79,5 +80,83 @@ func (h *RouteHandler) NotifyIntrusion(writer http.ResponseWriter, request *http
 		return
 	}
 	h.Log.Infof("Notification Sent: %s", response)
+	writer.WriteHeader(http.StatusOK)
+}
+
+func (h *RouteHandler) UpdateWeeklyDistribution(writer http.ResponseWriter, request *http.Request) {
+
+	if request.Method != http.MethodPost {
+		http.Error(writer, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	
+	subjectId, ok := request.Context().Value(middleware.UserIdContextKey).(string)
+	if !ok {
+		h.Log.Errorf("could not assert subjectId from context as string: %v", subjectId)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	
+	// parse body
+	body := &requests.UpdateWeeklyDistributionRequest{}
+	if request.Body == nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	err := json.NewDecoder(request.Body).Decode(body)
+	if err != nil {
+		h.Log.Errorf("json decode error: %s", err.Error())
+		http.Error(writer, "unable to parse body", http.StatusBadRequest)
+		return
+	}
+	if body.Benign < 0 || body.PortScan < 0 || body.DDoS < 0 {
+		http.Error(writer, "invalid request", http.StatusBadRequest)
+		return
+	}
+	
+	updateErr := h.Db.UpdateWeeklyDistribution(subjectId, body.Benign, body.PortScan, body.DDoS)
+	if updateErr != nil {
+		h.Log.Errorf("error updating weekly distribution: %s", updateErr.Err)
+		http.Error(writer, "unable to update weekly distribution", updateErr.HttpStatus)
+		return
+	}
+	
+	writer.WriteHeader(http.StatusOK)
+
+}
+
+func (h *RouteHandler) ResetWeeklyDistribution(writer http.ResponseWriter, request *http.Request) {
+
+	if request.Method != http.MethodPost {
+		http.Error(writer, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	
+	subjectId, ok := request.Context().Value(middleware.UserIdContextKey).(string)
+	if !ok {
+		h.Log.Errorf("could not assert subjectId from context as string: %v", subjectId)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	body := &requests.ResetWeeklyDistributionRequest{}
+	if request.Body == nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	err := json.NewDecoder(request.Body).Decode(body)
+	if err != nil {
+		h.Log.Errorf("json decode error: %s", err.Error())
+		http.Error(writer, "unable to parse body", http.StatusBadRequest)
+		return
+	}
+	
+	resetErr := h.Db.ResetWeeklyDistribution(subjectId, body.WeekTotal)
+	if resetErr != nil {
+		h.Log.Errorf("error resetting weekly distribution: %s", resetErr.Err)
+		http.Error(writer, "unable to reset weekly distribution", resetErr.HttpStatus)
+		return
+	}
+	
 	writer.WriteHeader(http.StatusOK)
 }
