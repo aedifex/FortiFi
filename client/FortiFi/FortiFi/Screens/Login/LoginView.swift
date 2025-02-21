@@ -52,15 +52,15 @@ struct LoginView: View {
                     Text("Login")
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color("Fortifi-Primary"))
-                    .foregroundColor(.white)
+                    .background(.fortifiPrimary)
+                    .foregroundStyle(.fortifiBackground)
                     .cornerRadius(8)
             }
             
         }
         .padding(40)
         .frame(maxHeight: .infinity)
-        .background(Color("Background"))
+        .background(.backgroundAlt)
         .alert(item: $viewModel.alert) {alert in
             Alert(title: alert.title, message: alert.message, dismissButton: alert.dismissButton)
         }
@@ -73,12 +73,12 @@ struct CustomTextFieldStyle: TextFieldStyle {
         configuration
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
-            .background(Color.white)
+            .background(.fortifiBackground)
             .foregroundColor(.gray)
             .cornerRadius(8)
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color("Foreground-Muted"), lineWidth: 1)
+                    .stroke(.foregroundMuted, lineWidth: 1)
             )
     }
 }

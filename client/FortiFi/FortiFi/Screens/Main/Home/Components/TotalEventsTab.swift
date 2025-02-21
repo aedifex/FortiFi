@@ -17,11 +17,11 @@ struct TotalEventsTab: View {
             HStack {
                 Text("Traffic Volume")
                     .font(.subheadline)
-                    .foregroundStyle(Color("Foreground-Muted"))
+                    .foregroundStyle(.foregroundMuted)
                 Spacer()
                 Text("\(weekStart) - Present")
                     .font(.subheadline)
-                    .foregroundStyle(Color("Foreground-Muted"))
+                    .foregroundStyle(.foregroundMuted)
             }
             HStack {
                 VStack (alignment: .leading, spacing: 8) {
@@ -30,22 +30,22 @@ struct TotalEventsTab: View {
                     if viewModel.difference == 0 {
                         Text("Same as previous week")
                                 .font(.subheadline)
-                                .foregroundStyle(Color("Foreground-Muted"))
+                                .foregroundStyle(.foregroundMuted)
                     } else if viewModel.difference < 0 {
                         Text("\(viewModel.difference) from previous week")
                                 .font(.subheadline)
-                                .foregroundStyle(Color("Foreground-Negative"))
+                                .foregroundStyle(.fortifiNegative)
                     } else {
                         Text("+\(viewModel.difference) from previous week")
                                 .font(.subheadline)
-                                .foregroundStyle(Color("Foreground-Positive"))
+                                .foregroundStyle(.fortifiPositive)
                     }
                 }
                 Spacer()
             }
         }
         .padding()
-        .background(Color(.white))
+        .background(.fortifiBackground)
         .cornerRadius(12)
         .shadow(color: Color.black.opacity(0.1), radius: 5, x: 2, y: 2)
     }

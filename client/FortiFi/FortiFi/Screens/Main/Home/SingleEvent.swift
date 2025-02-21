@@ -14,55 +14,55 @@ struct SingleEvent: View {
         VStack (alignment: .leading, spacing: 24){
             Text("Event Details")
                 .font(.title)
-                .foregroundStyle(Color("Foreground"))
+                .foregroundStyle(.fortifiForeground)
             
             VStack {
                 HStack {
                     Text("Source Ip")
                         .font(.subheadline)
-                        .foregroundStyle(Color("Foreground-Muted"))
+                        .foregroundStyle(.foregroundMuted)
                     Spacer()
                     Text(threat.src)
                         .font(.subheadline)
-                        .foregroundStyle(Color("Foreground"))
+                        .foregroundStyle(.fortifiForeground)
                 }
                 .padding(.vertical,4)
                 Divider()
                 HStack {
                     Text("Destination Ip")
                         .font(.subheadline)
-                        .foregroundStyle(Color("Foreground-Muted"))
+                        .foregroundStyle(.foregroundMuted)
                     Spacer()
                     Text(threat.dst)
                         .font(.subheadline)
-                        .foregroundStyle(Color("Foreground"))
+                        .foregroundStyle(.fortifiForeground)
                 }
                 .padding(.vertical,4)
             }
             .padding()
-            .background(.white)
+            .background(.fortifiBackground)
             .cornerRadius(16)
             .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
             
             HStack {
                 Text("Time of Incident")
                     .font(.subheadline)
-                    .foregroundStyle(Color("Foreground-Muted"))
+                    .foregroundStyle(.foregroundMuted)
                 Spacer()
                 Text(threat.ts)
                     .font(.subheadline)
-                    .foregroundStyle(Color("Foreground"))
+                    .foregroundStyle(.fortifiForeground)
             }
             .padding(.horizontal)
             .padding(.vertical, 16)
-            .background(.white)
+            .background(.fortifiBackground)
             .cornerRadius(16)
             .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
             
             HStack {
                 Text("Attack Type")
                     .font(.subheadline)
-                    .foregroundStyle(Color("Foreground-Muted"))
+                    .foregroundStyle(.foregroundMuted)
                 Spacer()
                 if threat.type == .portScan {
                     PortScanTag()
@@ -72,23 +72,23 @@ struct SingleEvent: View {
             }
             .padding(.horizontal)
             .padding(.vertical, 16)
-            .background(.white)
+            .background(.fortifiBackground)
             .cornerRadius(16)
             .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
             
             VStack(alignment: .leading) {
                 Text("Details")
                     .font(.subheadline)
-                    .foregroundStyle(Color("Foreground-Muted"))
+                    .foregroundStyle(.foregroundMuted)
                 Divider()
                 Text(threat.details)
                     .font(.subheadline)
-                    .foregroundStyle(Color("Foreground"))
+                    .foregroundStyle(.fortifiForeground)
                     .padding(.vertical)
             }
             .padding(.horizontal)
             .padding(.vertical, 16)
-            .background(.white)
+            .background(.fortifiBackground)
             .cornerRadius(16)
             .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
             
@@ -98,8 +98,8 @@ struct SingleEvent: View {
                     Text("Ask AI for Assistance")
                         .font(.headline)
                         .padding()
-                        .foregroundStyle(.white)
-                        .background(Color("Fortifi-Primary"))
+                        .foregroundStyle(.fortifiBackground)
+                        .background(.fortifiPrimary)
                 }
                 .cornerRadius(16)
                 Spacer()
@@ -109,7 +109,7 @@ struct SingleEvent: View {
         }
         .frame(maxHeight: .infinity)
         .padding()
-        .background(Color("Background"))
+        .background(.backgroundAlt)
     }
 }
 

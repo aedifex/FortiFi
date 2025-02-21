@@ -13,7 +13,7 @@ import SwiftUI
     static let shared = NetworkManager()
     var fcm = ""
 
-    static private let baseUrl = "http://<fill in>:3000"
+    static private let baseUrl = "http://192.168.4.136:3000"
     private let loginUrl = baseUrl + "/Login"
     private let eventsUrl = baseUrl + "/GetUserEvents"
     private let refreshUrl = baseUrl + "/RefreshUser"

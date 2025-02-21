@@ -48,8 +48,8 @@ struct Home: View {
             }
             .contentMargins(16)
             .frame(maxHeight: .infinity)
-            .background(Color("Background"))
-            .foregroundStyle(Color("Foreground"))
+            .background(.backgroundAlt)
+            .foregroundStyle(.fortifiForeground)
         }
         .refreshable {
             Task {

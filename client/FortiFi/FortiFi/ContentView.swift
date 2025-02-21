@@ -26,7 +26,7 @@ struct ContentView: View {
         
                     }
                     .tag("home")
-                    .toolbarBackground(.white, for: .tabBar)
+                    .toolbarBackground(.fortifiBackground, for: .tabBar)
                     
 
                 Devices()

@@ -25,25 +25,25 @@ struct EventTab: View {
                         Spacer()
                         Text("\(threat.ts)")
                             .font(.subheadline)
-                            .foregroundStyle(Color("Foreground-Muted"))
+                            .foregroundStyle(.foregroundMuted)
                     }
                     HStack{
                         VStack (alignment: .leading){
                             Text("Source IP")
                                 .font(.subheadline)
-                                .foregroundStyle(Color("Foreground-Muted"))
+                                .foregroundStyle(.foregroundMuted)
                             Text(threat.src)
                         }
                         Spacer()
                         VStack (alignment: .leading){
                             Text("Destination IP")
                                 .font(.subheadline)
-                                .foregroundStyle(Color("Foreground-Muted"))
+                                .foregroundStyle(.foregroundMuted)
                             Text(threat.dst)
                         }
                     }
                 }
-                Image(systemName: "chevron.right").foregroundColor(Color("Foreground-Muted"))
+                Image(systemName: "chevron.right").foregroundColor(.foregroundMuted)
             }
             .padding(.horizontal,2)
             .padding(.vertical, 8)
@@ -55,14 +55,14 @@ struct DDoSTag: View {
     var body: some View {
         Text("DDoS")
             .font(.caption)
-            .foregroundStyle(Color("Foreground-Negative"))
+            .foregroundStyle(.fortifiNegative)
             .padding(.horizontal,10)
             .padding(.vertical, 6)
-            .background(Color("Negative-Accent"))
+            .background(.negativeBackground)
             .cornerRadius(4)
             .overlay(
                 RoundedRectangle(cornerRadius: 4)
-                    .stroke(Color("Tag-Border"), lineWidth: 1)
+                    .stroke(.fortifiBorder, lineWidth: 1)
             )
     }
 }
@@ -71,14 +71,14 @@ struct PortScanTag: View {
     var body: some View {
         Text("PortScan")
             .font(.caption)
-            .foregroundStyle(Color("Foreground-Warn"))
+            .foregroundStyle(.fortifiWarning)
             .padding(.horizontal,10)
             .padding(.vertical, 6)
-            .background(Color("Background-Warn"))
+            .background(.warningBackground)
             .cornerRadius(4)
             .overlay(
                 RoundedRectangle(cornerRadius: 4)
-                    .stroke(Color("Tag-Border"), lineWidth: 1)
+                    .stroke(.fortifiBorder, lineWidth: 1)
             )
     }
 }
