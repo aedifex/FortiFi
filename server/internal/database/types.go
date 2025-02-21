@@ -37,4 +37,5 @@ type Device struct {
 	Name 		string	`json:"name" sql:"name"`
 	IpAddress 	string	`json:"ip_address" sql:"ip_address"`
 	MacAddress 	string	`json:"mac_address" sql:"mac_address"`
+	UserId 		string	`json:"user_id" sql:"user_id"`
 }
