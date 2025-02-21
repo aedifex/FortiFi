@@ -283,7 +283,7 @@ func (db *DatabaseConn) StoreEvent(e *Event) *DatabaseError {
     // TODO should be made primary key -- need to update init.sql file as well
     
     // Insert id, details, ts, expires
-    query := fmt.Sprintf("INSERT INTO %s VALUES (?, ?, ?, ?, ?, ?, ?)", EventsTable)
+    query := fmt.Sprintf("INSERT INTO %s (id, details, ts, expires, event_type, src_ip, dst_ip) VALUES (?, ?, ?, ?, ?, ?, ?)", EventsTable)
 
     // prepare statement
     preparedStatement, err := db.conn.Prepare(query)
@@ -351,7 +351,7 @@ func (db *DatabaseConn) GetUserEvents(userId string) ([]*Event, *DatabaseError) 
     }
 
     // prepare query
-    query := fmt.Sprintf("SELECT id, details, ts, expires, event_type, src_ip, dst_ip FROM %s WHERE id = ? ORDER BY ts DESC;", EventsTable)
+    query := fmt.Sprintf("SELECT threat_id, id, details, ts, expires, event_type, src_ip, dst_ip FROM %s WHERE id = ? ORDER BY ts DESC;", EventsTable)
     preparedStatement, err := db.conn.Prepare(query)
     if err != nil {
         return nil, PREPARE_ERROR(err)
@@ -368,7 +368,7 @@ func (db *DatabaseConn) GetUserEvents(userId string) ([]*Event, *DatabaseError) 
     var events []*Event
     for rows.Next() {
         event := &Event{}
-        err := rows.Scan(&event.Id, &event.Details, &event.TS, &event.Expires, &event.Type, &event.SrcIP, &event.DstIP)
+        err := rows.Scan(&event.ThreatId, &event.Id, &event.Details, &event.TS, &event.Expires, &event.Type, &event.SrcIP, &event.DstIP)
         if err != nil {
             return nil, SCAN_ERROR(err)
         }

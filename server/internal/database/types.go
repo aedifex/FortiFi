@@ -16,6 +16,7 @@ type RefreshToken struct {
 }
 
 type Event struct {
+	ThreatId 	int		`json:"threat_id" sql:"threat_id"`
 	Id 			string	`json:"id" sql:"id"`
     Details 	string	`json:"details" sql:"details"`
     TS 			string	`json:"ts" sql:"ts"`

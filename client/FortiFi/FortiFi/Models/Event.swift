@@ -8,6 +8,7 @@
 import Foundation
 
 struct Event: Codable, Identifiable, Hashable{
+    var threat_id: Int
     var id: String
     var details: String
     var ts: String

@@ -37,6 +37,7 @@ CREATE TABLE UserRefreshTokens (
 CREATE INDEX Users_Expires_Index ON UserRefreshTokens(expires ASC);
 
 CREATE TABLE NetworkThreats (
+    threat_id INT NOT NULL AUTO_INCREMENT,
     id varchar(255) NOT NULL,
     details varchar(255) NOT NULL,
     ts DATETIME NOT NULL,
@@ -44,6 +45,7 @@ CREATE TABLE NetworkThreats (
     event_type INT NOT NULL, --  1 = HorizontalPortScan, 2 = DDoS
     src_ip varchar(255) NOT NULL,
     dst_ip varchar(255) NOT NULL,
+    PRIMARY KEY (threat_id),
     FOREIGN KEY (id) REFERENCES Users(id) ON DELETE CASCADE
 );
 CREATE INDEX NetworkThreats_Id_Index ON NetworkThreats(id ASC);

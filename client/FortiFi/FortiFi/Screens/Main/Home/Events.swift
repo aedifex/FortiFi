@@ -21,7 +21,7 @@ struct Events: View {
             
             ScrollView{
                 VStack (spacing: 12) {
-                    ForEach(viewModel.threats, id: \.self){ threat in
+                    ForEach(viewModel.threats, id: \.threat_id){ threat in
                         EventTab(threat: threat)
                         
                         if threat.self != viewModel.threats.last.self {

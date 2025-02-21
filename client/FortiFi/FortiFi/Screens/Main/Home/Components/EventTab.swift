@@ -83,9 +83,9 @@ struct PortScanTag: View {
     }
 }
 
-#Preview {
-    EventTab(threat: Event(id: "123", details: "details hers", ts: "15:04:05", expires: "2006-01-02 15:04:05.999999994", type: .ddos, src: "10.0.0.1", dst: "10.0.0.2"))
-}
+//#Preview {
+//    EventTab(threat: Event(id: "123", details: "details hers", ts: "15:04:05", expires: "2006-01-02 15:04:05.999999994", type: .ddos, src: "10.0.0.1", dst: "10.0.0.2"))
+//}
 
 #Preview {
     PortScanTag()

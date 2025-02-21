@@ -756,6 +756,7 @@ func TestGetUserEvents(t *testing.T) {
 	event := map[string][]database.Event{
 		"events": {
 			{
+				ThreatId: 1,
 				Id: id,
 				Details: "Instrusion event details here",
 				TS: "2006-01-02 15:04:05",
