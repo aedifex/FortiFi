@@ -29,7 +29,7 @@ pipeline:
               - parallel:
                   - step:
                       type: Run
-                      name: Say Hi
+                      name: Produce Artifact
                       identifier: Say_Hi
                       spec:
                         shell: Sh
