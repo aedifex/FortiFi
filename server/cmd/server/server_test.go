@@ -857,3 +857,29 @@ func TestGetWeeklyDistribution(t *testing.T) {
 		t.Run(tc.name, buildTest(tc, method, path))
 	}
 }
+
+func TestResetWeeklyDistribution(t *testing.T) {
+	path := "/ResetWeeklyDistribution"
+	method := http.MethodPost
+
+	testCases := []testCase{
+		{
+			name: "valid request",
+			correctStatus: http.StatusOK,
+			jwt: piJwt,
+		},
+		{
+			name: "missing jwt",
+			correctStatus: http.StatusUnauthorized,
+		},
+		{
+			name: "invalid jwt",
+			correctStatus: http.StatusUnauthorized,
+			jwt: "invalid.jwt.token",
+		},
+	}
+	
+	for _, tc := range testCases {
+		t.Run(tc.name, buildTest(tc, method, path))
+	}
+}

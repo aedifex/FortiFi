@@ -234,48 +234,6 @@ func (h *RouteHandler) GetUserEvents(writer http.ResponseWriter, request *http.R
 
 }
 
-func (h *RouteHandler) UpdateWeeklyDistribution(writer http.ResponseWriter, request *http.Request) {
-
-	if request.Method != http.MethodPost {
-		http.Error(writer, "Method Not Allowed", http.StatusMethodNotAllowed)
-		return
-	}
-	
-	subjectId, ok := request.Context().Value(middleware.UserIdContextKey).(string)
-	if !ok {
-		h.Log.Errorf("could not assert subjectId from context as string: %v", subjectId)
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	
-	// parse body
-	body := &requests.UpdateWeeklyDistributionRequest{}
-	if request.Body == nil {
-		writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	err := json.NewDecoder(request.Body).Decode(body)
-	if err != nil {
-		h.Log.Errorf("json decode error: %s", err.Error())
-		http.Error(writer, "unable to parse body", http.StatusBadRequest)
-		return
-	}
-	if body.Benign < 0 || body.PortScan < 0 || body.DDoS < 0 {
-		http.Error(writer, "invalid request", http.StatusBadRequest)
-		return
-	}
-	
-	updateErr := h.Db.UpdateWeeklyDistribution(subjectId, body.Benign, body.PortScan, body.DDoS)
-	if updateErr != nil {
-		h.Log.Errorf("error updating weekly distribution: %s", updateErr.Err)
-		http.Error(writer, "unable to update weekly distribution", updateErr.HttpStatus)
-		return
-	}
-	
-	writer.WriteHeader(http.StatusOK)
-
-}
-
 func (h *RouteHandler) GetWeeklyDistribution(writer http.ResponseWriter, request *http.Request) {
 
 	if request.Method != http.MethodGet {

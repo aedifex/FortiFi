@@ -388,23 +388,39 @@ func (db *DatabaseConn) UpdateWeeklyDistribution(userId string, benign int, port
         return DNE_ERROR
     }
 
-    prevWeekDistribution, getWeeklyDistributionErr := db.GetWeeklyDistribution(userId)
-    if getWeeklyDistributionErr != nil {
-        return getWeeklyDistributionErr
-    }
-
-    prevWeekTotal := prevWeekDistribution.Benign + 
-                        prevWeekDistribution.PortScan + 
-                            prevWeekDistribution.DDoS
-
-    query := fmt.Sprintf("UPDATE %s SET benign_count = ?, port_scan_count = ?, ddos_count = ?, prev_week_total = ? WHERE id = ?;", UsersTable)
+    query := fmt.Sprintf("UPDATE %s SET benign_count = ?, port_scan_count = ?, ddos_count = ? WHERE id = ?;", UsersTable)
     preparedStatement, err := db.conn.Prepare(query)
     if err != nil {
         return PREPARE_ERROR(err)
     }
     defer preparedStatement.Close()
 
-    _, err = preparedStatement.Exec(benign, portScan, ddos, prevWeekTotal, userId)
+    _, err = preparedStatement.Exec(benign, portScan, ddos, userId)
+    if err != nil {
+        return EXEC_ERROR(err)
+    }
+
+    return nil
+}
+
+func (db *DatabaseConn) ResetWeeklyDistribution(userId string, weekTotal int) *DatabaseError {
+
+    userExists, userExistsErr := db.userIdExists(userId);
+    if userExistsErr != nil {
+        return userExistsErr
+    }
+    if !userExists {
+        return DNE_ERROR
+    }
+
+    query := fmt.Sprintf("UPDATE %s SET benign_count = 0, port_scan_count = 0, ddos_count = 0, prev_week_total = ? WHERE id = ?;", UsersTable)
+    preparedStatement, err := db.conn.Prepare(query)
+    if err != nil {
+        return PREPARE_ERROR(err)
+    }
+    defer preparedStatement.Close()
+
+    _, err = preparedStatement.Exec(weekTotal, userId)
     if err != nil {
         return EXEC_ERROR(err)
     }

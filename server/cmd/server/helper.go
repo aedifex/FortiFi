@@ -79,6 +79,7 @@ func newServer(config *config.Config) *fortifiServer {
 	mux.HandleFunc("/GetUserEvents", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.GetUserEvents))
 	mux.HandleFunc("/GetWeeklyDistribution", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.GetWeeklyDistribution))
 	mux.HandleFunc("/UpdateWeeklyDistribution", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.UpdateWeeklyDistribution))
+	mux.HandleFunc("/ResetWeeklyDistribution", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.ResetWeeklyDistribution))
 	loggingMiddleware := middleware.Logging(zapLogger)
 	corsMiddleware := middleware.CORSMiddleware(config.CORS_ORIGIN)
 	serverHandler := corsMiddleware(loggingMiddleware(mux))
