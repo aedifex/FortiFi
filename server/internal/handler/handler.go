@@ -187,6 +187,11 @@ func (h *RouteHandler) AddDevice(writer http.ResponseWriter, request *http.Reque
 		return
 	}
 
+	if body.Name == "" || body.IpAddress == "" || body.MacAddress == "" {
+		http.Error(writer, "invalid request", http.StatusBadRequest)
+		return
+	}
+
 	device := &db.Device{
 		Name: body.Name,
 		IpAddress: body.IpAddress,

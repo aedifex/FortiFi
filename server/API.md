@@ -210,6 +210,49 @@ response_body: []
 response_headers: []
 ```
 
+<!-- Add Device -->
+<b>Add Device</b>
+
+```yaml
+path: /AddDevice
+description: Add a device to a user
+
+methods:
+    - POST
+
+query_params: []
+
+headers:
+    - Authorization: Bearer <jwt token>
+
+request_body: json
+    - name: string
+    - ip_address: string
+    - mac_address: string
+    - example:
+        {
+            "name": "smartTV",
+            "ip_address": "10.0.1.1",
+            "mac_address": "00:00:00:00:00:00"
+        }
+
+responses:
+    - 405: method not allowed
+        fix: check http method
+    - 401: unauthorized
+        fix: check the jwt header and ensure valid
+    - 400: bad request
+        fix: check request body follows format above and all fields are present
+    - 404: not found
+        fix: check the user entry in database
+    - 500: internal server error
+        fix: check server logs
+    - 200: OK
+
+response_body: []
+response_headers: []
+```
+
 ### Routes for Client Devices
 <!-- User Create Path -->
 <b>Create User</b>
@@ -457,45 +500,51 @@ response_body: json
 response_headers: []
 ```
 
-<!-- Add Device -->
-<b>Add Device</b>
+<!-- Get Devices -->
+<b>Get Devices</b>
 
 ```yaml
-path: /AddDevice
-description: Add a device to a user
+path: /GetDevices
+description: Get all devices for a user
 
 methods:
-    - POST
+    - GET
 
 query_params: []
 
 headers:
     - Authorization: Bearer <jwt token>
 
-request_body: json
-    - name: string
-    - ip_address: string
-    - mac_address: string
-    - example:
-        {
-            "name": "smartTV",
-            "ip_address": "10.0.1.1",
-            "mac_address": "00:00:00:00:00:00"
-        }
+request_body: []
 
 responses:
     - 405: method not allowed
         fix: check http method
     - 401: unauthorized
         fix: check the jwt header and ensure valid
-    - 400: bad request
-        fix: check request body follows format above and all fields are present
     - 404: not found
         fix: check the user entry in database
     - 500: internal server error
         fix: check server logs
     - 200: OK
 
-response_body: []
+response_body: json
+    - devices: [Devices]
+        - id: int
+        - name: string
+        - ip_address: string
+        - mac_address: string
+    - example:
+        {
+            "devices": [
+                {
+                    "id": 1,
+                    "name": "smartTV",
+                    "ip_address": "10.0.1.1",
+                    "mac_address": "00:00:00:00:00:00"
+                }
+            ]
+        }
+
 response_headers: []
 ```

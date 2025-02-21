@@ -83,7 +83,7 @@ func setupTestServer() *fortifiServer {
 		DB_URL: "localhost:3306",
 		DB_NAME: "FortiFi",
 		SIGNING_KEY: "b2e138d8553ea7d7ff8731e87e41406277bd4c98",
-		FcmKeyPath: "",
+		FcmKeyPath: "../../config/fortifi-1e7b8-firebase-adminsdk-fbsvc-7d9b6225cf.json",
 	}
 
 	// Create new FortifiServer
@@ -867,6 +867,9 @@ func TestResetWeeklyDistribution(t *testing.T) {
 			name: "valid request",
 			correctStatus: http.StatusOK,
 			jwt: piJwt,
+			requestBody: &requests.ResetWeeklyDistributionRequest{
+				WeekTotal: 10,
+			},
 		},
 		{
 			name: "missing jwt",
@@ -879,7 +882,101 @@ func TestResetWeeklyDistribution(t *testing.T) {
 		},
 	}
 	
+	missingBodyTest(t, method, path)
 	for _, tc := range testCases {
 		t.Run(tc.name, buildTest(tc, method, path))
 	}
 }
+
+func TestAddDevice(t *testing.T) {
+	path := "/AddDevice"
+	method := http.MethodPost
+
+	testCases := []testCase{
+		{
+			name: "valid request",
+			correctStatus: http.StatusOK,
+			jwt: userJwt,
+			requestBody: &requests.AddDeviceRequest{
+				Name: "smartTV",
+				IpAddress: "10.0.1.1",
+				MacAddress: "00:00:00:00:00:00",
+			},
+		},
+		{
+			name: "missing jwt",
+			correctStatus: http.StatusUnauthorized,
+		},
+		{
+			name: "invalid jwt",
+			correctStatus: http.StatusUnauthorized,
+			jwt: "invalid.jwt.token",
+		},
+		{
+			name: "missing name",
+			correctStatus: http.StatusBadRequest,
+			jwt: userJwt,
+			requestBody: &requests.AddDeviceRequest{
+				IpAddress: "10.0.1.1",
+				MacAddress: "00:00:00:00:00:00",
+			},	
+		},
+		{
+			name: "missing ip address",
+			correctStatus: http.StatusBadRequest,
+			jwt: userJwt,
+			requestBody: &requests.AddDeviceRequest{
+				Name: "smartTV",
+				MacAddress: "00:00:00:00:00:00",
+			},
+		},
+		{
+			name: "missing mac address",
+			correctStatus: http.StatusBadRequest,
+			jwt: userJwt,
+			requestBody: &requests.AddDeviceRequest{
+				Name: "smartTV",
+				IpAddress: "10.0.1.1",
+			},
+		},
+	}
+
+	missingBodyTest(t, method, path)
+	for _, tc := range testCases {
+		t.Run(tc.name, buildTest(tc, method, path))
+	}
+}
+
+func TestGetDevices(t *testing.T) {
+	path := "/GetDevices"
+	method := http.MethodGet
+
+	testCases := []testCase{
+		{
+			name: "valid request",
+			correctStatus: http.StatusOK,
+			jwt: userJwt,
+			expectedBody: &[]database.Device{
+				{
+					Id: 1,
+					Name: "smartTV",
+					IpAddress: "10.0.1.1",
+					MacAddress: "00:00:00:00:00:00",
+				},
+			},
+		},
+		{
+			name: "missing jwt",
+			correctStatus: http.StatusUnauthorized,
+		},
+		{
+			name: "invalid jwt",
+			correctStatus: http.StatusUnauthorized,
+			jwt: "invalid.jwt.token",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, buildTest(tc, method, path))
+	}
+}	
