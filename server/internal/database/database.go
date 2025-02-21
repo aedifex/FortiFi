@@ -13,10 +13,11 @@ type DatabaseConn struct {
 }
 
 const (
-    UsersTable       = "Users"
-    EventsTable      = "NetworkThreats"
+    UsersTable       =  "Users"
+    EventsTable      =  "NetworkThreats"
     UserRefreshTable =  "UserRefreshTokens"
     PiRefreshTable   =  "PiRefreshTokens"
+    DevicesTable     =  "Devices"
 )
 
 func ConnectDatabase(config *config.Config) (*DatabaseConn, error) {
@@ -465,3 +466,30 @@ func (db *DatabaseConn) GetWeeklyDistribution(userId string) (*WeeklyDistributio
     return weeklyDistribution, nil
 }
 
+func (db *DatabaseConn) GetDevices(userId string) ([]*Device, *DatabaseError) {
+
+    query := fmt.Sprintf("SELECT id, name, ip_address, mac_address FROM %s WHERE userId = ?;", DevicesTable)
+    preparedStatement, err := db.conn.Prepare(query)
+    if err != nil {
+        return nil, PREPARE_ERROR(err)
+    }
+    defer preparedStatement.Close()
+
+    rows, err := preparedStatement.Query(userId)
+    if err != nil {
+        return nil, QUERY_ERROR(err)
+    }
+    defer rows.Close()
+
+    var devices []*Device
+    for rows.Next() {
+        device := &Device{}
+        err := rows.Scan(&device.Id, &device.Name, &device.IpAddress, &device.MacAddress)
+        if err != nil {
+            return nil, SCAN_ERROR(err)
+        }
+        devices = append(devices, device)
+    }
+
+    return devices, nil
+}       

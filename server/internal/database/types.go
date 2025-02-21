@@ -31,3 +31,10 @@ type WeeklyDistribution struct {
 	DDoS			int	`sql:"ddos_count"`
 	PrevWeekTotal	int	`sql:"prev_week_total"`
 }
+
+type Device struct {
+	Id 			int		`json:"id" sql:"id"`
+	Name 		string	`json:"name" sql:"name"`
+	IpAddress 	string	`json:"ip_address" sql:"ip_address"`
+	MacAddress 	string	`json:"mac_address" sql:"mac_address"`
+}
