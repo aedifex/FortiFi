@@ -13,7 +13,7 @@ struct NetworkStatusNavigation: View {
 
     var body: some View {
         
-        if homeViewModel.events.count == 0 {
+        if homeViewModel.threats.count == 0 {
             
             HStack {
                 
@@ -23,7 +23,7 @@ struct NetworkStatusNavigation: View {
                     Text("Good")
                         .font(.body)
                         .foregroundColor(Color("Foreground"))
-                    Text("^[\(homeViewModel.events.count) Threat](inflect: true) found")
+                    Text("^[\(homeViewModel.threats.count) Threat](inflect: true) found")
                         .font(.subheadline)
                         .foregroundColor(Color("Foreground-Muted"))
                 }
@@ -48,7 +48,7 @@ struct NetworkStatusNavigation: View {
                         Text("Needs Attention")
                             .font(.body)
                             .foregroundColor(Color("Foreground"))
-                        Text("^[\(homeViewModel.events.count) Threat](inflect: true) found")
+                        Text("^[\(homeViewModel.threats.count) Threat](inflect: true) found")
                             .font(.subheadline)
                             .foregroundColor(Color("Foreground-Muted"))
                     }

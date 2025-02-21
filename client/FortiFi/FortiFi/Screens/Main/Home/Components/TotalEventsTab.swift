@@ -9,8 +9,20 @@ import SwiftUI
 
 struct TotalEventsTab: View {
     @ObservedObject var viewModel = HomeViewModel.shared
+    let weekStart = Calendar(identifier: .gregorian).currentWeekBoundary()!.startOfWeek!
+        .formatted(date: .numeric, time: .omitted)
+
     var body: some View {
-        VStack {
+        VStack(alignment: .leading, spacing: 24) {
+            HStack {
+                Text("Traffic Volume")
+                    .font(.subheadline)
+                    .foregroundStyle(Color("Foreground-Muted"))
+                Spacer()
+                Text("\(weekStart) - Present")
+                    .font(.subheadline)
+                    .foregroundStyle(Color("Foreground-Muted"))
+            }
             HStack {
                 VStack (alignment: .leading, spacing: 8) {
                     Text("^[**\(viewModel.totalEvents)** total event](inflect: true) this week")
@@ -29,10 +41,10 @@ struct TotalEventsTab: View {
                                 .foregroundStyle(Color("Foreground-Positive"))
                     }
                 }
-                .padding()
                 Spacer()
             }
         }
+        .padding()
         .background(Color(.white))
         .cornerRadius(12)
         .shadow(color: Color.black.opacity(0.1), radius: 5, x: 2, y: 2)

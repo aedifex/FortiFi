@@ -8,8 +8,8 @@
 import Foundation
 
 struct DistributionResponse: Codable {
-    var Normal: Int
-    var Anomalous: Int
-    var Malicious: Int
+    var Benign: Int
+    var PortScan: Int
+    var DDoS: Int
     var PrevWeekTotal: Int
 }

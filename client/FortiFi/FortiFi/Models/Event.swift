@@ -7,10 +7,12 @@
 
 import Foundation
 
-struct Event: Codable {
+struct Event: Codable, Identifiable, Hashable{
     var id: String
     var details: String
     var ts: String
     var expires: String
-    var type: String
+    var type: ThreatTypes
+    var src: String
+    var dst: String
 }

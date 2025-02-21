@@ -56,7 +56,7 @@ import SwiftUI
             
             refreshToken = response.value(forHTTPHeaderField: "Refresh")!
             jwt = response.value(forHTTPHeaderField: "Jwt")!
-//            try await setNotificationsToken()
+            try await setNotificationsToken()
             return try JWT.getSubject(for: jwt)
             
         case 404:
