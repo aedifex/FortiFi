@@ -30,7 +30,7 @@ struct EventsDistribution: View {
                     .Label()
                     .foregroundStyle(.foregroundMuted)
             }
-            HStack (spacing: 50){
+            HStack (spacing: 40){
                 VStack(alignment: .leading, spacing: 15){
                     VStack (alignment: .leading){
                         Text("^[**\(HomeViewModel.shared.totalEvents)** total event](inflect: true)")
