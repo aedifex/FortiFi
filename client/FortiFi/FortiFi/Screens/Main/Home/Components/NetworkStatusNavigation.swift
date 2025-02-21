@@ -18,6 +18,8 @@ struct NetworkStatusNavigation: View {
             HStack {
                 
                 Image("OK")
+                    .resizable()
+                    .frame(width: 50, height: 50)
                 
                 VStack (alignment: .leading){
                     Text("Good")
@@ -43,7 +45,8 @@ struct NetworkStatusNavigation: View {
                 HStack {
                     
                     Image("Error")
-                    
+                        .resizable()
+                        .frame(width: 50, height: 50)
                     VStack (alignment: .leading){
                         Text("Needs Attention")
                             .font(.body)

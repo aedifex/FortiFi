@@ -20,6 +20,8 @@ struct ContentView: View {
                     .tabItem {
                         if selection == "home" {
                             Image("home-active")
+                                .resizable()
+                                .frame(width: 50, height: 50)
                         } else {
                             Image("home")
                         }
