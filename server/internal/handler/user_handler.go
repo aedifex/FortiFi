@@ -264,6 +264,37 @@ func (h *RouteHandler) GetWeeklyDistribution(writer http.ResponseWriter, request
 	}
 	
 }
+
+func (h *RouteHandler) GetDevices(writer http.ResponseWriter, request *http.Request) {
+
+	if request.Method != http.MethodGet {
+		http.Error(writer, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	subjectId, ok := request.Context().Value(middleware.UserIdContextKey).(string)
+	if !ok {
+		h.Log.Errorf("could not assert subjectId from context as string: %v", subjectId)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	devices, err := h.Db.GetDevices(subjectId)
+	if err != nil {
+		h.Log.Errorf("error getting devices: %s", err.Err)
+		http.Error(writer, "failed to get devices", err.HttpStatus)
+		return
+	}
+
+	writer.Header().Set("Content-Type", "application/json")
+	encodeErr := json.NewEncoder(writer).Encode(devices)
+	if encodeErr != nil {
+		h.Log.Errorf("error encoding devices: %s", encodeErr.Error())
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	
+}
 // TODO implement this -- Should revoke refresh tokens
 // func (h *RouteHandler) Logout(writer http.ResponseWriter, request *http.Request){
 // 	return
