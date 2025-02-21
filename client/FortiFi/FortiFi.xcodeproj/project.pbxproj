@@ -23,9 +23,9 @@
 		606E27F02D679EED00387D67 /* EventTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606E27EF2D679EE600387D67 /* EventTab.swift */; };
 		606E27F22D67A55F00387D67 /* SingleEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606E27F12D67A55F00387D67 /* SingleEvent.swift */; };
 		606E27F52D681C1B00387D67 /* Date+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606E27F42D681C1500387D67 /* Date+.swift */; };
-		606E27F92D68B1E500387D67 /* ThreatTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606E27F82D68B1E500387D67 /* ThreatTypes.swift */; };
 		606E27FD2D68E20300387D67 /* Font+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606E27FC2D68E20300387D67 /* Font+.swift */; };
 		606E28012D68E80C00387D67 /* Inter.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 606E28002D68E80C00387D67 /* Inter.ttf */; };
+		606E28092D68F5C700387D67 /* ThreatTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606E28082D68F5C500387D67 /* ThreatTypes.swift */; };
 		60C633C32D553A3100CFD81C /* FortiFiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C633C22D553A3100CFD81C /* FortiFiApp.swift */; };
 		60C633C52D553A3100CFD81C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C633C42D553A3100CFD81C /* ContentView.swift */; };
 		60C633C72D553A3200CFD81C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 60C633C62D553A3200CFD81C /* Assets.xcassets */; };
@@ -60,9 +60,9 @@
 		606E27EF2D679EE600387D67 /* EventTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventTab.swift; sourceTree = "<group>"; };
 		606E27F12D67A55F00387D67 /* SingleEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleEvent.swift; sourceTree = "<group>"; };
 		606E27F42D681C1500387D67 /* Date+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+.swift"; sourceTree = "<group>"; };
-		606E27F82D68B1E500387D67 /* ThreatTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ThreatTypes.swift; path = /Users/jonathannguyen/Downloads/ThreatTypes.swift; sourceTree = "<absolute>"; };
 		606E27FC2D68E20300387D67 /* Font+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+.swift"; sourceTree = "<group>"; };
 		606E28002D68E80C00387D67 /* Inter.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Inter.ttf; sourceTree = "<group>"; };
+		606E28082D68F5C500387D67 /* ThreatTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreatTypes.swift; sourceTree = "<group>"; };
 		60C633BF2D553A3100CFD81C /* FortiFi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FortiFi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		60C633C22D553A3100CFD81C /* FortiFiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FortiFiApp.swift; sourceTree = "<group>"; };
 		60C633C42D553A3100CFD81C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -193,11 +193,11 @@
 		60DB19602D62C168009ECBA9 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				606E28082D68F5C500387D67 /* ThreatTypes.swift */,
 				60DB19762D62D561009ECBA9 /* Responses */,
 				60DB19732D62D419009ECBA9 /* Requests */,
 				60DB196C2D62C3BF009ECBA9 /* User.swift */,
 				602857462D66A33200295739 /* Event.swift */,
-				606E27F82D68B1E500387D67 /* ThreatTypes.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -367,7 +367,7 @@
 				602857412D66328B00295739 /* NetworkStatusNavigation.swift in Sources */,
 				60DB196F2D62C532009ECBA9 /* NetworkManager.swift in Sources */,
 				6028574B2D66CB3700295739 /* DistributionResponse.swift in Sources */,
-				606E27F92D68B1E500387D67 /* ThreatTypes.swift in Sources */,
+				606E28092D68F5C700387D67 /* ThreatTypes.swift in Sources */,
 				602857472D66A33200295739 /* Event.swift in Sources */,
 				602857392D6614A600295739 /* Devices.swift in Sources */,
 				60DB196B2D62C374009ECBA9 /* LoginViewModel.swift in Sources */,
