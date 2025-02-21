@@ -160,3 +160,45 @@ func (h *RouteHandler) ResetWeeklyDistribution(writer http.ResponseWriter, reque
 	
 	writer.WriteHeader(http.StatusOK)
 }
+
+func (h *RouteHandler) AddDevice(writer http.ResponseWriter, request *http.Request) {
+
+	if request.Method != http.MethodPost {
+		http.Error(writer, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	subjectId, ok := request.Context().Value(middleware.UserIdContextKey).(string)
+	if !ok {
+		h.Log.Errorf("could not assert subjectId from context as string: %v", subjectId)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}	
+
+	body := &requests.AddDeviceRequest{}
+	if request.Body == nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}	
+	err := json.NewDecoder(request.Body).Decode(body)
+	if err != nil {
+		h.Log.Errorf("json decode error: %s", err.Error())
+		http.Error(writer, "unable to parse body", http.StatusBadRequest)
+		return
+	}
+
+	device := &db.Device{
+		Name: body.Name,
+		IpAddress: body.IpAddress,
+		MacAddress: body.MacAddress,
+		UserId: subjectId,
+	}
+	addErr := h.Db.AddDevice(device)
+	if addErr != nil {
+		h.Log.Errorf("error adding device: %s", addErr.Err)
+		http.Error(writer, "unable to add device", addErr.HttpStatus)
+		return
+	}
+
+	writer.WriteHeader(http.StatusOK)
+}

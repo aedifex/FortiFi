@@ -504,14 +504,14 @@ func (db *DatabaseConn) AddDevice(device *Device) *DatabaseError {
         return DNE_ERROR
     }
     
-    query := fmt.Sprintf("INSERT INTO %s (id, name, ip_address, mac_address, userId) VALUES (?, ?, ?, ?, ?);", DevicesTable)
+    query := fmt.Sprintf("INSERT INTO %s (name, ip_address, mac_address, userId) VALUES (?, ?, ?, ?);", DevicesTable)
     preparedStatement, err := db.conn.Prepare(query)
     if err != nil {
         return PREPARE_ERROR(err)
     }
     defer preparedStatement.Close()
 
-    _, err = preparedStatement.Exec(device.Id, device.Name, device.IpAddress, device.MacAddress, device.UserId)
+    _, err = preparedStatement.Exec(device.Name, device.IpAddress, device.MacAddress, device.UserId)
     if err != nil {
         return EXEC_ERROR(err)
     }

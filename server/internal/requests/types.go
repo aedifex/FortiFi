@@ -32,3 +32,9 @@ type UpdateWeeklyDistributionRequest struct {
 type ResetWeeklyDistributionRequest struct {
 	WeekTotal	int	`json:"week_total"`
 }
+
+type AddDeviceRequest struct {
+	Name 		string	`json:"name"`
+	IpAddress	string	`json:"ip_address"`
+	MacAddress	string	`json:"mac_address"`
+}
