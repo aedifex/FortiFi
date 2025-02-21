@@ -46,5 +46,5 @@ CREATE TABLE NetworkThreats (
     dst_ip varchar(255) NOT NULL,
     FOREIGN KEY (id) REFERENCES Users(id) ON DELETE CASCADE
 );
-CREATE INDEX NetworkEvents_Id_Index ON NetworkEvents(id ASC);
-CREATE INDEX NetworkEvents_TS_Index ON NetworkEvents(ts ASC);
+CREATE INDEX NetworkThreats_Id_Index ON NetworkThreats(id ASC);
+CREATE INDEX NetworkThreats_TS_Index ON NetworkThreats(ts ASC);

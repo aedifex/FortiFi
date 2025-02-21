@@ -47,7 +47,7 @@ var (
 	lastName = "Bear"
 	email = "oskibear@berkeley.edu"
 	password = "Go Bears!"
-	fcmToken = ""
+	fcmToken = "c9g9Wdmp90NchwYMhiiLBp:APA91bHfeKLGu921KeSj45uikQbhg1_Gx44qBjHErrjDoMzSIag5fGJdUotOCOjCQumLv2etUbe_e_gfJNKOIQEhUua6KIcp7zQcgGetkleiWPLJgRJ3GcY"
 )
 
 var server = setupTestServer()
@@ -83,7 +83,7 @@ func setupTestServer() *fortifiServer {
 		DB_URL: "localhost:3306",
 		DB_NAME: "FortiFi",
 		SIGNING_KEY: "b2e138d8553ea7d7ff8731e87e41406277bd4c98",
-		FcmKeyPath: "<path to fcm key>",
+		FcmKeyPath: "",
 	}
 
 	// Create new FortifiServer
@@ -646,7 +646,7 @@ func TestNotifyIntrusion(t *testing.T) {
 					Details: "Instrusion event details here",
 					TS: "2006-01-02 15:04:05",
 					Expires: "2026-01-02 15:04:05",
-					Type: "anomaly",
+					Type: "1",
 					SrcIP: "10.0.1.1",
 					DstIP: "10.0.1.2",
 				},
@@ -760,7 +760,7 @@ func TestGetUserEvents(t *testing.T) {
 				Details: "Instrusion event details here",
 				TS: "2006-01-02 15:04:05",
 				Expires: "2026-01-02 15:04:05",
-				Type: "anomaly",
+				Type: "1",
 				SrcIP: "10.0.1.1",
 				DstIP: "10.0.1.2",
 			},
@@ -800,9 +800,9 @@ func TestUpdateWeeklyDistribution(t *testing.T) {
 			correctStatus: http.StatusOK,
 			jwt: piJwt,
 			requestBody: &requests.UpdateWeeklyDistributionRequest{
-				Normal: 10,
-				Anomalous: 5,
-				Malicious: 2,
+				Benign: 10,
+				PortScan: 5,
+				DDoS: 2,
 			},
 		},
 		{
@@ -832,9 +832,9 @@ func TestGetWeeklyDistribution(t *testing.T) {
 			correctStatus: http.StatusOK,
 			jwt: piJwt,
 			expectedBody: &database.WeeklyDistribution{
-				Normal: 10,
-				Anomalous: 5,
-				Malicious: 2,
+				Benign: 10,
+				PortScan: 5,
+				DDoS: 2,
 				PrevWeekTotal: 0,
 			},
 		},
