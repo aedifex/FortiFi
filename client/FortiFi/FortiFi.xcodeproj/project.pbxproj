@@ -24,6 +24,7 @@
 		606E27F22D67A55F00387D67 /* SingleEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606E27F12D67A55F00387D67 /* SingleEvent.swift */; };
 		606E27F52D681C1B00387D67 /* Date+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606E27F42D681C1500387D67 /* Date+.swift */; };
 		606E27F92D68B1E500387D67 /* ThreatTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606E27F82D68B1E500387D67 /* ThreatTypes.swift */; };
+		606E27FD2D68E20300387D67 /* Font+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606E27FC2D68E20300387D67 /* Font+.swift */; };
 		60C633C32D553A3100CFD81C /* FortiFiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C633C22D553A3100CFD81C /* FortiFiApp.swift */; };
 		60C633C52D553A3100CFD81C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C633C42D553A3100CFD81C /* ContentView.swift */; };
 		60C633C72D553A3200CFD81C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 60C633C62D553A3200CFD81C /* Assets.xcassets */; };
@@ -59,6 +60,7 @@
 		606E27F12D67A55F00387D67 /* SingleEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleEvent.swift; sourceTree = "<group>"; };
 		606E27F42D681C1500387D67 /* Date+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+.swift"; sourceTree = "<group>"; };
 		606E27F82D68B1E500387D67 /* ThreatTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ThreatTypes.swift; path = /Users/jonathannguyen/Downloads/ThreatTypes.swift; sourceTree = "<absolute>"; };
+		606E27FC2D68E20300387D67 /* Font+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+.swift"; sourceTree = "<group>"; };
 		60C633BF2D553A3100CFD81C /* FortiFi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FortiFi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		60C633C22D553A3100CFD81C /* FortiFiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FortiFiApp.swift; sourceTree = "<group>"; };
 		60C633C42D553A3100CFD81C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -118,6 +120,7 @@
 			isa = PBXGroup;
 			children = (
 				606E27F42D681C1500387D67 /* Date+.swift */,
+				606E27FC2D68E20300387D67 /* Font+.swift */,
 			);
 			path = extensions;
 			sourceTree = "<group>";
@@ -376,6 +379,7 @@
 				60DB196D2D62C3BF009ECBA9 /* User.swift in Sources */,
 				602857492D66A37A00295739 /* EventsResponse.swift in Sources */,
 				606E27F02D679EED00387D67 /* EventTab.swift in Sources */,
+				606E27FD2D68E20300387D67 /* Font+.swift in Sources */,
 				60DB197A2D62DA76009ECBA9 /* Alerts.swift in Sources */,
 				6028574D2D66D99600295739 /* TotalEventsTab.swift in Sources */,
 				60C633C32D553A3100CFD81C /* FortiFiApp.swift in Sources */,
