@@ -138,6 +138,18 @@ func (h *RouteHandler) ResetWeeklyDistribution(writer http.ResponseWriter, reque
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	body := &requests.ResetWeeklyDistributionRequest{}
+	if request.Body == nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	err := json.NewDecoder(request.Body).Decode(body)
+	if err != nil {
+		h.Log.Errorf("json decode error: %s", err.Error())
+		http.Error(writer, "unable to parse body", http.StatusBadRequest)
+		return
+	}
 	
 	resetErr := h.Db.ResetWeeklyDistribution(subjectId, 0)
 	if resetErr != nil {

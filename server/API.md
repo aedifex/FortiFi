@@ -4,6 +4,7 @@ This api serves as authentication services for users and hardware devices wishin
 
 ## Paths
 
+### Routes for Pi Devices
 <!-- PiInit Path -->
 <b>Pi Initialization</b>
 
@@ -75,6 +76,141 @@ response_headers:
     - Refresh: long-lived token
 ```
 
+<!-- Notifications Path -->
+<b>Send Notifications</b>
+
+```yaml
+path: /NotifyIntrusion
+description: Send a notification to user
+
+methods:
+    - POST
+
+query_params: []
+
+headers:
+    - Authorization: Bearer <jwt token>
+
+request_body: json
+    - event:
+        - id: string
+        - details: string
+        - ts: timestamp string
+        - expires: timestamp string
+        - type: string (1 for port scan, 2 for ddos)
+        - src: string
+        - dst: string
+    - example:
+        {
+            "event": {
+                "id": "id",
+                "details": "there has been an intrusion on your network",
+                "ts": "2006-01-02 15:04:05",
+                "expires": "2006-01-02 15:04:05",
+                "type": "1",
+                "src": "10.0.1.1",
+                "dst": "10.0.1.2"
+            }
+        }
+
+responses:
+    - 405: method not allowed
+        fix: check http method
+    - 401: unauthorized
+        fix: check the jwt header and ensure valid
+    - 400: bad request
+        fix: check event is in body as json and all event fields are present
+    - 404: not found
+        fix: check the user entry in database
+    - 500: internal server error
+        fix: check server logs
+    - 200: OK
+
+response_body: []
+response_headers: []
+```
+
+<!-- Update Weekly Distribution -->
+<b>Update Weekly Distribution</b>
+
+```yaml
+path: /UpdateWeeklyDistribution
+description: Update the weekly distribution of eventsfor a user
+
+methods:
+    - POST
+
+query_params: []
+
+headers:
+    - Authorization: Bearer <jwt token>
+
+request_body: json
+    - benign: int
+    - port_scan: int
+    - ddos: int
+    - example:
+        {
+            "benign": 124,
+            "port_scan": 13,
+            "ddos": 2
+        }
+
+responses:
+    - 405: method not allowed
+        fix: check http method
+    - 401: unauthorized
+        fix: check the jwt header and ensure valid
+    - 400: bad request
+        fix: check request body follows format above and all fields are present
+    - 404: not found
+        fix: check the user entry in database
+    - 500: internal server error
+        fix: check server logs
+    - 200: OK
+
+response_body: []
+response_headers: []
+```
+
+<!-- Reset Weekly Distribution -->
+<b>Reset Weekly Distribution</b>
+
+```yaml
+path: /ResetWeeklyDistribution
+description: Reset the weekly distribution of events for a user
+
+methods:
+    - POST
+
+query_params: []
+
+headers:
+    - Authorization: Bearer <jwt token>
+
+request_body: json
+    - week_total: int
+    - example:
+        {
+            "week_total": 124
+        }
+
+responses:
+    - 405: method not allowed
+        fix: check http method
+    - 401: unauthorized
+        fix: check the jwt header and ensure valid
+    - 404: not found
+        fix: check the user entry in database
+    - 500: internal server error
+        fix: check server logs
+    - 200: OK
+
+response_body: []
+response_headers: []
+```
+
+### Routes for Client Devices
 <!-- User Create Path -->
 <b>Create User</b>
 
@@ -238,60 +374,6 @@ response_headers:
     - Refresh: long-lived refresh token
 ```
 
-<!-- Notifications Path -->
-<b>Send Notifications</b>
-
-```yaml
-path: /NotifyIntrusion
-description: Send a notification to user
-
-methods:
-    - POST
-
-query_params: []
-
-headers:
-    - Authorization: Bearer <jwt token>
-
-request_body: json
-    - event:
-        - id: string
-        - details: string
-        - ts: timestamp string
-        - expires: timestamp string
-        - type: string (1 for port scan, 2 for ddos)
-        - src: string
-        - dst: string
-    - example:
-        {
-            "event": {
-                "id": "id",
-                "details": "there has been an intrusion on your network",
-                "ts": "2006-01-02 15:04:05",
-                "expires": "2006-01-02 15:04:05",
-                "type": "1",
-                "src": "10.0.1.1",
-                "dst": "10.0.1.2"
-            }
-        }
-
-responses:
-    - 405: method not allowed
-        fix: check http method
-    - 401: unauthorized
-        fix: check the jwt header and ensure valid
-    - 400: bad request
-        fix: check event is in body as json and all event fields are present
-    - 404: not found
-        fix: check the user entry in database
-    - 500: internal server error
-        fix: check server logs
-    - 200: OK
-
-response_body: []
-response_headers: []
-```
-
 <!-- Get Events  -->
 <b>Get Events</b>
 
@@ -330,49 +412,6 @@ response_body: json
         - src_ip: string
         - dst_ip: string
         
-response_headers: []
-```
-
-<!-- Update Weekly Distribution -->
-<b>Update Weekly Distribution</b>
-
-```yaml
-path: /UpdateWeeklyDistribution
-description: Update the weekly distribution of eventsfor a user
-
-methods:
-    - POST
-
-query_params: []
-
-headers:
-    - Authorization: Bearer <jwt token>
-
-request_body: json
-    - benign: int
-    - port_scan: int
-    - ddos: int
-    - example:
-        {
-            "benign": 124,
-            "port_scan": 13,
-            "ddos": 2
-        }
-
-responses:
-    - 405: method not allowed
-        fix: check http method
-    - 401: unauthorized
-        fix: check the jwt header and ensure valid
-    - 400: bad request
-        fix: check request body follows format above and all fields are present
-    - 404: not found
-        fix: check the user entry in database
-    - 500: internal server error
-        fix: check server logs
-    - 200: OK
-
-response_body: []
 response_headers: []
 ```
 

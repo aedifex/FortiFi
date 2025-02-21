@@ -28,3 +28,7 @@ type UpdateWeeklyDistributionRequest struct {
 	PortScan	int	`json:"port_scan"`
 	DDoS		int	`json:"ddos"`
 }
+
+type ResetWeeklyDistributionRequest struct {
+	WeekTotal	int	`json:"week_total"`
+}
