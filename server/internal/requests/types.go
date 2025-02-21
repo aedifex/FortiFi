@@ -24,7 +24,7 @@ type PiInitRequest struct {
 }
 
 type UpdateWeeklyDistributionRequest struct {
-	Normal	int	`json:"normal"`
-	Anomalous	int	`json:"anomalous"`
-	Malicious	int	`json:"malicious"`
+	Benign		int	`json:"benign"`
+	PortScan	int	`json:"port_scan"`
+	DDoS		int	`json:"ddos"`
 }

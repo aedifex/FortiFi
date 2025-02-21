@@ -260,12 +260,12 @@ func (h *RouteHandler) UpdateWeeklyDistribution(writer http.ResponseWriter, requ
 		http.Error(writer, "unable to parse body", http.StatusBadRequest)
 		return
 	}
-	if body.Normal < 0 || body.Anomalous < 0 || body.Malicious < 0 {
+	if body.Benign < 0 || body.PortScan < 0 || body.DDoS < 0 {
 		http.Error(writer, "invalid request", http.StatusBadRequest)
 		return
 	}
 	
-	updateErr := h.Db.UpdateWeeklyDistribution(subjectId, body.Normal, body.Anomalous, body.Malicious)
+	updateErr := h.Db.UpdateWeeklyDistribution(subjectId, body.Benign, body.PortScan, body.DDoS)
 	if updateErr != nil {
 		h.Log.Errorf("error updating weekly distribution: %s", updateErr.Err)
 		http.Error(writer, "unable to update weekly distribution", updateErr.HttpStatus)

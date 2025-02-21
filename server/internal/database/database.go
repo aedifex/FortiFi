@@ -370,7 +370,7 @@ func (db *DatabaseConn) GetUserEvents(userId string) ([]*Event, *DatabaseError) 
     return events, nil
 }
 
-func (db *DatabaseConn) UpdateWeeklyDistribution(userId string, normal int, anomalous int, malicious int) *DatabaseError {
+func (db *DatabaseConn) UpdateWeeklyDistribution(userId string, benign int, portScan int, ddos int) *DatabaseError {
 
     userExists, userExistsErr := db.userIdExists(userId);
     if userExistsErr != nil {
@@ -385,18 +385,18 @@ func (db *DatabaseConn) UpdateWeeklyDistribution(userId string, normal int, anom
         return getWeeklyDistributionErr
     }
 
-    prevWeekTotal := prevWeekDistribution.Normal + 
-                        prevWeekDistribution.Anomalous + 
-                            prevWeekDistribution.Malicious
+    prevWeekTotal := prevWeekDistribution.Benign + 
+                        prevWeekDistribution.PortScan + 
+                            prevWeekDistribution.DDoS
 
-    query := fmt.Sprintf("UPDATE %s SET normal_count = ?, anomalous_count = ?, malicious_count = ?, prev_week_total = ? WHERE id = ?;", UsersTable)
+    query := fmt.Sprintf("UPDATE %s SET benign_count = ?, port_scan_count = ?, ddos_count = ?, prev_week_total = ? WHERE id = ?;", UsersTable)
     preparedStatement, err := db.conn.Prepare(query)
     if err != nil {
         return PREPARE_ERROR(err)
     }
     defer preparedStatement.Close()
 
-    _, err = preparedStatement.Exec(normal, anomalous, malicious, prevWeekTotal, userId)
+    _, err = preparedStatement.Exec(benign, portScan, ddos, prevWeekTotal, userId)
     if err != nil {
         return EXEC_ERROR(err)
     }
@@ -414,7 +414,7 @@ func (db *DatabaseConn) GetWeeklyDistribution(userId string) (*WeeklyDistributio
         return nil, DNE_ERROR
     }
 
-    query := fmt.Sprintf("SELECT normal_count, anomalous_count, malicious_count, prev_week_total FROM %s WHERE id = ?;", UsersTable)
+    query := fmt.Sprintf("SELECT benign_count, port_scan_count, ddos_count, prev_week_total FROM %s WHERE id = ?;", UsersTable)
     preparedStatement, err := db.conn.Prepare(query)
     if err != nil {
         return nil, PREPARE_ERROR(err)
@@ -430,7 +430,7 @@ func (db *DatabaseConn) GetWeeklyDistribution(userId string) (*WeeklyDistributio
     }   
 
     weeklyDistribution := &WeeklyDistribution{}
-    err = rows.Scan(&weeklyDistribution.Normal, &weeklyDistribution.Anomalous, &weeklyDistribution.Malicious, &weeklyDistribution.PrevWeekTotal)
+    err = rows.Scan(&weeklyDistribution.Benign, &weeklyDistribution.PortScan, &weeklyDistribution.DDoS, &weeklyDistribution.PrevWeekTotal)
     if err != nil {
         return nil, SCAN_ERROR(err)
     }
