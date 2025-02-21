@@ -151,7 +151,7 @@ func (h *RouteHandler) ResetWeeklyDistribution(writer http.ResponseWriter, reque
 		return
 	}
 	
-	resetErr := h.Db.ResetWeeklyDistribution(subjectId, 0)
+	resetErr := h.Db.ResetWeeklyDistribution(subjectId, body.WeekTotal)
 	if resetErr != nil {
 		h.Log.Errorf("error resetting weekly distribution: %s", resetErr.Err)
 		http.Error(writer, "unable to reset weekly distribution", resetErr.HttpStatus)
