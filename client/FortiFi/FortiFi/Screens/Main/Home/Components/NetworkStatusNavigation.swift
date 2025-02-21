@@ -24,7 +24,7 @@ struct NetworkStatusNavigation: View {
                         .font(.body)
                         .foregroundColor(.fortifiForeground)
                     Text("^[\(homeViewModel.threats.count) Threat](inflect: true) found")
-                        .font(.subheadline)
+                        .Label()
                         .foregroundColor(.foregroundMuted)
                 }
                 
@@ -49,7 +49,7 @@ struct NetworkStatusNavigation: View {
                             .font(.body)
                             .foregroundColor(.fortifiForeground)
                         Text("^[\(homeViewModel.threats.count) Threat](inflect: true) found")
-                            .font(.subheadline)
+                            .Label()
                             .foregroundColor(.foregroundMuted)
                     }
                     

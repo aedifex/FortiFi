@@ -23,11 +23,11 @@ struct EventsDistribution: View {
         VStack (spacing: 24){
             HStack {
                 Text("Traffic Distribution")
-                    .font(.subheadline)
+                    .Label()
                     .foregroundStyle(.foregroundMuted)
                 Spacer()
                 Text("\(weekStart) - Present")
-                    .font(.subheadline)
+                    .Label()
                     .foregroundStyle(.foregroundMuted)
             }
             HStack (spacing: 50){
@@ -36,29 +36,29 @@ struct EventsDistribution: View {
                         Text("^[**\(HomeViewModel.shared.totalEvents)** total event](inflect: true)")
                             .font(.body)
                         Text("This week")
-                            .font(.subheadline)
+                            .Label()
                             .foregroundStyle(.foregroundMuted)
                     }
                     VStack(alignment: .leading, spacing: 16) {
                         HStack {
                             Text("**\(HomeViewModel.shared.eventCounts.Benign)** Benign")
-                                .font(.subheadline)
+                                .Label()
                             Text("\(HomeViewModel.shared.distributions[.benign] ?? 0, specifier: "%.1f")%")
-                                .font(.subheadline)
+                                .Label()
                                 .foregroundStyle(.foregroundMuted)
                         }
                         HStack {
                             Text("**\(HomeViewModel.shared.eventCounts.PortScan)** Port Scan")
-                                .font(.subheadline)
+                                .Label()
                             Text("\(HomeViewModel.shared.distributions[.portScan] ?? 0,specifier: "%.1f")%")
-                                .font(.subheadline)
+                                .Label()
                                 .foregroundStyle(.foregroundMuted)
                         }
                         HStack {
                             Text("**\(HomeViewModel.shared.eventCounts.DDoS)** DDoS")
-                                .font(.subheadline)
+                                .Label()
                             Text("\(HomeViewModel.shared.distributions[.ddos] ?? 0,specifier: "%.1f")%")
-                                .font(.subheadline)
+                                .Label()
                                 .foregroundStyle(.foregroundMuted)
                         }
                     }
@@ -88,7 +88,7 @@ struct EventsDistribution: View {
                               let frame = geometry[anchor]
                               Text("Nothing to\nReport")
                                 .multilineTextAlignment(.center)
-                                .font(.caption)
+                                .Tag()
                                 .foregroundStyle(.foregroundMuted)
                                 .position(x: frame.midX, y: frame.midY)
                             }

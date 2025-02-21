@@ -24,20 +24,20 @@ struct EventTab: View {
                         }
                         Spacer()
                         Text("\(threat.ts)")
-                            .font(.subheadline)
+                            .Label()
                             .foregroundStyle(.foregroundMuted)
                     }
                     HStack{
                         VStack (alignment: .leading){
                             Text("Source IP")
-                                .font(.subheadline)
+                                .Label()
                                 .foregroundStyle(.foregroundMuted)
                             Text(threat.src)
                         }
                         Spacer()
                         VStack (alignment: .leading){
                             Text("Destination IP")
-                                .font(.subheadline)
+                                .Label()
                                 .foregroundStyle(.foregroundMuted)
                             Text(threat.dst)
                         }
@@ -54,7 +54,7 @@ struct EventTab: View {
 struct DDoSTag: View {
     var body: some View {
         Text("DDoS")
-            .font(.caption)
+            .Tag()
             .foregroundStyle(.fortifiNegative)
             .padding(.horizontal,10)
             .padding(.vertical, 6)
@@ -70,7 +70,7 @@ struct DDoSTag: View {
 struct PortScanTag: View {
     var body: some View {
         Text("PortScan")
-            .font(.caption)
+            .Tag()
             .foregroundStyle(.fortifiWarning)
             .padding(.horizontal,10)
             .padding(.vertical, 6)

@@ -12,11 +12,11 @@ struct Events: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
             Text("Flagged Events")
-                .font(.title)
+                .Title()
                 .fontWeight(.medium)
                 .frame(maxWidth: .infinity, alignment: .leading)
             Text("\(viewModel.threats.count) Threats found")
-                .font(.subheadline)
+                .Label()
                 .foregroundColor(.foregroundMuted)
             
             ScrollView{

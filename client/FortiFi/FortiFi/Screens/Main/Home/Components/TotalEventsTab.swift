@@ -16,11 +16,11 @@ struct TotalEventsTab: View {
         VStack(alignment: .leading, spacing: 24) {
             HStack {
                 Text("Traffic Volume")
-                    .font(.subheadline)
+                    .Label()
                     .foregroundStyle(.foregroundMuted)
                 Spacer()
                 Text("\(weekStart) - Present")
-                    .font(.subheadline)
+                    .Label()
                     .foregroundStyle(.foregroundMuted)
             }
             HStack {
@@ -29,15 +29,15 @@ struct TotalEventsTab: View {
                             .font(.body)
                     if viewModel.difference == 0 {
                         Text("Same as previous week")
-                                .font(.subheadline)
+                                .Label()
                                 .foregroundStyle(.foregroundMuted)
                     } else if viewModel.difference < 0 {
                         Text("\(viewModel.difference) from previous week")
-                                .font(.subheadline)
+                                .Label()
                                 .foregroundStyle(.fortifiNegative)
                     } else {
                         Text("+\(viewModel.difference) from previous week")
-                                .font(.subheadline)
+                                .Label()
                                 .foregroundStyle(.fortifiPositive)
                     }
                 }

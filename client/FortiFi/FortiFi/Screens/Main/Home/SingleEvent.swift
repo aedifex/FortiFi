@@ -13,28 +13,28 @@ struct SingleEvent: View {
     var body: some View {
         VStack (alignment: .leading, spacing: 24){
             Text("Event Details")
-                .font(.title)
+                .Title()
                 .foregroundStyle(.fortifiForeground)
             
             VStack {
                 HStack {
                     Text("Source Ip")
-                        .font(.subheadline)
+                        .Label()
                         .foregroundStyle(.foregroundMuted)
                     Spacer()
                     Text(threat.src)
-                        .font(.subheadline)
+                        .Label()
                         .foregroundStyle(.fortifiForeground)
                 }
                 .padding(.vertical,4)
                 Divider()
                 HStack {
                     Text("Destination Ip")
-                        .font(.subheadline)
+                        .Label()
                         .foregroundStyle(.foregroundMuted)
                     Spacer()
                     Text(threat.dst)
-                        .font(.subheadline)
+                        .Label()
                         .foregroundStyle(.fortifiForeground)
                 }
                 .padding(.vertical,4)
@@ -46,11 +46,11 @@ struct SingleEvent: View {
             
             HStack {
                 Text("Time of Incident")
-                    .font(.subheadline)
+                    .Label()
                     .foregroundStyle(.foregroundMuted)
                 Spacer()
                 Text(threat.ts)
-                    .font(.subheadline)
+                    .Label()
                     .foregroundStyle(.fortifiForeground)
             }
             .padding(.horizontal)
@@ -61,7 +61,7 @@ struct SingleEvent: View {
             
             HStack {
                 Text("Attack Type")
-                    .font(.subheadline)
+                    .Label()
                     .foregroundStyle(.foregroundMuted)
                 Spacer()
                 if threat.type == .portScan {
@@ -78,11 +78,11 @@ struct SingleEvent: View {
             
             VStack(alignment: .leading) {
                 Text("Details")
-                    .font(.subheadline)
+                    .Label()
                     .foregroundStyle(.foregroundMuted)
                 Divider()
                 Text(threat.details)
-                    .font(.subheadline)
+                    .Label()
                     .foregroundStyle(.fortifiForeground)
                     .padding(.vertical)
             }
@@ -96,7 +96,7 @@ struct SingleEvent: View {
                 Spacer()
                 NavigationLink(destination: Chat()) {
                     Text("Ask AI for Assistance")
-                        .font(.headline)
+                        .Label()
                         .padding()
                         .foregroundStyle(.fortifiBackground)
                         .background(.fortifiPrimary)

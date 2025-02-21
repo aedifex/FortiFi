@@ -7,13 +7,22 @@
 
 import Foundation
 import SwiftUICore
+import UIKit
 
-extension Font {
-    static let fortifiTitle: Font = .custom("Inter", size: 24).weight(.medium)
-    static let fortifiHeader: Font = .custom("Inter", size: 20).weight(.regular)
-    static let fortifiBody: Font = .custom("Inter", size: 16).weight(.regular)
-    static let fortifiLabel: Font = .custom("Inter", size: 14).weight(.regular)
-    static let fortifiButtons: Font = .custom("Inter", size: 14).weight(.medium)
-    static let fortifiNumbers: Font = .custom("Inter", size: 16).weight(.medium)
+extension View {
+    func Title() -> some View {
+        return self.font(.title)
+            .fontWeight(.medium)
+    }
+    func Header() -> some View {
+        self.font(.title3)
+            .fontWeight(.regular)
+    }
+    func Label() -> some View {
+        self.font(.subheadline)
+    }
+    func Tag() -> some View {
+        self.font(.caption)
+    }
 }
 

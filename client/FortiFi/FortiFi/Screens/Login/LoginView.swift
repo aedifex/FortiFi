@@ -28,7 +28,8 @@ struct LoginView: View {
             VStack(spacing: 24) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Email")
-                        .font(.system(size: 14, weight: .medium))
+                        .Label()
+                        .foregroundStyle(.foregroundMuted)
                     TextField("", text: $viewModel.user.email)
                         .textFieldStyle(CustomTextFieldStyle())
                         .autocapitalization(.none)
@@ -37,7 +38,8 @@ struct LoginView: View {
                 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Password")
-                        .font(.system(size: 14, weight: .medium))
+                        .Label()
+                        .foregroundStyle(.foregroundMuted)
                     SecureField("", text: $viewModel.user.password)
                         .textFieldStyle(CustomTextFieldStyle())
                 }
