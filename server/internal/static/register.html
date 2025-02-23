@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FortiFi - Register</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/static/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -57,11 +57,9 @@
             responseElement.className = '';
             responseElement.textContent = '';
 
-            const url = 'http://localhost:3000';
-
             const userData = {
                 user: {
-                    id: crypto.randomUUID(),
+                    id: "RandomGeneratedId",
                     first_name: document.getElementById('firstName').value,
                     last_name: document.getElementById('lastName').value,
                     email: document.getElementById('email').value,
@@ -70,7 +68,7 @@
             };
 
             try {
-                const response = await fetch(url+'/CreateUser', {
+                const response = await fetch('/CreateUser', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

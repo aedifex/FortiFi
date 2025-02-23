@@ -209,3 +209,13 @@ func (h *RouteHandler) AddDevice(writer http.ResponseWriter, request *http.Reque
 
 	writer.WriteHeader(http.StatusOK)
 }
+
+func (h *RouteHandler) Registration(writer http.ResponseWriter, request *http.Request) {
+
+	if request.Method != http.MethodGet {
+		http.Error(writer, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	http.ServeFile(writer, request, "./internal/static/register.html")
+}
