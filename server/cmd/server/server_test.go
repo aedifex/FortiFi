@@ -10,6 +10,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/aedifex/FortiFi/config"
 	"github.com/aedifex/FortiFi/internal/database"
@@ -963,6 +964,8 @@ func TestGetDevices(t *testing.T) {
 					Name: "smartTV",
 					IpAddress: "10.0.1.1",
 					MacAddress: "00:00:00:00:00:00",
+					DateAdded: time.Now().Format(time.DateOnly),
+					IncidentCount: 0,
 				},
 			},
 		},
