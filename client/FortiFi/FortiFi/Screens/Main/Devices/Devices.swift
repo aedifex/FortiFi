@@ -19,22 +19,47 @@ struct Devices: View {
                 Text("\(viewModel.devices.count) Monitored Devices")
                     .Label()
                     .foregroundColor(.foregroundMuted)
-                ScrollView{
-                    VStack {
-                        ForEach(viewModel.devices) {device in
-                            DeviceListItem(device: device)
-                            if device.self != viewModel.devices.last.self {
-                                       Divider()
+                switch viewModel.devices.count {
+                case 0:
+                    HStack{
+                        Spacer()
+                        VStack(alignment: .center, spacing: 12){
+                            Image(systemName: "iphone.circle.fill")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 150)
+                                .foregroundStyle(.foregroundMuted)
+                                .opacity(0.6)
+                            VStack {
+                                Text("No tracked devices")
+                                    .Header()
+                                Text("Fortifi will automatically update this as traffic passes through your network")
+                                    .Label()
+                                    .foregroundStyle(.foregroundMuted)
+                                    .multilineTextAlignment(.center)
                             }
                         }
+                        Spacer()
                     }
-                    .padding()
-                    .background(.fortifiBackground)
-                    .cornerRadius(16)
-                    .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 0)
+                    .padding(.vertical, 32)
+                default:
+                    ScrollView{
+                        VStack {
+                            ForEach(viewModel.devices) {device in
+                                DeviceListItem(device: device)
+                                if device.self != viewModel.devices.last.self {
+                                           Divider()
+                                }
+                            }
+                        }
+                        .padding()
+                        .background(.fortifiBackground)
+                        .cornerRadius(16)
+                        .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 0)
+                    }
+                    .contentMargins(2)
                 }
-                .contentMargins(2)
-
+                Spacer()
             }
             .padding()
             .toolbarBackground(.fortifiBackground, for: .navigationBar)
