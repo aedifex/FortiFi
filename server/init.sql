@@ -57,6 +57,7 @@ CREATE TABLE Devices (
     name varchar(255) NOT NULL,
     ip_address varchar(255) NOT NULL,
     mac_address varchar(255) NOT NULL,
+    date_added DATE NOT NULL,
     FOREIGN KEY (userId) REFERENCES Users(id) ON DELETE CASCADE,
     PRIMARY KEY (id)
 );
