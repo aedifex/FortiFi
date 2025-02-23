@@ -21,6 +21,7 @@ struct EventsDistribution: View {
     
     var body: some View {
         VStack (spacing: 24){
+            
             HStack {
                 Text("Traffic Distribution")
                     .Label()
@@ -45,21 +46,21 @@ struct EventsDistribution: View {
                                 .Label()
                             Text("\(HomeViewModel.shared.distributions[.benign] ?? 0, specifier: "%.1f")%")
                                 .Label()
-                                .foregroundStyle(.foregroundMuted)
+                                .foregroundStyle(.fortifiPositive)
                         }
                         HStack {
                             Text("**\(HomeViewModel.shared.eventCounts.PortScan)** Port Scan")
                                 .Label()
                             Text("\(HomeViewModel.shared.distributions[.portScan] ?? 0,specifier: "%.1f")%")
                                 .Label()
-                                .foregroundStyle(.foregroundMuted)
+                                .foregroundStyle(.fortifiWarning)
                         }
                         HStack {
                             Text("**\(HomeViewModel.shared.eventCounts.DDoS)** DDoS")
                                 .Label()
                             Text("\(HomeViewModel.shared.distributions[.ddos] ?? 0,specifier: "%.1f")%")
                                 .Label()
-                                .foregroundStyle(.foregroundMuted)
+                                .foregroundStyle(.fortifiNegative)
                         }
                     }
                     .padding(.vertical)
@@ -68,12 +69,24 @@ struct EventsDistribution: View {
                     if HomeViewModel.shared.totalEvents > 0 {
                         Chart {
                             ForEach(data, id: \.name) {type in
-                                SectorMark(angle: .value("percent", type.count), angularInset: 1)
+                                SectorMark(angle: .value("percent", type.count), innerRadius: .ratio(0.5), angularInset: 1)
                                     .foregroundStyle(type.style)
                                     .cornerRadius(5)
                             }
                         }
                         .frame(height: 150)
+                        .chartBackground { chartProxy in
+                          GeometryReader { geometry in
+                            if let anchor = chartProxy.plotFrame {
+                              let frame = geometry[anchor]
+                              Text("Network\nStatus")
+                                .multilineTextAlignment(.center)
+                                .Tag()
+                                .foregroundStyle(.foregroundMuted)
+                                .position(x: frame.midX, y: frame.midY)
+                            }
+                          }
+                        }
                     } else {
                         Chart{
                             SectorMark(angle: .value("percent", 1),

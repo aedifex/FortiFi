@@ -7,9 +7,11 @@
 
 import Foundation
 
-struct DevicesResponse: Codable {
+struct DevicesResponse: Codable, Identifiable, Equatable {
     var id: Int
     var name: String
     var ip_address: String
     var mac_address: String
+    var date_added: String
+    var incident_count: Int
 }

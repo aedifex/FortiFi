@@ -37,11 +37,7 @@ struct ContentView: View {
                     .toolbarBackgroundVisibility(.visible, for: .tabBar)
             }
             .tint(.fortifiPrimary)
-            .onAppear{
-                Task {
-                    await HomeViewModel.shared.refresh()
-                }
-            }
+            
         case false:
             LoginView()
         }

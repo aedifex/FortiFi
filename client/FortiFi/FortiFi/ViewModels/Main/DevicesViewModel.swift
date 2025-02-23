@@ -18,4 +18,8 @@ import Foundation
         }
     }
     
+    func refresh() async {
+        await getDevices()
+    }
+    
 }

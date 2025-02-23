@@ -32,7 +32,7 @@ struct Events: View {
                 .padding()
                 .background(.fortifiBackground)
                 .cornerRadius(16)
-                .shadow(color: Color.black.opacity(0.1), radius: 5, x: 2, y: 2)
+                .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 0)
             }
             .contentMargins(2)
         }

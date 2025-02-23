@@ -13,12 +13,13 @@ import SwiftUI
     static let shared = NetworkManager()
     var fcm = ""
 
-    static private let baseUrl = "http://192.168.4.136:3000"
+    static private let baseUrl = "http://10.0.0.67:3000"
     private let loginUrl = baseUrl + "/Login"
     private let eventsUrl = baseUrl + "/GetUserEvents"
     private let refreshUrl = baseUrl + "/RefreshUser"
     private let setFcmUrl = baseUrl + "/UpdateFcm"
     private let distributionUrl = baseUrl + "/GetWeeklyDistribution"
+    private let getDevicesUrl = baseUrl + "/GetDevices"
     
     @AppStorage("refreshToken") private var refreshToken: String = ""
     @AppStorage("jwt") var jwt: String = ""
@@ -219,6 +220,39 @@ import SwiftUI
             throw Errors.networkError("network error")
         }
         
+    }
+    
+    func getDevices() async throws -> [DevicesResponse] {
+        
+        if try JWT.isExpired(jwt) {
+            try await refreshAuthTokens()
+        }
+        
+        guard let url = URL(string: getDevicesUrl) else {
+            throw Errors.invalidUrl("url could not be constructed")
+        }
+        
+        var request = URLRequest(url:url)
+        request.setValue("Bearer \(jwt)", forHTTPHeaderField: "Authorization")
+        request.httpMethod = "GET"
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let response = response as? HTTPURLResponse else {
+            throw Errors.internalError("failed to parse response")
+        }
+        
+        switch response.statusCode {
+        case 200:
+            let devices = try JSONDecoder().decode([DevicesResponse].self, from: data)
+            return devices
+        case 404:
+            throw Errors.notFound("user does not exist")
+        case 401:
+            throw Errors.expiredToken("tokens have expired")
+        default:
+            throw Errors.networkError("network error")
+        }
     }
     
 }

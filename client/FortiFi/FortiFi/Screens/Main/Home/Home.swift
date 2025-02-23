@@ -51,6 +51,11 @@ struct Home: View {
             .background(.backgroundAlt)
             .foregroundStyle(.fortifiForeground)
         }
+        .onAppear{
+            Task {
+                await HomeViewModel.shared.refresh()
+            }
+        }
         .refreshable {
             Task {
                 await homeViewModel.refresh()
