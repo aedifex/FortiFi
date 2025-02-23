@@ -80,6 +80,10 @@ db_name:
   "FortiFi"
 signing_key:
   "b2e138d8553ea7d7ff8731e87e41406277bd4c98"
+fcm_key_path:
+  "./config/fortifi-firebase-auth.json" # Contact @Jonathan for this file
+cors_origin:
+  "*"
 ```
 
 Also, your database password should be set in the Makefile as the password you used to setup `mysql`.
