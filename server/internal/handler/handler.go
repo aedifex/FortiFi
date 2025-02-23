@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/aedifex/FortiFi/config"
 	db "github.com/aedifex/FortiFi/internal/database"
@@ -197,6 +198,7 @@ func (h *RouteHandler) AddDevice(writer http.ResponseWriter, request *http.Reque
 		IpAddress: body.IpAddress,
 		MacAddress: body.MacAddress,
 		UserId: subjectId,
+		DateAdded: time.Now().Format("2006-01-02"),
 	}
 	addErr := h.Db.AddDevice(device)
 	if addErr != nil {
