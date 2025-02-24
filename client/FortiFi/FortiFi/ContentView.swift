@@ -13,7 +13,7 @@ struct ContentView: View {
     
     var body: some View {
         switch manager.authenticated {
-        case false:
+        case true:
             TabView{
                 Home()
                     .tabItem{
