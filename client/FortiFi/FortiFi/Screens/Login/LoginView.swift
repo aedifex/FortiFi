@@ -76,11 +76,12 @@ struct CustomTextFieldStyle: TextFieldStyle {
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
             .background(.fortifiBackground)
-            .foregroundColor(.gray)
+            .foregroundColor(.fortifiForeground)
             .cornerRadius(8)
             .overlay(
-                RoundedRectangle(cornerRadius: 8)
+                RoundedRectangle(cornerRadius: 16)
                     .stroke(.foregroundMuted, lineWidth: 1)
+                    .opacity(0.6)
             )
     }
 }

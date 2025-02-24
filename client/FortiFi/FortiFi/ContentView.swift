@@ -13,7 +13,7 @@ struct ContentView: View {
     
     var body: some View {
         switch manager.authenticated {
-        case true:
+        case false:
             TabView{
                 Home()
                     .tabItem{
@@ -38,7 +38,7 @@ struct ContentView: View {
             }
             .tint(.fortifiPrimary)
             
-        case false:
+        default:
             LoginView()
         }
     }
