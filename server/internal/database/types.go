@@ -24,6 +24,7 @@ type Event struct {
 	Type 		string	`json:"type" sql:"event_type"`
 	SrcIP 		string	`json:"src" sql:"src_ip"`
 	DstIP 		string	`json:"dst" sql:"dst_ip"`
+	Confidence 	int		`json:"confidence" sql:"confidence_interval"`
 }
 
 type WeeklyDistribution struct {

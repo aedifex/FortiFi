@@ -45,6 +45,7 @@ CREATE TABLE NetworkThreats (
     event_type INT NOT NULL, --  1 = HorizontalPortScan, 2 = DDoS
     src_ip varchar(255) NOT NULL,
     dst_ip varchar(255) NOT NULL,
+    confidence_interval INT NOT NULL,
     PRIMARY KEY (threat_id),
     FOREIGN KEY (id) REFERENCES Users(id) ON DELETE CASCADE
 );

@@ -100,6 +100,7 @@ request_body: json
         - type: string (1 for port scan, 2 for ddos)
         - src: string
         - dst: string
+        - confidence: int
     - example:
         {
             "event": {
@@ -109,7 +110,8 @@ request_body: json
                 "expires": "2006-01-02 15:04:05",
                 "type": "1",
                 "src": "10.0.1.1",
-                "dst": "10.0.1.2"
+                "dst": "10.0.1.2",
+                "confidence": 100
             }
         }
 

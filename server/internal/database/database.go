@@ -281,7 +281,7 @@ func (db *DatabaseConn) StoreEvent(e *Event) *DatabaseError {
 
     
     // Insert id, details, ts, expires
-    query := fmt.Sprintf("INSERT INTO %s (id, details, ts, expires, event_type, src_ip, dst_ip) VALUES (?, ?, ?, ?, ?, ?, ?)", EventsTable)
+    query := fmt.Sprintf("INSERT INTO %s (id, details, ts, expires, event_type, src_ip, dst_ip, confidence_interval) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", EventsTable)
 
     // prepare statement
     preparedStatement, err := db.conn.Prepare(query)
@@ -290,7 +290,7 @@ func (db *DatabaseConn) StoreEvent(e *Event) *DatabaseError {
     }
 
     // execute statement
-    res, err := preparedStatement.Exec(e.Id, e.Details, e.TS, e.Expires, e.Type, e.SrcIP, e.DstIP)
+    res, err := preparedStatement.Exec(e.Id, e.Details, e.TS, e.Expires, e.Type, e.SrcIP, e.DstIP, e.Confidence)
     if err != nil {
         return EXEC_ERROR(err)
     }

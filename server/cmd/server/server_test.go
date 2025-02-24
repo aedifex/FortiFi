@@ -650,6 +650,7 @@ func TestNotifyIntrusion(t *testing.T) {
 					Type: "1",
 					SrcIP: "10.0.1.1",
 					DstIP: "10.0.1.2",
+					Confidence: 100,
 				},
 			},
 			jwt: piJwt,
