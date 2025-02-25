@@ -550,3 +550,110 @@ response_body: json
 
 response_headers: []
 ```
+
+<!-- Get Threat Assistance -->
+<b>Get Threat Assistance</b>
+
+```yaml
+path: /GetThreatAssistance
+description: Get threat assistance for a user
+
+methods:
+    - GET
+
+query_params:
+    - threatId
+
+headers:
+    - Authorization: Bearer <jwt token>
+
+request_body: []
+
+responses:
+    - 405: method not allowed
+        fix: check http method
+    - 401: unauthorized
+        fix: check the jwt header and ensure valid
+    - 404: not found
+        fix: check the user entry in database   
+    - 500: internal server error
+        fix: check server logs
+    - 200: OK
+
+response_body: json
+    - response: string
+
+```
+
+<!-- Get More Assistance -->
+<b>Get More Assistance</b>
+
+```yaml
+path: /GetMoreAssistance
+description: Get more assistance for a user
+
+methods:
+    - GET
+
+query_params:
+    - threatId
+
+headers:
+    - Authorization: Bearer <jwt token>
+
+request_body: json
+    - query: string
+
+responses:
+    - 405: method not allowed
+        fix: check http method
+    - 401: unauthorized
+        fix: check the jwt header and ensure valid
+    - 404: not found
+        fix: check the user entry in database
+    - 500: internal server error
+        fix: check server logs
+    - 200: OK
+
+response_body: json
+    - response: string
+
+response_headers: []
+```
+
+<!-- Get Recommendations -->
+<b>Get Recommendations</b>
+
+```yaml
+path: /GetRecommendations
+description: Get recommendations for a user
+
+methods:
+    - GET
+
+query_params:
+    - threatId
+
+headers:
+    - Authorization: Bearer <jwt token>
+
+request_body: []
+
+responses:
+    - 405: method not allowed
+        fix: check http method
+    - 401: unauthorized
+        fix: check the jwt header and ensure valid
+    - 404: not found
+        fix: check the user entry in database
+    - 500: internal server error
+        fix: check server logs
+    - 200: OK
+
+response_body: json
+    - response: string
+
+response_headers: []
+```
+
+

@@ -84,6 +84,8 @@ fcm_key_path:
   "./config/fortifi-firebase-auth.json" # Contact @Jonathan for this file
 cors_origin:
   "*"
+openai_api_key:
+  "<openai_api_key>"
 ```
 
 Also, your database password should be set in the Makefile as the password you used to setup `mysql`.
