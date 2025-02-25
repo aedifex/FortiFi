@@ -299,7 +299,7 @@ func (h *RouteHandler) GetDevices(writer http.ResponseWriter, request *http.Requ
 }
 
 func (h *RouteHandler) GetThreatAssistance(writer http.ResponseWriter, request *http.Request) {
-
+	
 	if request.Method != http.MethodGet {
 		http.Error(writer, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
@@ -396,7 +396,7 @@ func (h *RouteHandler) GetRecommendations(writer http.ResponseWriter, request *h
 
 func (h *RouteHandler) GetMoreAssistance(writer http.ResponseWriter, request *http.Request) {
 
-	if request.Method != http.MethodGet {
+	if request.Method != http.MethodPost {
 		http.Error(writer, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
@@ -461,7 +461,7 @@ func (h *RouteHandler) GetMoreAssistance(writer http.ResponseWriter, request *ht
 
 func (h *RouteHandler) GetGeneralAssistance(writer http.ResponseWriter, request *http.Request) {
 
-	if request.Method != http.MethodGet {
+	if request.Method != http.MethodPost {
 		http.Error(writer, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
