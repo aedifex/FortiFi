@@ -9,6 +9,7 @@ import (
 	"github.com/aedifex/FortiFi/internal/middleware"
 	"github.com/aedifex/FortiFi/internal/requests"
 	"github.com/aedifex/FortiFi/pkg/utils"
+	"github.com/google/uuid"
 )
 
 func (h *RouteHandler) CreateUser(writer http.ResponseWriter, request *http.Request) {
@@ -335,6 +336,7 @@ func (h *RouteHandler) GetThreatAssistance(writer http.ResponseWriter, request *
 	writer.Header().Set("Content-Type", "application/json")
 	encodeErr := json.NewEncoder(writer).Encode(map[string]string{
 		"response": llmResponse,
+		"id": uuid.New().String(),
 	})
 	if encodeErr != nil {
 		h.Log.Errorf("error encoding response: %s", encodeErr.Error())
@@ -382,6 +384,7 @@ func (h *RouteHandler) GetRecommendations(writer http.ResponseWriter, request *h
 	writer.Header().Set("Content-Type", "application/json")
 	encodeErr := json.NewEncoder(writer).Encode(map[string]string{
 		"response": llmResponse,
+		"id": uuid.New().String(),
 	})
 	if encodeErr != nil {
 		h.Log.Errorf("error encoding response: %s", encodeErr.Error())
@@ -446,6 +449,7 @@ func (h *RouteHandler) GetMoreAssistance(writer http.ResponseWriter, request *ht
 	writer.Header().Set("Content-Type", "application/json")
 	encodeErr := json.NewEncoder(writer).Encode(map[string]string{
 		"response": llmResponse,
+		"id": uuid.New().String(),
 	})
 	if encodeErr != nil {
 		h.Log.Errorf("error encoding response: %s", encodeErr.Error())
@@ -495,7 +499,8 @@ func (h *RouteHandler) GetGeneralAssistance(writer http.ResponseWriter, request 
 	
 	writer.Header().Set("Content-Type", "application/json")
 	encodeErr := json.NewEncoder(writer).Encode(map[string]string{
-		"response": llmResponse,
+		"response": llmResponse,	
+		"id": uuid.New().String(),
 	})
 	if encodeErr != nil {
 		h.Log.Errorf("error encoding response: %s", encodeErr.Error())
