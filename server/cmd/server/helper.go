@@ -79,7 +79,7 @@ func newServer(config *config.Config) *fortifiServer {
 	mux.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	// User Authentication Routes
-	mux.HandleFunc("/Register", routeHandler.Registration)
+	mux.HandleFunc("/Register", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.Registration))
 	// ? Should CreateUser be wrapped by Auth? Use the Pi init token to create a user
 	mux.HandleFunc("/CreateUser", routeHandler.CreateUser)
 	mux.HandleFunc("/Login", routeHandler.Login)

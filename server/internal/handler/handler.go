@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"html/template"
 	"net/http"
 	"time"
 
@@ -219,5 +220,28 @@ func (h *RouteHandler) Registration(writer http.ResponseWriter, request *http.Re
 		return
 	}
 
-	http.ServeFile(writer, request, "./internal/static/register.html")
+	subjectId := request.Context().Value(middleware.UserIdContextKey).(string)
+	if subjectId == "" {
+		http.Error(writer, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	data := struct{UserId string}{
+		UserId: subjectId,
+	}
+
+	tmpl, err := template.ParseFiles("./internal/static/register.html")
+	if err != nil {
+		h.Log.Errorf("error parsing template: %s", err.Error())
+		http.Error(writer, "unable to parse template", http.StatusInternalServerError)
+		return
+	}
+
+	err = tmpl.Execute(writer, data)
+	if err != nil {
+		h.Log.Errorf("error executing template: %s", err.Error())
+		http.Error(writer, "unable to execute template", http.StatusInternalServerError)
+		return
+	}
+
 }
