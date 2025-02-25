@@ -238,7 +238,7 @@ func (db *DatabaseConn) userExists(user *User) *DatabaseError {
     if res.Next() { return USER_EXISTS_ERROR}
     
     // check id
-    queryId := "SELECT * FROM USERS WHERE id = ?;"
+    queryId := fmt.Sprintf("SELECT * FROM %s WHERE id = ?;", UsersTable)
     preparedStatementId, _ := db.conn.Prepare(queryId)
     defer preparedStatementId.Close()
     res, err = preparedStatementId.Query(user.Id)
