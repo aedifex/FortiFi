@@ -336,7 +336,6 @@ func (h *RouteHandler) GetThreatAssistance(writer http.ResponseWriter, request *
 	encodeErr := json.NewEncoder(writer).Encode(map[string]string{
 		"response": llmResponse,
 	})
-	writer.WriteHeader(http.StatusOK)
 	if encodeErr != nil {
 		h.Log.Errorf("error encoding response: %s", encodeErr.Error())
 		writer.WriteHeader(http.StatusInternalServerError)
@@ -389,7 +388,6 @@ func (h *RouteHandler) GetRecommendations(writer http.ResponseWriter, request *h
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	writer.WriteHeader(http.StatusOK)
 
 }
 
@@ -454,9 +452,58 @@ func (h *RouteHandler) GetMoreAssistance(writer http.ResponseWriter, request *ht
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	writer.WriteHeader(http.StatusOK)
 
 }
+
+func (h *RouteHandler) GetGeneralAssistance(writer http.ResponseWriter, request *http.Request) {
+
+	if request.Method != http.MethodGet {
+		http.Error(writer, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	subjectId, ok := request.Context().Value(middleware.UserIdContextKey).(string)
+	if !ok {
+		h.Log.Errorf("could not assert subjectId from context as string: %v", subjectId)
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	body := &requests.GetGeneralAssistanceRequest{}
+	if request.Body == nil {
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	err := json.NewDecoder(request.Body).Decode(body)
+	if err != nil {
+		h.Log.Errorf("error decoding request body: %s", err.Error())
+		http.Error(writer, "invalid request", http.StatusBadRequest)
+		return
+	}
+
+	if body.Query == ""{
+		http.Error(writer, "invalid request", http.StatusBadRequest)
+		return
+	}
+	
+	llmResponse, err := h.OpenaiClient.GetGeneralAssistance(body.Query)
+	if err != nil {
+		h.Log.Errorf("error getting general assistance: %s", err.Error())
+		http.Error(writer, "failed to get general assistance", http.StatusInternalServerError)
+		return
+	}
+	
+	writer.Header().Set("Content-Type", "application/json")
+	encodeErr := json.NewEncoder(writer).Encode(map[string]string{
+		"response": llmResponse,
+	})
+	if encodeErr != nil {
+		h.Log.Errorf("error encoding response: %s", encodeErr.Error())
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
 // TODO implement this -- Should revoke refresh tokens
 // func (h *RouteHandler) Logout(writer http.ResponseWriter, request *http.Request){
 // 	return

@@ -42,3 +42,7 @@ type AddDeviceRequest struct {
 type GetMoreAssistanceRequest struct {
 	Query	string	`json:"query"`
 }
+
+type GetGeneralAssistanceRequest struct {
+	Query	string	`json:"query"`
+}

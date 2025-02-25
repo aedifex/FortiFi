@@ -107,7 +107,9 @@ func newServer(config *config.Config) *fortifiServer {
 	mux.HandleFunc("/GetThreatAssistance", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.GetThreatAssistance))
 	mux.HandleFunc("/GetRecommendations", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.GetRecommendations))
 	mux.HandleFunc("/GetMoreAssistance", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.GetMoreAssistance))
+	mux.HandleFunc("/GetGeneralAssistance", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.GetGeneralAssistance))
 
+	// configure middleware
 	loggingMiddleware := middleware.Logging(zapLogger)
 	corsMiddleware := middleware.CORSMiddleware(config.CORS_ORIGIN)
 	serverHandler := corsMiddleware(loggingMiddleware(mux))

@@ -33,6 +33,8 @@ const (
 				"Destination IP: %v\n"+
 				"More Details: %v"+
 				"Can you provide an explanation or insights into this prediction?"
+
+	GENERAL_ASSISTANCE_MESSAGE = "You are a network security analyst tasked with providing insights into IoT traffic in a home network to a homeowner. The home owner can ask for insights based on specific threats or general information about the network. Your role is to provide a general explanation of the following: %s. Inform the users of the ability to ask for more threat specific information by navigating to the threats list on the FortiFi home page. If the user asks for information not related to the network or security, please inform them that you are not able to provide information on that topic and restate your purpose."
 )
 type OpenAIClient struct {
 	Client *openai.Client
@@ -113,4 +115,20 @@ func (c *OpenAIClient) generateLLMResponse(messages []openai.ChatCompletionMessa
 		return "", fmt.Errorf("error generating LLM response: %v", err)
 	}
 	return response.Choices[0].Message.Content, nil
+}
+
+func (c *OpenAIClient) GetGeneralAssistance(query string) (string, error) {
+	generalAssistanceMessage := "please provide a general explanation of the following: %s"
+
+	system_message := fmt.Sprintf(GENERAL_ASSISTANCE_MESSAGE, query)
+	messages := []openai.ChatCompletionMessageParamUnion{
+		openai.SystemMessage(system_message),
+		openai.UserMessage(generalAssistanceMessage),
+	}
+
+	response, err := c.generateLLMResponse(messages)
+	if err != nil {
+		return "", fmt.Errorf("error generating LLM response: %v", err)
+	}
+	return response, nil
 }
