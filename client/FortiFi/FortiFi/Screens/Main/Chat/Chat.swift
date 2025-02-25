@@ -8,11 +8,12 @@
 import SwiftUI
 
 struct Chat: View {
+    var viewModel: ChatViewModel
     var body: some View {
-        ChatView()
+        ChatView(viewModel: viewModel)
     }
 }
 
 #Preview {
-    Chat()
+    Chat(viewModel: ChatViewModel())
 }

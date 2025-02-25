@@ -9,6 +9,8 @@ import SwiftUI
 
 struct SingleEvent: View {
     var threat: Event
+    @StateObject var viewModel: ChatViewModel
+    
     @State var offset: CGSize = CGSize(width: 0, height: 600)
     var body: some View {
         VStack (alignment: .leading, spacing: 24){
@@ -94,7 +96,7 @@ struct SingleEvent: View {
             
             HStack {
                 Spacer()
-                NavigationLink(destination: Chat()) {
+                NavigationLink(destination: Chat(viewModel: viewModel)) {
                     Text("Ask AI for Assistance")
                         .Label()
                         .padding()

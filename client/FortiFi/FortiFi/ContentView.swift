@@ -29,7 +29,7 @@ struct ContentView: View {
                     .toolbarBackground(.fortifiBackground, for: .tabBar)
                     .toolbarBackgroundVisibility(.visible, for: .tabBar)
 
-                Chat()
+                Chat(viewModel: ChatViewModel())
                     .tabItem {
                         SwiftUI.Label("Chat", systemImage: "bubble.left.and.exclamationmark.bubble.right")
                     }

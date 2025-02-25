@@ -25,7 +25,6 @@ import Foundation
             threats = try await NetworkManager.shared.getEvents()
         } catch {
             print("error getting events: \(error)")
-            BaseViewModel.shared.authenticated = false
         }
     }
     

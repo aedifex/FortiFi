@@ -9,8 +9,9 @@ import SwiftUI
 
 struct EventTab: View {
     var threat: Event
+
     var body: some View {
-        NavigationLink(destination: SingleEvent(threat: threat)) {
+        NavigationLink(destination: SingleEvent(threat: threat, viewModel: ChatViewModel(for: threat.threat_id))) {
             HStack(spacing: 15){
                 VStack (alignment: .leading, spacing: 15){
                     HStack{
