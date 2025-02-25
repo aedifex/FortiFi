@@ -29,42 +29,40 @@ var (
 	InvalidBody = func(exp interface{}, got interface{}) string {
 		return formatError("invalid body")(fmt.Errorf("\nexpected: %v\ngot %v", exp, got))
 	}
-
 )
 
 var (
-
-	piJwt = ""
-	piRefresh = ""
-	userJwt = ""
+	piJwt       = ""
+	piRefresh   = ""
+	userJwt     = ""
 	userRefresh = ""
-	
+
 	// these are used to test invalidated tokens after a refresh request goes through
-	jwtTemp = ""
+	jwtTemp     = ""
 	refreshTemp = ""
 
-	id = "userId123"
+	id        = "userId123"
 	firstName = "Oski"
-	lastName = "Bear"
-	email = "oskibear@berkeley.edu"
-	password = "Go Bears!"
-	fcmToken = "c9g9Wdmp90NchwYMhiiLBp:APA91bHfeKLGu921KeSj45uikQbhg1_Gx44qBjHErrjDoMzSIag5fGJdUotOCOjCQumLv2etUbe_e_gfJNKOIQEhUua6KIcp7zQcgGetkleiWPLJgRJ3GcY"
+	lastName  = "Bear"
+	email     = "oskibear@berkeley.edu"
+	password  = "Go Bears!"
+	fcmToken  = "c9g9Wdmp90NchwYMhiiLBp:APA91bHfeKLGu921KeSj45uikQbhg1_Gx44qBjHErrjDoMzSIag5fGJdUotOCOjCQumLv2etUbe_e_gfJNKOIQEhUua6KIcp7zQcgGetkleiWPLJgRJ3GcY"
 )
 
 var server = setupTestServer()
 var testHandler = server.httpServer.Handler
 
 type testCase struct {
-	name			string
-	correctStatus	int
-	requestBody		interface{}
-	getsTokens		bool
-	jwt				string
-	refresh			string
-	setup 			func (req *http.Request)
-	jwtTarget		*string
-	refreshTarget	*string
-	expectedBody	interface{}
+	name          string
+	correctStatus int
+	requestBody   interface{}
+	getsTokens    bool
+	jwt           string
+	refresh       string
+	setup         func(req *http.Request)
+	jwtTarget     *string
+	refreshTarget *string
+	expectedBody  interface{}
 }
 
 func formatError(s string) func(err error) string {
@@ -78,13 +76,13 @@ func setupTestServer() *fortifiServer {
 
 	// Setup environment
 	config := &config.Config{
-		Port: ":3000",
-		DB_USER: "root",
-		DB_PASS: "",
-		DB_URL: "localhost:3306",
-		DB_NAME: "FortiFi",
+		Port:        ":3000",
+		DB_USER:     "root",
+		DB_PASS:     "",
+		DB_URL:      "localhost:3306",
+		DB_NAME:     "FortiFi",
 		SIGNING_KEY: "b2e138d8553ea7d7ff8731e87e41406277bd4c98",
-		FcmKeyPath: "../../config/fortifi-1e7b8-firebase-adminsdk-fbsvc-7d9b6225cf.json",
+		FcmKeyPath:  "/harness/server/firebase_auth.json",
 	}
 
 	// Create new FortifiServer
@@ -98,17 +96,19 @@ func setupTestServer() *fortifiServer {
 
 func Marshal(body interface{}, t *testing.T) io.Reader {
 	t.Helper()
-	if body == nil {return nil}
+	if body == nil {
+		return nil
+	}
 	marshaledBody, err := json.Marshal(body)
-    if err != nil {
-        t.Fatal(err)
-    }
+	if err != nil {
+		t.Fatal(err)
+	}
 	return bytes.NewReader(marshaledBody)
 }
 
 func methodTest(t *testing.T, path string) {
 	t.Helper()
-	t.Run("method not allowed test", func (t *testing.T) {
+	t.Run("method not allowed test", func(t *testing.T) {
 		req := buildRequest(t, http.MethodTrace, path, nil)
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", piJwt))
 		resp := httptest.NewRecorder()
@@ -126,7 +126,7 @@ func missingBodyTest(t *testing.T, method string, path string) {
 		// This is to test a missing body on protected routes
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", userJwt))
 		resp := httptest.NewRecorder()
-		testHandler.ServeHTTP(resp,req)
+		testHandler.ServeHTTP(resp, req)
 		if resp.Code != http.StatusBadRequest {
 			t.Fatal(BadStatus(http.StatusBadRequest, resp.Code))
 		}
@@ -143,9 +143,8 @@ func buildRequest(t *testing.T, method string, path string, body interface{}) *h
 	return req
 }
 
-	
-func buildTest(tc testCase, method string, path string) func (t *testing.T) {
-	return func (t *testing.T) {
+func buildTest(tc testCase, method string, path string) func(t *testing.T) {
+	return func(t *testing.T) {
 		methodTest(t, path)
 		req := buildRequest(t, method, path, tc.requestBody)
 		if tc.jwt != "" {
@@ -171,7 +170,7 @@ func buildTest(tc testCase, method string, path string) func (t *testing.T) {
 			*tc.jwtTarget = resp.Header().Get("jwt")
 			*tc.refreshTarget = resp.Header().Get("refresh")
 		}
-		if tc.expectedBody != nil {			
+		if tc.expectedBody != nil {
 			// Convert both expected and got to JSON strings for comparison
 			expectedJSON := Marshal(tc.expectedBody, t)
 			expectedBytes, err := io.ReadAll(expectedJSON)
@@ -181,10 +180,10 @@ func buildTest(tc testCase, method string, path string) func (t *testing.T) {
 			expectedString := strings.TrimSpace(string(expectedBytes))
 
 			got := strings.TrimSpace(resp.Body.String())
-			
+
 			if expectedString != got {
-				t.Fatalf("Strings differ:\nexpected (len=%d): %q\ngot (len=%d): %q", 
-					len(expectedString), expectedString, 
+				t.Fatalf("Strings differ:\nexpected (len=%d): %q\ngot (len=%d): %q",
+					len(expectedString), expectedString,
 					len(got), got)
 				t.Fatalf(InvalidBody(expectedString, got))
 			}
@@ -197,26 +196,25 @@ func TestPiInit(t *testing.T) {
 	validMethod := http.MethodPost
 	testCases := []testCase{
 		{
-			name: "correct body",
+			name:          "correct body",
 			correctStatus: http.StatusOK,
 			requestBody: &requests.PiInitRequest{
 				Id: id,
 			},
-			getsTokens: true,
-			jwtTarget: &piJwt,
+			getsTokens:    true,
+			jwtTarget:     &piJwt,
 			refreshTarget: &piRefresh,
 		},
 		{
-			name: "missing id",
+			name:          "missing id",
 			correctStatus: http.StatusBadRequest,
-			requestBody: &requests.PiInitRequest{},
-			getsTokens: false,
+			requestBody:   &requests.PiInitRequest{},
+			getsTokens:    false,
 		},
-
 	}
 
 	missingBodyTest(t, validMethod, path)
-	for _,tc := range testCases {
+	for _, tc := range testCases {
 		t.Run(tc.name, buildTest(tc, validMethod, path))
 	}
 }
@@ -227,23 +225,23 @@ func TestPiRefresh(t *testing.T) {
 	validMethod := http.MethodGet
 	testCases := []testCase{
 		{
-			name: "valid request",
+			name:          "valid request",
 			correctStatus: http.StatusOK,
-			getsTokens: true,
-			refresh: piRefresh,
+			getsTokens:    true,
+			refresh:       piRefresh,
 			setup: func(req *http.Request) {
 				query := req.URL.Query()
 				query.Add("id", id)
 				req.URL.RawQuery = query.Encode()
 			},
-			jwtTarget: &piJwt,
+			jwtTarget:     &piJwt,
 			refreshTarget: &piRefresh,
 		},
 		{
-			name: "retrying old tokens",
+			name:          "retrying old tokens",
 			correctStatus: http.StatusUnauthorized,
-			getsTokens: false,
-			refresh: refreshTemp,
+			getsTokens:    false,
+			refresh:       refreshTemp,
 			setup: func(req *http.Request) {
 				query := req.URL.Query()
 				query.Add("id", id)
@@ -251,16 +249,16 @@ func TestPiRefresh(t *testing.T) {
 			},
 		},
 		{
-			name: "missing id",
+			name:          "missing id",
 			correctStatus: http.StatusNotFound,
-			getsTokens: false,
-			refresh: piRefresh,
+			getsTokens:    false,
+			refresh:       piRefresh,
 		},
 		{
-			name: "invalid id",
+			name:          "invalid id",
 			correctStatus: http.StatusNotFound,
-			getsTokens: false,
-			refresh: refreshTemp,
+			getsTokens:    false,
+			refresh:       refreshTemp,
 			setup: func(req *http.Request) {
 				query := req.URL.Query()
 				query.Add("id", "badId123")
@@ -268,9 +266,9 @@ func TestPiRefresh(t *testing.T) {
 			},
 		},
 		{
-			name: "missing token",
+			name:          "missing token",
 			correctStatus: http.StatusUnauthorized,
-			getsTokens: false,
+			getsTokens:    false,
 			setup: func(req *http.Request) {
 				query := req.URL.Query()
 				query.Add("id", id)
@@ -278,10 +276,10 @@ func TestPiRefresh(t *testing.T) {
 			},
 		},
 		{
-			name: "invalid token",
+			name:          "invalid token",
 			correctStatus: http.StatusUnauthorized,
-			getsTokens: false,
-			refresh: "bad.refresh.token",
+			getsTokens:    false,
+			refresh:       "bad.refresh.token",
 			setup: func(req *http.Request) {
 				query := req.URL.Query()
 				query.Add("id", id)
@@ -290,7 +288,7 @@ func TestPiRefresh(t *testing.T) {
 		},
 	}
 
-	for _,tc := range testCases {
+	for _, tc := range testCases {
 		t.Run(tc.name, buildTest(tc, validMethod, path))
 	}
 }
@@ -378,63 +376,63 @@ func TestCreateUser(t *testing.T) {
 	method := http.MethodPost
 	testCases := []testCase{
 		{
-			name: "missing user in body",
+			name:          "missing user in body",
 			correctStatus: http.StatusBadRequest,
-			getsTokens: false,
-			requestBody: emptyBody,
+			getsTokens:    false,
+			requestBody:   emptyBody,
 		},
 		{
-			name: "missing id field",
+			name:          "missing id field",
 			correctStatus: http.StatusBadRequest,
-			getsTokens: false,
-			requestBody: userMissingId,
+			getsTokens:    false,
+			requestBody:   userMissingId,
 		},
 		{
-			name: "missing first name field",
+			name:          "missing first name field",
 			correctStatus: http.StatusBadRequest,
-			getsTokens: false,
-			requestBody: userMissingFirstName,
+			getsTokens:    false,
+			requestBody:   userMissingFirstName,
 		},
 		{
-			name: "missing last name field",
+			name:          "missing last name field",
 			correctStatus: http.StatusBadRequest,
-			getsTokens: false,
-			requestBody: userMissingLastName,
+			getsTokens:    false,
+			requestBody:   userMissingLastName,
 		},
 		{
-			name: "missing email field",
+			name:          "missing email field",
 			correctStatus: http.StatusBadRequest,
-			getsTokens: false,
-			requestBody: userMissingEmail,
+			getsTokens:    false,
+			requestBody:   userMissingEmail,
 		},
 		{
-			name: "missing password field",
+			name:          "missing password field",
 			correctStatus: http.StatusBadRequest,
-			getsTokens: false,
-			requestBody: userMissingPassword,
+			getsTokens:    false,
+			requestBody:   userMissingPassword,
 		},
 		{
-			name: "valid request",
+			name:          "valid request",
 			correctStatus: http.StatusCreated,
-			getsTokens: false,
-			requestBody: userCorrect,
+			getsTokens:    false,
+			requestBody:   userCorrect,
 		},
 		{
-			name: "duplicate id field",
+			name:          "duplicate id field",
 			correctStatus: http.StatusConflict,
-			getsTokens: false,
-			requestBody: userDuplicateId,
+			getsTokens:    false,
+			requestBody:   userDuplicateId,
 		},
 		{
-			name: "duplicate email field",
+			name:          "duplicate email field",
 			correctStatus: http.StatusConflict,
-			getsTokens: false,
-			requestBody: userDuplicateEmail,
+			getsTokens:    false,
+			requestBody:   userDuplicateEmail,
 		},
 	}
 
 	missingBodyTest(t, method, path)
-	for _,tc := range testCases {
+	for _, tc := range testCases {
 		t.Run(tc.name, buildTest(tc, method, path))
 	}
 
@@ -446,7 +444,7 @@ func TestLogin(t *testing.T) {
 
 	loginCorrect := &requests.LoginUserRequest{
 		User: &database.User{
-			Email: email,
+			Email:    email,
 			Password: password,
 		},
 	}
@@ -465,14 +463,14 @@ func TestLogin(t *testing.T) {
 
 	loginBadEmail := &requests.LoginUserRequest{
 		User: &database.User{
-			Email: "bad@email.com",
+			Email:    "bad@email.com",
 			Password: password,
 		},
 	}
 
 	loginBadPassword := &requests.LoginUserRequest{
 		User: &database.User{
-			Email: email,
+			Email:    email,
 			Password: "badPassword",
 		},
 	}
@@ -481,47 +479,47 @@ func TestLogin(t *testing.T) {
 	method := http.MethodPost
 	testCases := []testCase{
 		{
-			name: "missing user in body",
+			name:          "missing user in body",
 			correctStatus: http.StatusBadRequest,
-			getsTokens: false,
-			requestBody: loginMissingBody,
+			getsTokens:    false,
+			requestBody:   loginMissingBody,
 		},
 		{
-			name: "missing email",
+			name:          "missing email",
 			correctStatus: http.StatusBadRequest,
-			getsTokens: false,
-			requestBody: loginMissingEmail,
+			getsTokens:    false,
+			requestBody:   loginMissingEmail,
 		},
 		{
-			name: "missing password",
+			name:          "missing password",
 			correctStatus: http.StatusBadRequest,
-			getsTokens: false,
-			requestBody: loginMissingPassword,
+			getsTokens:    false,
+			requestBody:   loginMissingPassword,
 		},
 		{
-			name: "unregistered email",
+			name:          "unregistered email",
 			correctStatus: http.StatusNotFound,
-			getsTokens: false,
-			requestBody: loginBadEmail,
+			getsTokens:    false,
+			requestBody:   loginBadEmail,
 		},
 		{
-			name: "incorrect password",
+			name:          "incorrect password",
 			correctStatus: http.StatusUnauthorized,
-			getsTokens: false,
-			requestBody: loginBadPassword,
+			getsTokens:    false,
+			requestBody:   loginBadPassword,
 		},
 		{
-			name: "valid request",
+			name:          "valid request",
 			correctStatus: http.StatusOK,
-			getsTokens: true,
-			requestBody: loginCorrect,
-			jwtTarget: &userJwt,
+			getsTokens:    true,
+			requestBody:   loginCorrect,
+			jwtTarget:     &userJwt,
 			refreshTarget: &userRefresh,
 		},
 	}
 
 	missingBodyTest(t, method, path)
-	for _,tc := range testCases {
+	for _, tc := range testCases {
 		t.Run(tc.name, buildTest(tc, method, path))
 	}
 
@@ -533,10 +531,10 @@ func TestUserRefresh(t *testing.T) {
 	method := http.MethodGet
 	testCases := []testCase{
 		{
-			name: "valid request",
-			refresh: userRefresh,
-			getsTokens: true,
-			jwtTarget: &userJwt,
+			name:          "valid request",
+			refresh:       userRefresh,
+			getsTokens:    true,
+			jwtTarget:     &userJwt,
 			refreshTarget: &userRefresh,
 			setup: func(req *http.Request) {
 				query := req.URL.Query()
@@ -546,8 +544,8 @@ func TestUserRefresh(t *testing.T) {
 			correctStatus: http.StatusOK,
 		},
 		{
-			name: "retry revoked refresh token",
-			refresh: refreshTemp,
+			name:       "retry revoked refresh token",
+			refresh:    refreshTemp,
 			getsTokens: false,
 			setup: func(req *http.Request) {
 				query := req.URL.Query()
@@ -557,14 +555,14 @@ func TestUserRefresh(t *testing.T) {
 			correctStatus: http.StatusUnauthorized,
 		},
 		{
-			name: "missing id",
-			refresh: userRefresh,
-			getsTokens: false,
+			name:          "missing id",
+			refresh:       userRefresh,
+			getsTokens:    false,
 			correctStatus: http.StatusNotFound,
 		},
 		{
-			name: "invalid id",
-			refresh: userRefresh,
+			name:       "invalid id",
+			refresh:    userRefresh,
 			getsTokens: false,
 			setup: func(req *http.Request) {
 				query := req.URL.Query()
@@ -574,7 +572,7 @@ func TestUserRefresh(t *testing.T) {
 			correctStatus: http.StatusNotFound,
 		},
 		{
-			name: "missing token",
+			name:       "missing token",
 			getsTokens: false,
 			setup: func(req *http.Request) {
 				query := req.URL.Query()
@@ -584,8 +582,8 @@ func TestUserRefresh(t *testing.T) {
 			correctStatus: http.StatusUnauthorized,
 		},
 		{
-			name: "invalid token",
-			refresh: "bad.refresh.token",
+			name:       "invalid token",
+			refresh:    "bad.refresh.token",
 			getsTokens: false,
 			setup: func(req *http.Request) {
 				query := req.URL.Query()
@@ -596,7 +594,7 @@ func TestUserRefresh(t *testing.T) {
 		},
 	}
 
-	for _,tc := range testCases {
+	for _, tc := range testCases {
 		t.Run(tc.name, buildTest(tc, method, path))
 	}
 
@@ -608,29 +606,29 @@ func TestUpdateFcmToken(t *testing.T) {
 	path := "/UpdateFcm"
 	testCases := []testCase{
 		{
-			name: "valid request",
+			name:          "valid request",
 			correctStatus: http.StatusAccepted,
-			jwt: userJwt,
+			jwt:           userJwt,
 			requestBody: &requests.UpdateFcmRequest{
 				FcmToken: fcmToken,
 			},
 		},
 		{
-			name: "bad jwt",
+			name:          "bad jwt",
 			correctStatus: http.StatusUnauthorized,
-			jwt: "bad.jwt",
+			jwt:           "bad.jwt",
 			requestBody: &requests.UpdateFcmRequest{
 				FcmToken: fcmToken,
 			},
 		},
 		{
-			name: "missing jwt",
+			name:          "missing jwt",
 			correctStatus: http.StatusUnauthorized,
 		},
 	}
 
 	missingBodyTest(t, method, path)
-	for _,tc := range testCases {
+	for _, tc := range testCases {
 		t.Run(tc.name, buildTest(tc, method, path))
 	}
 }
@@ -640,51 +638,51 @@ func TestNotifyIntrusion(t *testing.T) {
 	method := http.MethodPost
 	testCases := []testCase{
 		{
-			name: "valid request",
+			name:          "valid request",
 			correctStatus: http.StatusOK,
 			requestBody: &requests.NotifyIntrusionRequest{
 				Event: &database.Event{
-					Details: "Instrusion event details here",
-					TS: "2006-01-02 15:04:05",
-					Expires: "2026-01-02 15:04:05",
-					Type: "1",
-					SrcIP: "10.0.1.1",
-					DstIP: "10.0.1.2",
+					Details:    "Instrusion event details here",
+					TS:         "2006-01-02 15:04:05",
+					Expires:    "2026-01-02 15:04:05",
+					Type:       "1",
+					SrcIP:      "10.0.1.1",
+					DstIP:      "10.0.1.2",
 					Confidence: 100,
 				},
 			},
 			jwt: piJwt,
 		},
 		{
-			name: "missing event",
+			name:          "missing event",
 			correctStatus: http.StatusBadRequest,
-			requestBody: &requests.NotifyIntrusionRequest{},
-			jwt: piJwt,
+			requestBody:   &requests.NotifyIntrusionRequest{},
+			jwt:           piJwt,
 		},
 		{
-			name: "missing token",
+			name:          "missing token",
 			correctStatus: http.StatusUnauthorized,
 			requestBody: &requests.NotifyIntrusionRequest{
 				Event: &database.Event{
 					Details: "Instrusion event details here",
-					TS: "2006-01-02 15:04:05",
+					TS:      "2006-01-02 15:04:05",
 					Expires: "2026-01-02 15:04:05",
 				},
 			},
 		},
 		{
-			name: "missing details",
+			name:          "missing details",
 			correctStatus: http.StatusBadRequest,
 			requestBody: &requests.NotifyIntrusionRequest{
 				Event: &database.Event{
-					TS: "2006-01-02 15:04:05",
+					TS:      "2006-01-02 15:04:05",
 					Expires: "2026-01-02 15:04:05",
 				},
 			},
 			jwt: piJwt,
 		},
 		{
-			name: "missing TS",
+			name:          "missing TS",
 			correctStatus: http.StatusBadRequest,
 			requestBody: &requests.NotifyIntrusionRequest{
 				Event: &database.Event{
@@ -695,58 +693,58 @@ func TestNotifyIntrusion(t *testing.T) {
 			jwt: piJwt,
 		},
 		{
-			name: "missing expires",
+			name:          "missing expires",
 			correctStatus: http.StatusBadRequest,
 			requestBody: &requests.NotifyIntrusionRequest{
 				Event: &database.Event{
 					Details: "Instrusion event details here",
-					TS: "2006-01-02 15:04:05",
+					TS:      "2006-01-02 15:04:05",
 				},
 			},
 			jwt: piJwt,
 		},
 		{
-			name: "missing type",
+			name:          "missing type",
 			correctStatus: http.StatusBadRequest,
 			requestBody: &requests.NotifyIntrusionRequest{
 				Event: &database.Event{
 					Details: "Instrusion event details here",
-					TS: "2006-01-02 15:04:05",
+					TS:      "2006-01-02 15:04:05",
 					Expires: "2026-01-02 15:04:05",
 				},
 			},
 			jwt: piJwt,
 		},
 		{
-			name: "missing src ip",
+			name:          "missing src ip",
 			correctStatus: http.StatusBadRequest,
 			requestBody: &requests.NotifyIntrusionRequest{
 				Event: &database.Event{
 					Details: "Instrusion event details here",
-					TS: "2006-01-02 15:04:05",
+					TS:      "2006-01-02 15:04:05",
 					Expires: "2026-01-02 15:04:05",
-					Type: "anomaly",
+					Type:    "anomaly",
 				},
 			},
 			jwt: piJwt,
 		},
 		{
-			name: "missing dst ip",
+			name:          "missing dst ip",
 			correctStatus: http.StatusBadRequest,
 			requestBody: &requests.NotifyIntrusionRequest{
 				Event: &database.Event{
 					Details: "Instrusion event details here",
-					TS: "2006-01-02 15:04:05",
+					TS:      "2006-01-02 15:04:05",
 					Expires: "2026-01-02 15:04:05",
-					Type: "anomaly",
+					Type:    "anomaly",
 				},
 			},
 			jwt: piJwt,
 		},
 	}
-	
+
 	missingBodyTest(t, method, path)
-	for _,tc := range testCases {
+	for _, tc := range testCases {
 		t.Run(tc.name, buildTest(tc, method, path))
 	}
 }
@@ -759,32 +757,32 @@ func TestGetUserEvents(t *testing.T) {
 		"events": {
 			{
 				ThreatId: 1,
-				Id: id,
-				Details: "Instrusion event details here",
-				TS: "2006-01-02 15:04:05",
-				Expires: "2026-01-02 15:04:05",
-				Type: "1",
-				SrcIP: "10.0.1.1",
-				DstIP: "10.0.1.2",
+				Id:       id,
+				Details:  "Instrusion event details here",
+				TS:       "2006-01-02 15:04:05",
+				Expires:  "2026-01-02 15:04:05",
+				Type:     "1",
+				SrcIP:    "10.0.1.1",
+				DstIP:    "10.0.1.2",
 			},
 		},
 	}
 
 	testCases := []testCase{
 		{
-			name: "valid request",
+			name:          "valid request",
 			correctStatus: http.StatusOK,
-			jwt: userJwt,
-			expectedBody: event,
+			jwt:           userJwt,
+			expectedBody:  event,
 		},
 		{
-			name: "missing jwt",
+			name:          "missing jwt",
 			correctStatus: http.StatusUnauthorized,
 		},
 		{
-			name: "invalid jwt",
+			name:          "invalid jwt",
 			correctStatus: http.StatusUnauthorized,
-			jwt: "invalid.jwt.token",
+			jwt:           "invalid.jwt.token",
 		},
 	}
 
@@ -799,23 +797,23 @@ func TestUpdateWeeklyDistribution(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			name: "valid request",
+			name:          "valid request",
 			correctStatus: http.StatusOK,
-			jwt: piJwt,
+			jwt:           piJwt,
 			requestBody: &requests.UpdateWeeklyDistributionRequest{
-				Benign: 10,
+				Benign:   10,
 				PortScan: 5,
-				DDoS: 2,
+				DDoS:     2,
 			},
 		},
 		{
-			name: "missing jwt",
+			name:          "missing jwt",
 			correctStatus: http.StatusUnauthorized,
 		},
 		{
-			name: "invalid jwt",
+			name:          "invalid jwt",
 			correctStatus: http.StatusUnauthorized,
-			jwt: "invalid.jwt.token",
+			jwt:           "invalid.jwt.token",
 		},
 	}
 
@@ -831,31 +829,31 @@ func TestGetWeeklyDistribution(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			name: "valid request",
+			name:          "valid request",
 			correctStatus: http.StatusOK,
-			jwt: piJwt,
+			jwt:           piJwt,
 			expectedBody: &database.WeeklyDistribution{
-				Benign: 10,
-				PortScan: 5,
-				DDoS: 2,
+				Benign:        10,
+				PortScan:      5,
+				DDoS:          2,
 				PrevWeekTotal: 0,
 			},
 		},
 		{
-			name: "missing jwt",
+			name:          "missing jwt",
 			correctStatus: http.StatusUnauthorized,
 		},
 		{
-			name: "invalid jwt",
+			name:          "invalid jwt",
 			correctStatus: http.StatusUnauthorized,
-			jwt: "invalid.jwt.token",
+			jwt:           "invalid.jwt.token",
 		},
 		{
-			name: "user does not exist",
+			name:          "user does not exist",
 			correctStatus: http.StatusUnauthorized,
 		},
 	}
-	
+
 	for _, tc := range testCases {
 		t.Run(tc.name, buildTest(tc, method, path))
 	}
@@ -867,24 +865,24 @@ func TestResetWeeklyDistribution(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			name: "valid request",
+			name:          "valid request",
 			correctStatus: http.StatusOK,
-			jwt: piJwt,
+			jwt:           piJwt,
 			requestBody: &requests.ResetWeeklyDistributionRequest{
 				WeekTotal: 10,
 			},
 		},
 		{
-			name: "missing jwt",
+			name:          "missing jwt",
 			correctStatus: http.StatusUnauthorized,
 		},
 		{
-			name: "invalid jwt",
+			name:          "invalid jwt",
 			correctStatus: http.StatusUnauthorized,
-			jwt: "invalid.jwt.token",
+			jwt:           "invalid.jwt.token",
 		},
 	}
-	
+
 	missingBodyTest(t, method, path)
 	for _, tc := range testCases {
 		t.Run(tc.name, buildTest(tc, method, path))
@@ -897,48 +895,48 @@ func TestAddDevice(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			name: "valid request",
+			name:          "valid request",
 			correctStatus: http.StatusOK,
-			jwt: userJwt,
+			jwt:           userJwt,
 			requestBody: &requests.AddDeviceRequest{
-				Name: "smartTV",
-				IpAddress: "10.0.1.1",
+				Name:       "smartTV",
+				IpAddress:  "10.0.1.1",
 				MacAddress: "00:00:00:00:00:00",
 			},
 		},
 		{
-			name: "missing jwt",
+			name:          "missing jwt",
 			correctStatus: http.StatusUnauthorized,
 		},
 		{
-			name: "invalid jwt",
+			name:          "invalid jwt",
 			correctStatus: http.StatusUnauthorized,
-			jwt: "invalid.jwt.token",
+			jwt:           "invalid.jwt.token",
 		},
 		{
-			name: "missing name",
+			name:          "missing name",
 			correctStatus: http.StatusBadRequest,
-			jwt: userJwt,
+			jwt:           userJwt,
 			requestBody: &requests.AddDeviceRequest{
-				IpAddress: "10.0.1.1",
-				MacAddress: "00:00:00:00:00:00",
-			},	
-		},
-		{
-			name: "missing ip address",
-			correctStatus: http.StatusBadRequest,
-			jwt: userJwt,
-			requestBody: &requests.AddDeviceRequest{
-				Name: "smartTV",
+				IpAddress:  "10.0.1.1",
 				MacAddress: "00:00:00:00:00:00",
 			},
 		},
 		{
-			name: "missing mac address",
+			name:          "missing ip address",
 			correctStatus: http.StatusBadRequest,
-			jwt: userJwt,
+			jwt:           userJwt,
 			requestBody: &requests.AddDeviceRequest{
-				Name: "smartTV",
+				Name:       "smartTV",
+				MacAddress: "00:00:00:00:00:00",
+			},
+		},
+		{
+			name:          "missing mac address",
+			correctStatus: http.StatusBadRequest,
+			jwt:           userJwt,
+			requestBody: &requests.AddDeviceRequest{
+				Name:      "smartTV",
 				IpAddress: "10.0.1.1",
 			},
 		},
@@ -956,32 +954,32 @@ func TestGetDevices(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			name: "valid request",
+			name:          "valid request",
 			correctStatus: http.StatusOK,
-			jwt: userJwt,
+			jwt:           userJwt,
 			expectedBody: &[]database.Device{
 				{
-					Id: 1,
-					Name: "smartTV",
-					IpAddress: "10.0.1.1",
-					MacAddress: "00:00:00:00:00:00",
-					DateAdded: time.Now().Format(time.DateOnly),
+					Id:            1,
+					Name:          "smartTV",
+					IpAddress:     "10.0.1.1",
+					MacAddress:    "00:00:00:00:00:00",
+					DateAdded:     time.Now().Format(time.DateOnly),
 					IncidentCount: 0,
 				},
 			},
 		},
 		{
-			name: "missing jwt",
+			name:          "missing jwt",
 			correctStatus: http.StatusUnauthorized,
 		},
 		{
-			name: "invalid jwt",
+			name:          "invalid jwt",
 			correctStatus: http.StatusUnauthorized,
-			jwt: "invalid.jwt.token",
+			jwt:           "invalid.jwt.token",
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, buildTest(tc, method, path))
 	}
-}	
+}
