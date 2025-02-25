@@ -38,3 +38,7 @@ type AddDeviceRequest struct {
 	IpAddress	string	`json:"ip_address"`
 	MacAddress	string	`json:"mac_address"`
 }
+
+type GetMoreAssistanceRequest struct {
+	Query	string	`json:"query"`
+}

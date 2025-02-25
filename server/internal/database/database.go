@@ -516,3 +516,31 @@ func (db *DatabaseConn) AddDevice(device *Device) *DatabaseError {
 
     return nil 
 }
+
+func (db *DatabaseConn) GetThreatById(threatId int, userId string) (*Event, *DatabaseError) {
+
+    query := fmt.Sprintf("SELECT details, ts, event_type, src_ip, dst_ip, confidence_interval FROM %s WHERE threat_id = ? AND id = ?;", EventsTable)
+    preparedStatement, err := db.conn.Prepare(query)
+    if err != nil {
+        return nil, PREPARE_ERROR(err)
+    }
+    defer preparedStatement.Close()
+
+    rows, err := preparedStatement.Query(threatId, userId)
+    if err != nil {
+        return nil, QUERY_ERROR(err)
+    }
+    defer rows.Close()
+
+    if !rows.Next() {
+        return nil, DNE_ERROR
+    }
+    
+    threat := &Event{}
+    err = rows.Scan(&threat.Details, &threat.TS, &threat.Type, &threat.SrcIP, &threat.DstIP, &threat.Confidence)
+    if err != nil {
+        return nil, SCAN_ERROR(err)
+    }
+
+    return threat, nil
+}

@@ -8,6 +8,7 @@ import (
 	"github.com/aedifex/FortiFi/config"
 	db "github.com/aedifex/FortiFi/internal/database"
 	"github.com/aedifex/FortiFi/internal/firebase"
+	"github.com/aedifex/FortiFi/internal/llm"
 	"github.com/aedifex/FortiFi/internal/middleware"
 	"github.com/aedifex/FortiFi/internal/requests"
 	"go.uber.org/zap"
@@ -19,6 +20,7 @@ type RouteHandler struct {
 	Db    	  	*db.DatabaseConn
 	Config 	  	*config.Config
 	FcmClient 	*firebase.FcmClient
+	OpenaiClient *llm.OpenAIClient
 }
 
 func (h *RouteHandler) NotifyIntrusion(writer http.ResponseWriter, request *http.Request) {

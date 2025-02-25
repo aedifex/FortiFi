@@ -12,6 +12,7 @@ import (
 	"github.com/aedifex/FortiFi/internal/database"
 	"github.com/aedifex/FortiFi/internal/firebase"
 	"github.com/aedifex/FortiFi/internal/handler"
+	"github.com/aedifex/FortiFi/internal/llm"
 	"github.com/aedifex/FortiFi/internal/middleware"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -57,12 +58,16 @@ func newServer(config *config.Config) *fortifiServer {
 	}
 	zapLogger.Info("connected to firebase client")
 
+	openaiClient := llm.NewOpenAIClient(config)
+	zapLogger.Info("connected to openai client")
+
 	// Route handling wrapper
 	routeHandler := &handler.RouteHandler{
 		Log: zapLogger,
 		Db: db,
 		Config: config,
 		FcmClient: fcmClient,
+		OpenaiClient: openaiClient,
 	}
 	
 	// Register the Routes
@@ -72,23 +77,37 @@ func newServer(config *config.Config) *fortifiServer {
 	// Serve static files (CSS, JS, images, etc.)
 	fs := http.FileServer(http.Dir("./internal/static"))
 	mux.Handle("/static/", http.StripPrefix("/static/", fs))
-	
-	mux.HandleFunc("/NotifyIntrusion", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.NotifyIntrusion))
+
+	// User Authentication Routes
+	mux.HandleFunc("/Register", routeHandler.Registration)
 	// ? Should CreateUser be wrapped by Auth? Use the Pi init token to create a user
 	mux.HandleFunc("/CreateUser", routeHandler.CreateUser)
 	mux.HandleFunc("/Login", routeHandler.Login)
 	mux.HandleFunc("/RefreshUser", routeHandler.RefreshUser)
+
+	// Pi Routes
 	mux.HandleFunc("/RefreshPi", routeHandler.RefreshPi)
 	mux.HandleFunc("/PiInit", routeHandler.PiInit)
+
+	// Intrusion Detection Routes
 	mux.HandleFunc("/UpdateFcm",  middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.UpdateFcmToken))
 	mux.HandleFunc("/GetUserEvents", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.GetUserEvents))
+	mux.HandleFunc("/NotifyIntrusion", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.NotifyIntrusion))
+
+	// Weekly Distribution Routes
 	mux.HandleFunc("/GetWeeklyDistribution", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.GetWeeklyDistribution))
 	mux.HandleFunc("/UpdateWeeklyDistribution", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.UpdateWeeklyDistribution))
 	mux.HandleFunc("/ResetWeeklyDistribution", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.ResetWeeklyDistribution))
+
+	// Device Routes
 	mux.HandleFunc("/AddDevice", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.AddDevice))
 	mux.HandleFunc("/GetDevices", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.GetDevices))
-	mux.HandleFunc("/Register", routeHandler.Registration)
-	
+
+	// Threat Assistance Routes
+	mux.HandleFunc("/GetThreatAssistance", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.GetThreatAssistance))
+	mux.HandleFunc("/GetRecommendations", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.GetRecommendations))
+	mux.HandleFunc("/GetMoreAssistance", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.GetMoreAssistance))
+
 	loggingMiddleware := middleware.Logging(zapLogger)
 	corsMiddleware := middleware.CORSMiddleware(config.CORS_ORIGIN)
 	serverHandler := corsMiddleware(loggingMiddleware(mux))

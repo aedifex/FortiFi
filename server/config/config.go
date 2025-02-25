@@ -17,6 +17,7 @@ type Config struct {
 	SIGNING_KEY 	string
 	FcmKeyPath		string
 	CORS_ORIGIN 	string
+	OpenAIKey		string
 }
 
 
@@ -41,5 +42,6 @@ func SetConfig() *Config{
 		SIGNING_KEY: viper.GetString("signing_key"),
 		FcmKeyPath: viper.GetString("fcm_key_path"),
 		CORS_ORIGIN: viper.GetString("cors_origin"),
+		OpenAIKey: viper.GetString("openai_key"),
 	}
 }
