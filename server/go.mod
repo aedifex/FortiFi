@@ -1,6 +1,6 @@
 module github.com/aedifex/FortiFi
 
-go 1.22.2
+go 1.23
 
 require (
 	firebase.google.com/go v3.13.0+incompatible
