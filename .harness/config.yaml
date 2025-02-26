@@ -29,7 +29,7 @@ pipeline:
               - parallel:
                   - step:
                       type: Run
-                      name: Produce Artifact
+                      name: Clone Codebase
                       identifier: Say_Hi
                       spec:
                         shell: Sh
@@ -68,6 +68,37 @@ pipeline:
 
                       # Initialize database
                       mysql -h 127.0.0.1 -P 3306 -uroot --password="" -e "SOURCE server/init.sql;"
+              - step:
+                  type: Run
+                  name: Inject Firebase Secret
+                  identifier: Inject_Firebase_Secret
+                  spec:
+                    shell: Sh
+                    command: |-
+                      echo "Retrieving Firebase JSON secret..."
+                      echo '<+secrets.getValue("firebase_authjson")>' > /harness/firebase_auth.json
+                      echo "Firebase JSON stored at /harness/firebase_auth.json"
+              - step:
+                  type: Run
+                  name: Execute Tests
+                  identifier: Execute_Tests
+                  spec:
+                    shell: Sh
+                    command: |-
+                      cd server
+                      make set-env
+                      chmod 644 /harness/firebase_auth.json
+                      pwd
+                      mv /harness/firebase_auth.json .
+                      ls -alt
+                      pwd
+                      cat firebase_auth.json
+                      echo "Cleaning module cache..."
+                      go clean -modcache
+                      echo "Fetching latest dependencies..."
+                      go mod tidy
+                      go mod download
+                      make test
   variables:
     - name: DB_PASSWORD
       type: String
@@ -79,3 +110,8 @@ pipeline:
       description: ""
       required: false
       value: "yes"
+    - name: GOOGLE_APPLICATION_CREDENTIALS
+      type: String
+      description: ""
+      required: false
+      value: "/harness/serverfirebase_auth.json"
