@@ -82,7 +82,7 @@ func setupTestServer() *fortifiServer {
 		DB_URL:      "localhost:3306",
 		DB_NAME:     "FortiFi",
 		SIGNING_KEY: "b2e138d8553ea7d7ff8731e87e41406277bd4c98",
-		FcmKeyPath:  "firebase_auth.json",
+		FcmKeyPath:  "/harness/firebase_auth.json",
 	}
 
 	// Create new FortifiServer
