@@ -89,17 +89,11 @@ pipeline:
                       make set-env
                       chmod 644 /harness/firebase_auth.json
                       pwd
-                      cp /harness/firebase_auth.json .
+                      mv /harness/firebase_auth.json .
                       ls -alt
                       pwd
                       cat firebase_auth.json
-                      # echo "Cleaning module cache..."
-                      # go clean -modcache
-                      # echo "Fetching latest dependencies..."
-                      # go mod tidy
-                      # go mod download
-                      # make test
-                      find / -name "/harness/firebase_auth.json" 2>/dev/null
+                      make test
   variables:
     - name: DB_PASSWORD
       type: String
