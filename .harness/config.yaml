@@ -114,4 +114,4 @@ pipeline:
       type: String
       description: ""
       required: false
-      value: /harness/serverfirebase_auth.json
+      value: /harness/server/firebase_auth.json
