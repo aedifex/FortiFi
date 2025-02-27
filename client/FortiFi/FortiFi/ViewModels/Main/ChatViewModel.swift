@@ -34,6 +34,7 @@ import Foundation
     
     func handleNeedRecommendationsResponse() async {
         if input.contains("yes") || input.contains("Yes") {
+            input = ""
             await getRecommendations()
         } else {
             pushGoodbye()
@@ -88,10 +89,13 @@ import Foundation
             pushGoodbye()
             return
         }
+        let question = input
+        input = ""
         do{
             isLoading = true
-            let resp = try await NetworkManager.shared.getMoreAssistance(threatId: threatId!, query: input)
+            let resp = try await NetworkManager.shared.getMoreAssistance(threatId: threatId!, query: question)
             messages.append(resp)
+            offerMoreAssistance()
             isLoading = false
         }catch {
             isLoading = false
@@ -100,9 +104,11 @@ import Foundation
     }
     
     func getGeneralAssistance() async {
+        let question = input
+        input = ""
         do{
             isLoading = true
-            let resp = try await NetworkManager.shared.getGeneralAssistance(query: input)
+            let resp = try await NetworkManager.shared.getGeneralAssistance(query: question)
             messages.append(resp)
             offerMoreAssistance()
             isLoading = false

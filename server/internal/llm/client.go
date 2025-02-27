@@ -118,7 +118,7 @@ func (c *OpenAIClient) generateLLMResponse(messages []openai.ChatCompletionMessa
 }
 
 func (c *OpenAIClient) GetGeneralAssistance(query string) (string, error) {
-	generalAssistanceMessage := "please provide a general explanation of the following: %s"
+	generalAssistanceMessage := fmt.Sprintf("please provide a general explanation of the following: %s",query)
 
 	system_message := fmt.Sprintf(GENERAL_ASSISTANCE_MESSAGE, query)
 	messages := []openai.ChatCompletionMessageParamUnion{

@@ -17,38 +17,48 @@ struct ChatView: View {
                 .Header()
                 .foregroundStyle(.fortifiForeground)
                 .padding(.bottom, 24)
-            ScrollView{
-                VStack(spacing: 32){
-                    ForEach(viewModel.messages, id: \.id) {message in
-                        HStack{
-                            if message.sender == 0 {
-                                Spacer()
-                                Text("\(message.text)")
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 12)
-                                    .foregroundStyle(.fortifiForeground)
-                                    .background(.textBubble)
-                                    .cornerRadius(24).multilineTextAlignment(.trailing)
-                                    .Label()
-                            }
-                            else {
-                                Text("\(message.text)")
-                                    .foregroundStyle(.fortifiForeground)
-                                    .Label()
-                                Spacer()
+            
+            ScrollViewReader { proxy in
+                ScrollView{
+                    VStack(spacing: 32){
+                        ForEach(viewModel.messages, id: \.id) {message in
+                            HStack{
+                                if message.sender == 0 {
+                                    Spacer()
+                                    Text("\(message.text)")
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 12)
+                                        .foregroundStyle(.fortifiForeground)
+                                        .background(.textBubble)
+                                        .cornerRadius(24).multilineTextAlignment(.trailing)
+                                        .Label()
+                                }
+                                else {
+                                    Text("\(message.text)")
+                                        .foregroundStyle(.fortifiForeground)
+                                        .Label()
+                                    Spacer()
+                                }
                             }
                         }
-                    }
-                    if viewModel.isLoading {
-                        HStack {
-                            ThreeDots()
-                            Spacer()
+                        if viewModel.isLoading {
+                            HStack {
+                                ThreeDots()
+                                Spacer()
+                            }
                         }
                     }
                 }
+                .onChange(of: viewModel.messages) {
+                    withAnimation{
+                        proxy.scrollTo(viewModel.messages.last!.id, anchor: .bottom)
+                    }
+                }
+                .contentMargins(5, for: .scrollContent)
+                .padding(.bottom, 8)
+
             }
-            .contentMargins(5, for: .scrollContent)
-            .padding(.bottom, 8)
+            
             TextField("Ask AI a question", text: $viewModel.input)
                 .textFieldStyle(CustomTextFieldStyle())
                 .background(.fortifiBackground)
@@ -64,12 +74,18 @@ struct ChatView: View {
                                 viewModel.pushUserMessage()
                                 await viewModel.getMoreAssistance()
                             }
+                            else {
+                                viewModel.pushUserMessage()
+                                await viewModel.getGeneralAssistance()
+                            }
                         case false:
+                            viewModel.pushUserMessage()
                             await viewModel.getGeneralAssistance()
                         }
                         viewModel.input = ""
                     }
                 }
+            
         }
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)

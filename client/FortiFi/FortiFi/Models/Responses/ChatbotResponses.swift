@@ -12,7 +12,7 @@ struct ChatResponse: Codable {
     var response: String
 }
 
-struct ChatMessage: Codable, Identifiable {
+struct ChatMessage: Codable, Identifiable, Equatable {
     var id: String
     var text: String
     var sender: Int = 1
