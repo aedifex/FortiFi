@@ -8,7 +8,7 @@ Create Table Users (
     first_name varchar(255) NOT NULL,
     last_name varchar(64) NOT NULL,
     email varchar(64) NOT NULL,
-    fcm_token varchar(255),
+    fcm_token varchar(255) DEFAULT '',
     benign_count int NOT NULL DEFAULT 0,
     port_scan_count int NOT NULL DEFAULT 0,
     ddos_count int NOT NULL DEFAULT 0,
