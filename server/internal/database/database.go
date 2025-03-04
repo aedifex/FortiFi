@@ -94,6 +94,7 @@ func (db *DatabaseConn) UpdateFcmToken(subjectId string, fcmToken string) *Datab
     if err != nil {
         return PREPARE_ERROR(err)
     }
+    defer preparedStatement.Close()
 
     // execute statement
     _, err = preparedStatement.Exec(fcmToken, subjectId)
@@ -129,7 +130,8 @@ func (db *DatabaseConn) ValidateLogin(user *User) (*User, *DatabaseError) {
     if err != nil {
         return nil, QUERY_ERROR(err)
     }
-
+    defer res.Close()
+    
     // check if user exists
     if !res.Next() { return nil, DNE_ERROR }
 
@@ -164,11 +166,13 @@ func (db *DatabaseConn) ValidateRefresh(refresh *RefreshToken, tablename string)
     if err != nil {
         return PREPARE_ERROR(err)
     }
+    defer preparedStatement.Close()
 
     rows, err := preparedStatement.Query(refresh.Id)
     if err != nil {
         return QUERY_ERROR(err)
     }
+    defer rows.Close()
 
     if !rows.Next() {
         return DNE_ERROR
@@ -230,7 +234,10 @@ func (db *DatabaseConn) StoreRefresh(refresh *RefreshToken, tablename string) *D
 func (db *DatabaseConn) userExists(user *User) *DatabaseError {
     // check email
     queryEmail := fmt.Sprintf("SELECT * FROM %s WHERE email = ?;", UsersTable)
-    preparedStatementEmail, _ := db.conn.Prepare(queryEmail)
+    preparedStatementEmail, err := db.conn.Prepare(queryEmail)
+    if err != nil {
+        return PREPARE_ERROR(err)
+    }
     defer preparedStatementEmail.Close()
     res, err := preparedStatementEmail.Query(user.Email)
     if err != nil { return EXEC_ERROR(err) }
@@ -239,7 +246,10 @@ func (db *DatabaseConn) userExists(user *User) *DatabaseError {
     
     // check id
     queryId := fmt.Sprintf("SELECT * FROM %s WHERE id = ?;", UsersTable)
-    preparedStatementId, _ := db.conn.Prepare(queryId)
+    preparedStatementId, err := db.conn.Prepare(queryId)
+    if err != nil {
+        return PREPARE_ERROR(err)
+    }
     defer preparedStatementId.Close()
     res, err = preparedStatementId.Query(user.Id)
     if err != nil { return QUERY_ERROR(err) }
@@ -288,6 +298,7 @@ func (db *DatabaseConn) StoreEvent(e *Event) *DatabaseError {
     if err != nil {
         return PREPARE_ERROR(err)
     }
+    defer preparedStatement.Close()
 
     // execute statement
     res, err := preparedStatement.Exec(e.Id, e.Details, e.TS, e.Expires, e.Type, e.SrcIP, e.DstIP, e.Confidence)
@@ -315,13 +326,15 @@ func (db *DatabaseConn) GetFcmToken(subjectId string) (string, *DatabaseError) {
     if err != nil {
         return "", PREPARE_ERROR(err)
     }
+    defer preparedStatement.Close()
 
     // execute query
     rows, err := preparedStatement.Query(subjectId)
     if err != nil {
         return "", QUERY_ERROR(err)
     }
-
+    defer rows.Close()
+    
     if !rows.Next() {
         return "", DNE_ERROR
     }
