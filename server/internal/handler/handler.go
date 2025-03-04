@@ -77,6 +77,12 @@ func (h *RouteHandler) NotifyIntrusion(writer http.ResponseWriter, request *http
 	}
 	
 	// Send Notification
+	if fcmToken == "" {
+		h.writeResponse(writer, "user has not logged into ios client -- notification not sent but event is stored")
+		writer.WriteHeader(http.StatusOK)
+		return
+	}
+	
 	response, sendErr := h.FcmClient.SendMessage(fcmToken)
 	if sendErr != nil {
 		h.Log.Errorf("error sending notification: %s", sendErr)
