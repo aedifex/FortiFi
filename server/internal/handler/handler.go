@@ -251,3 +251,18 @@ func (h *RouteHandler) Registration(writer http.ResponseWriter, request *http.Re
 	}
 
 }
+
+func (h *RouteHandler) DeleteUser(writer http.ResponseWriter, request *http.Request) {
+	subjectId := request.Context().Value(middleware.UserIdContextKey).(string)
+	if subjectId == "" {
+		http.Error(writer, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+	err := h.Db.DeleteUser(subjectId)
+	if err != nil {
+		h.Log.Infof("error on deleting user: %s", err.Err)
+		http.Error(writer, "unable to delete user", err.HttpStatus)
+		return
+	}
+	writer.WriteHeader(http.StatusOK)
+}

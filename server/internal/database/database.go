@@ -557,3 +557,14 @@ func (db *DatabaseConn) GetThreatById(threatId int, userId string) (*Event, *Dat
 
     return threat, nil
 }
+
+func (db *DatabaseConn) DeleteUser(id string) (*DatabaseError) {
+    query := fmt.Sprintf("DELETE * from %s WHERE id = ?;", UsersTable)
+    preparedStatement, err := db.conn.Prepare(query)
+    if err != nil {
+        return PREPARE_ERROR(err)
+    }
+    defer preparedStatement.Close()
+    preparedStatement.Exec(id)
+    return nil
+}

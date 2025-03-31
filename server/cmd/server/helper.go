@@ -109,6 +109,9 @@ func newServer(config *config.Config) *fortifiServer {
 	mux.HandleFunc("/GetMoreAssistance", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.GetMoreAssistance))
 	mux.HandleFunc("/GetGeneralAssistance", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.GetGeneralAssistance))
 
+	// Dev endpoint for resetting user
+	mux.HandleFunc("/NukeUser", middleware.Auth(config.SIGNING_KEY, zapLogger, routeHandler.DeleteUser))
+	
 	// configure middleware
 	loggingMiddleware := middleware.Logging(zapLogger)
 	corsMiddleware := middleware.CORSMiddleware(config.CORS_ORIGIN)

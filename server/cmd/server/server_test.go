@@ -80,11 +80,11 @@ func setupTestServer() *fortifiServer {
 	config := &config.Config{
 		Port: ":3000",
 		DB_USER: "root",
-		DB_PASS: "",
+		DB_PASS: "Password123!",
 		DB_URL: "localhost:3306",
 		DB_NAME: "FortiFi",
 		SIGNING_KEY: "b2e138d8553ea7d7ff8731e87e41406277bd4c98",
-		FcmKeyPath: "../../config/fortifi-1e7b8-firebase-adminsdk-fbsvc-7d9b6225cf.json",
+		FcmKeyPath: "../../config/firebase_auth.json",
 	}
 
 	// Create new FortifiServer
