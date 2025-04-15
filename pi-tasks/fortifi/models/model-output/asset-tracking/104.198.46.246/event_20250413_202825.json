@@ -1,0 +1,12 @@
+{
+    "event": {
+        "id": "CrPpTa2Gfl3NAvRZFj",
+        "details": "Intrusion detected on your network.",
+        "ts": "2025-04-13 20:28:25",
+        "expires": "2025-04-13 21:28:25",
+        "type": "2",
+        "src": "104.198.46.246",
+        "dst": "192.168.200.252",
+        "confidence": 80
+    }
+}

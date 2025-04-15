@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FortiFi - WiFi Setup</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        function checkSetupProgress() {
+            fetch("/get_setup_state")
+            .then(response => response.json())
+            .then(data => {
+                if (data.setup_step === "internet_connected") {
+                    redirectToRegister();
+                } else if (data.setup_step === "completed") {
+                    window.location.href = "{{ url_for('home') }}";
+                }
+            })
+            .catch(error => console.error("Error fetching setup state:", error));
+        }
+
+        async function submitForm(event) {
+            event.preventDefault();
+            document.getElementById("loading-box").style.display = "block";
+            document.getElementById("wifi-form").style.display = "none";
+            document.getElementById("error-message").style.display = "none";
+
+            const formData = new FormData(document.getElementById("wifi-form"));
+
+            fetch("/wifi", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Error saving WiFi credentials.");
+                }
+                return fetch("/update_setup_state", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ setup_step: "wifi_setup" })
+                });
+            })
+            .then(() => {
+                setTimeout(() => {
+                    checkInternetConnection();
+                }, 5000);
+            })
+            .catch(error => {
+                console.error("Error during WiFi setup:", error);
+                updateStatus("❌ Error saving WiFi credentials.");
+                resetUI();
+            });
+        }
+
+        function checkInternetConnection() {
+            updateStatus("Checking internet connection...");
+
+            fetch("/check_internet")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("No internet connection detected.");
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === "connected") {
+                    updateStatus("✅ Internet Connected! Authenticating...");
+                    authenticateDevice();
+                } else {
+                    throw new Error("No internet connection detected.");
+                }
+            })
+            .catch(error => {
+                console.error("Internet check error:", error);
+                updateStatus("❌ No internet connection. Please check your WiFi settings and try again.");
+                resetUI();
+            });
+        }
+
+        async function authenticateDevice() {
+            fetch("/get_device_uuid")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Unable to retrieve UUID from server.");
+                }
+                return response.json();
+            })
+            .then(data => {
+                const deviceId = data.uuid;
+
+                return fetch("/authenticate", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id: deviceId })
+                });
+            })
+            .then(response => response.json())
+            .then(data => {
+                localStorage.setItem("jwt_token", data.jwt);
+                localStorage.setItem("refresh_token", data.refresh);
+
+                return fetch("/update_setup_state", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ setup_step: "internet_connected" })
+                });
+            })
+            .then(() => {
+                setTimeout(() => {
+                    redirectToRegister();
+                }, 3000);
+            })
+            .catch(error => {
+                console.error("Error during authentication:", error);
+            });
+        }
+
+        function updateStatus(message) {
+            document.getElementById("status-message").textContent = message;
+            document.getElementById("status-message").style.display = "block";
+        }
+
+        function resetUI() {
+            document.getElementById("loading-box").style.display = "none";
+            document.getElementById("wifi-form").style.display = "block";
+        }
+
+        function redirectToRegister() {
+            window.location.href = "{{ url_for('register') }}";  // Redirect locally
+        }
+
+        window.onload = checkSetupProgress;
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="form-card centered-card">
+            <h1>Connect to WiFi</h1>
+            <p class="subtitle">Enter your WiFi credentials to connect</p>
+
+            <div id="status-message" class="status-message" style="display: none;"></div>
+
+            <form id="wifi-form" onsubmit="submitForm(event)">
+                <div class="form-group">
+                    <input type="text" name="ssid" class="input-field" placeholder="WiFi Name (SSID)" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" name="password" class="input-field" placeholder="WiFi Password" required>
+                </div>
+                <button type="submit" class="submit-btn">Connect</button>
+            </form>
+
+            <div id="loading-box" class="loading-box" style="display: none;">
+                <p>Checking internet connection...</p>
+            </div>
+
+            <a href="{{ url_for('register') }}" id="next-step-button" class="submit-btn" style="display: none;">Proceed to Device Registration</a>
+
+            <div id="error-message" class="error-box" style="display: none;">
+                ❌ Connection failed. Please check your credentials and try again.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

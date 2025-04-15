@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FortiFi - Register</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <form id="registerForm" class="form-card">
+            <h1>Create Account</h1>
+            <p class="subtitle">Join FortiFi to secure your network</p>
+            
+            <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input type="text" id="firstName" name="firstName" required>
+            </div>
+
+            <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input type="text" id="lastName" name="lastName" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <button type="submit" class="submit-btn">Create Account</button>
+        </form>
+
+        <div id="response"></div>
+    </div>
+
+    <script>
+        async function getDeviceUUID() {
+            try {
+                const response = await fetch('/get_device_uuid');
+                const data = await response.json();
+                return data.uuid;
+            } catch (error) {
+                console.error('Failed to retrieve device UUID:', error);
+                return null;
+            }
+        }
+
+        async function getJWTToken() {
+            try {
+                const response = await fetch('/refresh_token');
+                const data = await response.json();
+                return data.jwt;
+            } catch (error) {
+                console.error('Failed to retrieve JWT token:', error);
+                return null;
+            }
+        }
+
+        const form = document.getElementById('registerForm');
+        const responseElement = document.getElementById('response');
+        const submitButton = document.querySelector('.submit-btn');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent default form submission
+            
+            submitButton.disabled = true;
+            submitButton.textContent = 'Creating Account...';
+            
+            responseElement.className = '';
+            responseElement.textContent = '';
+
+            const deviceUUID = await getDeviceUUID();
+            const jwtToken = await getJWTToken();
+
+            if (!deviceUUID || !jwtToken) {
+                responseElement.textContent = 'Error retrieving authentication details. Please try again later.';
+                responseElement.classList.add('visible', 'error');
+                submitButton.disabled = false;
+                submitButton.textContent = 'Create Account';
+                return;
+            }
+
+            const userData = {
+                user: {
+                    id: deviceUUID,
+                    first_name: document.getElementById('firstName').value,
+                    last_name: document.getElementById('lastName').value,
+                    email: document.getElementById('email').value,
+                    password: document.getElementById('password').value
+                }
+            };
+
+            try {
+                const response = await fetch('http://3.101.107.33:3000/CreateUser', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${jwtToken}`
+                    },
+                    body: JSON.stringify(userData)
+                });
+
+                if (response.status === 201) {
+                    responseElement.textContent = 'Account created successfully!\nYou can now log into the mobile app to monitor your network.';
+                    responseElement.classList.add('visible', 'success');
+                    submitButton.style.visibility = 'hidden';
+
+                    await fetch('/update_setup_state', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ setup_step: 'completed' })
+                    }).then(response => response.json())
+                    .then(data => {
+                        if (data.message === "Setup state updated") {
+            
+                            // New request to start cron jobs after registration success
+                            return fetch('/start_services', { method: 'POST' });
+                        }
+                    }).then(() => {
+                        setTimeout(() => {
+                            window.location.href = "{{ url_for('home') }}";
+                        }, 3000);
+                    }).catch(error => {
+                        console.error("Error updating setup state or starting services:", error);
+                    });
+                } else if (response.status === 409) {
+                                    responseElement.textContent = 'An account with this email already exists';
+                    responseElement.classList.add('visible', 'error');
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Create Account';
+                } else {
+                    responseElement.textContent = 'Error creating account. Please try again.';
+                    responseElement.classList.add('visible', 'error');
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Create Account';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                responseElement.textContent = 'Network error. Please check your connection and try again.';
+                responseElement.classList.add('visible', 'error');
+                submitButton.disabled = false;
+                submitButton.textContent = 'Create Account';
+            }
+        });
+    </script>
+</body>
+</html>

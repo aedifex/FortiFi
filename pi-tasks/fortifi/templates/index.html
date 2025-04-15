@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FortiFi - Welcome</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        function checkSetupStatus() {
+            fetch("/get_setup_state")
+            .then(response => response.json())
+            .then(data => {
+                const startButton = document.getElementById("start-button");
+                const resetForm = document.getElementById("reset-form");
+    
+                if (data.setup_step === "completed") {
+                    startButton.style.display = "none";  // Hide start button
+                    resetForm.style.display = "block";   // Show reset button only
+                } else if (data.setup_step === "wifi_setup") {
+                    startButton.innerText = "Resume Setup";
+                    startButton.href = "{{ url_for('wifi') }}";
+                    startButton.style.display = "block";
+                    resetForm.style.display = "block";
+                } else if (data.setup_step === "internet_connected") {
+                    startButton.innerText = "Proceed to Registration";
+                    startButton.href = "{{ url_for('register') }}";
+                    startButton.style.display = "block";
+                    resetForm.style.display = "block";
+                } else {
+                    startButton.innerText = "Start Setup";
+                    startButton.href = "{{ url_for('wifi') }}";
+                    startButton.style.display = "block";
+                    resetForm.style.display = "none";
+                }
+            })
+            .catch(error => console.error("Error fetching setup status:", error));
+        }
+    
+        window.onload = checkSetupStatus;
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="form-card centered-card">
+            <h1>Welcome to FortiFi</h1>
+            <a id="start-button" href="{{ url_for('wifi') }}" class="submit-btn">Start Setup</a>
+            <a id="resume-button" class="submit-btn" style="display: none;">Resume Setup</a>
+            <form action="{{ url_for('reset_device') }}" method="post" style="display: none;" id="reset-form">
+                <button type="submit" class="danger-btn" id="reset-button">Reset Device</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
